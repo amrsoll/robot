@@ -2,7 +2,9 @@
 OS mindstorm project fall 2017 for the best OS team
 
 ## MAINFRAME
-`kinda everyone`  
+`kinda everyone`
+Concerned files :  
+`robotclient.c`  
 Links most of the modules and gives directions.  
 This is a crude estimate of how it should work :
 ```
@@ -21,6 +23,11 @@ Do the following while the map is not complete or non-existant (on the first ite
 
 ## Guidance system
 `Natalia`  
+Concerned files :  
+```
+gsyst.h
+gsyst.c
+```  
 Mainly mechanical and physical test heavy.
 Gets directions, tells motors to rotate accordingly.
 Stop movement if a robot suddently arrives.
@@ -28,16 +35,31 @@ Stop movement if a robot suddently arrives.
 
 ## Mapping
 `Axel`  
+Concerned files :  
+```
+map.h
+map.c
+```   
 Turn the robot on itself and calculate the distance from the walls.
 After each abrupt change in distance to robot measured, check if it is not due to the other robot and
 add a new node and vertice to the memorised map.
 
 ## Pathfinding
 `?`  
+Concerned files :  
+```
+path.h
+path.c
+```  
 Which path on the map should the robot take to join a coordinate? Look up for the dijkstra or the A\* algorithms.
 
 ## Next spot to map
 `?`  
+Concerned files :  
+```
+spot.h
+spot.c
+```  
 Figures out which spot is optimal for a new round of mapping.
 Reads the map info and determines which nodes are missing vertices to complete an object of the map. 
 What spot should the robot be in to see the most of these nodes?
@@ -47,14 +69,23 @@ Tells the system if the map is complete or not.
 
 ## Server communications
 `Vemund`  
+Concerned files :  
+```
+servercom.h
+servercom.c
+``` 
 Self explanatory? Still, could you write down here how it is we should use this hypothetical communication function? 
 
 ## Detect an other robot
 `Axel`  
+Concerned files :  
+`?`  
 Usually a problem during the mapping. because the robots are kinda boney, scanning through them creates noise. If we compare the scan to it's own low pass filter value we can detect hectic behavior synonym to noise i.e. an other robot.  
 Same goes for when the robot goes in a straight line : if an other robot passes in front of it, it will be able to measure
 
 ## Collision handler (secondary)
+`?`  
+Concerned files :  
 `?`  
 Detect collision :
  - Unpredicted sensor measures (sudden change in acceleration/gyroscope compared to what the robot 

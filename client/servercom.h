@@ -3,7 +3,7 @@
 
 void debug(const char*, ...);
 int read_from_server(int, char*, size_t);
-int get_message();
+int parse_message();
 int connect_to_server();
 int send_to_server(char*, size_t);
 int send_ACK(uint8_t, int16_t, int8_t);

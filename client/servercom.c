@@ -46,7 +46,7 @@ int read_from_server(int sock, char *buffer, size_t maxSize) {
     return bytes_read;
 }
 
-int get_message() {
+int parse_message() {
     char string[58];
     int msg;
     uint8_t dst;

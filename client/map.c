@@ -127,6 +127,12 @@ int addVertice(Node node1,Node node2)
     return 0;
 }
 
+int mapComplete()
+{
+    /*TODO : returns 0 if complete, else -1*/
+    return 0;
+}
+
 int eqNodes(Node nodeA, Node nodeB)
 {
     return (nodeA.x-nodeB.x)*(nodeA.x-nodeB.x) +
@@ -134,9 +140,9 @@ int eqNodes(Node nodeA, Node nodeB)
            ULTRASONIC_SENSOR_PRECISION*ULTRASONIC_SENSOR_PRECISION;
 }
 
-int makeClockwise()
+int makeClockwise(char *mapPath)
 {
-    FILE *nodes = fopen("map/nodes","r+");
+    FILE *nodes = fopen(mapPath,"r+");
     int totalNodes = countlines(nodes);
     sem_wait(semNodesr);
     sem_wait(semVerticesr);
@@ -145,12 +151,11 @@ int makeClockwise()
     sem_post(semNodesr);
     sem_post(semVerticesr);
     int visitedNodes[totalNodes];
-
-
-
+    /*TODO maybe work around having a local list of nodes instead of using semaphores all the time*/
 }
 
 int map(int posX,int posY)
 {
     /*TODO*/
+    // make several turns on itself to gain in precision.
 }

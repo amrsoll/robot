@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-W -Wall -ansi -pedantic
+CFLAGS=-W -Wall -ansi -pedantic -I../ev3dec-c/source/ev3
 LDFLAGS=
 EXEC=robotclient
 

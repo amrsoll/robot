@@ -1,5 +1,6 @@
 CC=gcc
-EV3LIB=-I./ev3dev-c/source/ev3 -O2 -std=gnu99 #use whenever you need the EV3 libraries
+EV3LIB=-I./../ev3dev-c/source/ev3 -O2 -std=gnu99 
+#use whenever you need the EV3 libraries
 CFLAGS=-W -Wall -ansi -pedantic
 LDFLAGS=
 EXEC=robotclient

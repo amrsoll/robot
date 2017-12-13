@@ -1,26 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdarg.h>
-#include <time.h>
-#include <sys/socket.h>
-#include <math.h>
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/rfcomm.h>
-
-#define SERV_ADDR "60:57:18:3e:03:86"   /* update with actual server address */
-#define TEAM_ID 9
-
-#define MSG_ACK 0
-#define MSG_START 1
-#define MSG_STOP 2
-#define MSG_KICK 3
-#define MSG_POSITION 4
-#define MSG_MAPDATA 5
-#define MSG_MAPDONE 6
-#define MSG_OBSTACLE 7
-#define Sleep(msec) usleep((msec)*1000)
-
+#include "servercom.h"
 
 void debug(const char *fmt, ...) {
     va_list argp;
@@ -86,13 +64,15 @@ int parse_message() {
         case MSG_KICK:
             kick_id = (uint8_t)string[5];
             printf("Robot with id=%d was kicked by server!\n", kick_id);
+            if (kick_id == TEAM_ID) {
+                printf("We got kicked!\n");
+            }
             /* check if we got kicked? */
             break;
         case MSG_POSITION:
-            /* what to do with other's position? */
+            /* I don't think we should do anything here */
             break;
         
-        /* need to clarify which messages the server will send to us, (0xFF) */
 
         default:
             printf("Invalid message type!\n");
@@ -102,7 +82,7 @@ int parse_message() {
     return msg;
 }
 
-
+/* Header address of server is 0xFF */
 int connect_to_server(){
     struct sockaddr_rc addr = {0};
     int status;

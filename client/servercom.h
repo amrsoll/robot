@@ -25,7 +25,7 @@
 
 #define Sleep(msec) usleep ((msec)*1000)
 
-void debug(const char*, ...);
+/*void debug(const char*, ...); */
 int read_from_server(int, char*, size_t);
 int parse_message();
 int connect_to_server();

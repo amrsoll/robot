@@ -1,11 +1,13 @@
 #include "servercom.h"
 
+/*
 void debug(const char *fmt, ...) {
     va_list argp;
     va_start(argp, fmt);
     vprintf(fmt, argp);
     va_end(argp);
 }
+*/
 
 int s;   /* socket */
 uint16_t msgId = 0;  /* seq num */

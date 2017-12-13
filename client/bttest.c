@@ -12,6 +12,18 @@ int main() {
     
     sleep(5);
 
+    /*
+    int i;
+    posX=100;
+    posY=100;
+    for (i=0;i<30;i++) {
+        
+        send_POSITION(posX,posY);
+        posX +=1;
+        posY -=1;
+    }
+    */
+
     return 0;
 
 

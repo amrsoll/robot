@@ -9,8 +9,8 @@ void debug(const char *fmt, ...) {
 }
 */
 
-int s;   /* socket */
-uint16_t msgId = 0;  /* seq num */
+//int s;   /* socket */
+//uint16_t msgId = 0;  /* seq num */
 
 int read_from_server(int sock, char *buffer, size_t maxSize) {
     int bytes_read = read(sock, buffer, maxSize);
@@ -85,23 +85,25 @@ int parse_message() {
 }
 
 /* Header address of server is 0xFF */
+/*
 int connect_to_server(){
     struct sockaddr_rc addr = {0};
     int status;
 
-    /* allocate a socket */
+    // allocate a socket 
     s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
     
-    /* set the connection parameters */
+    // set the connection parameters 
     addr.rc_family = AF_BLUETOOTH;
     addr.rc_channel = (uint8_t) 1;
     str2ba(SERV_ADDR, &addr.rc_bdaddr);
     
-    /* connect to server */
+    // connect to server 
     status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
 
     return status;
 }
+*/
 
 int send_to_server(char *data, size_t size) {
     return write(s, data, size);

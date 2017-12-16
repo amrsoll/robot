@@ -1,7 +1,7 @@
-#include "gsyst.h"
-#include "map.h"
-#include "path.h"
-#include "spot.h"
+//#include "gsyst.h"
+//#include "map.h"
+//#include "path.h"
+//#include "spot.h"
 #include "servercom.h"
 
 int s; /* socket */
@@ -109,6 +109,9 @@ int send_OBSTACLE(uint8_t act, int16_t x, int16_t y){
 
 
 int main(int argc, char **argv) {
+    
+    //printf("hello\n");
+
     int16_t posX, posY;
     
     /* SET UP BT CONNECTION TO SERVER */
@@ -123,13 +126,14 @@ int main(int argc, char **argv) {
     
     /* connect */
     status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
-
+    printf("status: %d\n", status);
     /* if connected */
     if(status==0) {
         char string[58];
 
         /* wait for START message */
         read_from_server(s, string,9);
+        printf("string: %s\n", string);
         if(string[4] == MSG_START) {
             printf("Received start message!\n");
         }

@@ -14,11 +14,9 @@ float value;
 float result;
 int maxmedium;
 float initial_ang,min_dist;
-
 uint8_t sn[2];
 FLAGS_T state;
 float value;
-
 uint8_t sn_sonar;
 uint8_t sn_gyr;
 
@@ -29,7 +27,6 @@ int i;
 char s[ 256 ];
 
 int init() {
-
     ev3_sensor_init();
     if (ev3_search_sensor(LEGO_EV3_US, &sn_sonar,0) == 0){
         printf("SONAR missing\n");
@@ -42,14 +39,11 @@ int init() {
         }
         return 0;
     }
-
 }
-
 
 
 void go_straight(int time,int max_speed, int a)
 {
-
     multi_set_tacho_stop_action_inx( sn, TACHO_COAST );
     multi_set_tacho_speed_sp( sn, a * max_speed * 1 / 4 );
     multi_set_tacho_time_sp( sn, time );
@@ -80,7 +74,6 @@ void continue_until(int max_speed, float goal)
         printf( "\r(%f) \n", value);
         fflush( stdout );
     }
-
     if(value<=goal) return;
     multi_set_tacho_command_inx( sn, TACHO_RESET );
     get_tacho_max_speed( sn[0], &max_speed );
@@ -90,9 +83,7 @@ void continue_until(int max_speed, float goal)
     multi_set_tacho_ramp_up_sp( sn, 0 );
     multi_set_tacho_ramp_down_sp( sn, 0 );
     multi_set_tacho_command_inx( sn, TACHO_RUN_FOREVER );
-
     //	Sleep( 300 );
-
     // sleep(200);
     while(value>goal)
     {
@@ -108,10 +99,7 @@ void continue_until(int max_speed, float goal)
         }
     }
     multi_set_tacho_command_inx( sn, TACHO_STOP );
-
-
 }
-
 void turn_relative(uint8_t ss, int max_speed, int a,float angle)
 {
     float res;
@@ -124,12 +112,10 @@ void turn_relative(uint8_t ss, int max_speed, int a,float angle)
     set_tacho_command_inx( ss, TACHO_RESET );
     set_tacho_stop_action_inx( ss, TACHO_COAST );
     set_tacho_speed_sp( ss, a*max_speed * 1 / 10 );
-
     set_tacho_ramp_up_sp( ss, 0 );
     set_tacho_ramp_down_sp( ss, 0 );
     set_tacho_command_inx( ss, TACHO_RUN_FOREVER );
     Sleep(100);
-
     int b;
     if(sn[0]==ss) b=-1;
     else b=1;
@@ -144,7 +130,6 @@ void turn_relative(uint8_t ss, int max_speed, int a,float angle)
             }
             fflush( stdout );
 
-
         }
     }
     else
@@ -157,19 +142,16 @@ void turn_relative(uint8_t ss, int max_speed, int a,float angle)
                 printf( "  value %f\n",result);
             }
             fflush( stdout );
-
         }
     }
     set_tacho_command_inx( ss, TACHO_STOP);
     Sleep(1000);
-
     if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
     {
         get_sensor_value0(sn_gyr,&result);
         printf( "  value %f\n",result);
     }
     fflush( stdout );
-
 
     if(a==1)
     {
@@ -181,7 +163,6 @@ void turn_relative(uint8_t ss, int max_speed, int a,float angle)
                 printf( "  value %f\n",result);
             }
             fflush( stdout );
-
             set_tacho_command_inx( ss, TACHO_RESET );
             set_tacho_stop_action_inx( ss, TACHO_COAST );
             set_tacho_speed_sp( ss, a*max_speed * 1 / 10 );
@@ -190,14 +171,12 @@ void turn_relative(uint8_t ss, int max_speed, int a,float angle)
             set_tacho_ramp_down_sp( ss, 0 );
             set_tacho_command_inx( ss, TACHO_RUN_TIMED );
             Sleep(1000);
-
             if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
             {
                 get_sensor_value0(sn_gyr,&result);
                 printf( "  value %f\n",result);
             }
         }
-
         while(b*result > b*(res+b*(angle-correction)))
         {
             if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
@@ -206,7 +185,6 @@ void turn_relative(uint8_t ss, int max_speed, int a,float angle)
                 //printf( "  value %f\n",result);
             }
             fflush( stdout );
-
             set_tacho_command_inx( ss, TACHO_RESET );
             set_tacho_stop_action_inx( ss, TACHO_COAST );
             set_tacho_speed_sp( ss, -1*a*max_speed * 1 / 10 );
@@ -215,14 +193,12 @@ void turn_relative(uint8_t ss, int max_speed, int a,float angle)
             set_tacho_ramp_down_sp( ss, 0 );
             set_tacho_command_inx( ss, TACHO_RUN_TIMED );
             Sleep(1000);
-
             if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
             {
                 get_sensor_value0(sn_gyr,&result);
                 //printf( "  value %f\n",result);
             }
         }
-
     }
     else
     {
@@ -275,20 +251,16 @@ void turn_relative(uint8_t ss, int max_speed, int a,float angle)
 
 void turn_absolute(uint8_t ss, int max_speed, int a,float angle)
 {
-
     if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0)) {
         get_sensor_value0(sn_gyr,&result);
     }
-
     set_tacho_command_inx( ss, TACHO_RESET );
     set_tacho_stop_action_inx( ss, TACHO_COAST );
     set_tacho_speed_sp( ss, a*max_speed * 1 / 10 );
-
     set_tacho_ramp_up_sp( ss, 0 );
     set_tacho_ramp_down_sp( ss, 0 );
     set_tacho_command_inx( ss, TACHO_RUN_FOREVER );
     Sleep(100);
-
     int b;
     if(sn[0]==ss) b=-1;
     else b=1;
@@ -300,7 +272,6 @@ void turn_absolute(uint8_t ss, int max_speed, int a,float angle)
             }
             fflush( stdout );
 
-
         }
     }else{
         while(b*result > b*(initial_ang-b*(angle-5))){
@@ -309,18 +280,15 @@ void turn_absolute(uint8_t ss, int max_speed, int a,float angle)
                 //printf( "  value %f\n",result);
             }
             fflush( stdout );
-
         }
     }
     set_tacho_command_inx( ss, TACHO_STOP);
     Sleep(1000);
-
     if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0)) {
         get_sensor_value0(sn_gyr,&result);
         //printf( "  value %f\n",result);
     }
     fflush( stdout );
-
 
     if(a==1){
         while(b*result < b*(initial_ang+b*(angle-3))){
@@ -329,7 +297,6 @@ void turn_absolute(uint8_t ss, int max_speed, int a,float angle)
                 //printf( "  value %f\n",result);
             }
             fflush( stdout );
-
             set_tacho_command_inx( ss, TACHO_RESET );
             set_tacho_stop_action_inx( ss, TACHO_COAST );
             set_tacho_speed_sp( ss, a*max_speed * 1 / 10 );
@@ -339,14 +306,12 @@ void turn_absolute(uint8_t ss, int max_speed, int a,float angle)
             set_tacho_command_inx( ss, TACHO_RUN_TIMED );
             Sleep(1000);
         }
-
         while(b*result > b*(initial_ang+b*(angle-3))){
             if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0)) {
                 get_sensor_value0(sn_gyr,&result);
                 //printf( "  value %f\n",result);
             }
             fflush( stdout );
-
             set_tacho_command_inx( ss, TACHO_RESET );
             set_tacho_stop_action_inx( ss, TACHO_COAST );
             set_tacho_speed_sp( ss, -1*a*max_speed * 1 / 10 );
@@ -356,9 +321,7 @@ void turn_absolute(uint8_t ss, int max_speed, int a,float angle)
             set_tacho_command_inx( ss, TACHO_RUN_TIMED );
             Sleep(500);
 
-
         }
-
     }else{
         while(b*result > b*(initial_ang-b*(angle-3))){
             if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0)) {
@@ -374,7 +337,6 @@ void turn_absolute(uint8_t ss, int max_speed, int a,float angle)
             set_tacho_ramp_down_sp( ss, 0 );
             set_tacho_command_inx( ss, TACHO_RUN_TIMED );
             Sleep(1000);
-
         }
         while(b*result < b*(initial_ang-b*(angle-3))){
             if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0)) {
@@ -390,23 +352,18 @@ void turn_absolute(uint8_t ss, int max_speed, int a,float angle)
             set_tacho_ramp_down_sp( ss, 0 );
             set_tacho_command_inx( ss, TACHO_RUN_TIMED );
             Sleep(1000);
-
         }
     }
 }
 
 
-
 int main (void){
-
     init();
     #ifndef __ARM_ARCH_4T__
     /* Disable auto-detection of the brick (you have to set the correct address below) */
     ev3_brick_addr = "192.168.0.204";
     #endif
-
     if ( ev3_init() == -1 ) return ( 1 );
-
     #ifndef __ARM_ARCH_4T__
     printf( "The EV3 brick auto-detection is DISABLED,\nwaiting %s online with plugged tacho...\n", ev3_brick_addr );
     #else
@@ -426,7 +383,6 @@ int main (void){
             printf("  port = %d %d\n", ev3_tacho_desc_port(i), ev3_tacho_desc_extport(i));
         }
     }
-
 
     //Run motors in order from port A to D
     int port1=65,port2=66,port3=68;
@@ -465,10 +421,8 @@ int main (void){
         //********turn to the second(2) obstacle****************
         continue_until(max_speed,300);
         Sleep(1000);
-
         turn_relative(s1,max_speed,1,90);
         Sleep(1000);
-
     }
 }
 /*
@@ -482,6 +436,5 @@ get_sensor_value0(sn_gyr,&ang1);
 printf( "  value %f\n",ang1);
 }
 fflush( stdout );
-
 }
 */

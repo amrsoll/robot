@@ -17,12 +17,14 @@ void move(uint8_t sn_sonar,
 	uint8_t sensor_left,
 	uint8_t sensor_right,
 	uint8_t motor[2],
-	float init_sonar,
+	float value,
+	float real_sonar_val,
+	float sonar_abs,
+	FLAGS_T state,
 	float distance)
 {
 	//FLAGS_T state;
-	float sonar_abs,
-	float real_sonar_val;
+	float init_sonar;
 	float measured_sonar_val;
 	int maximum_robot_speed;
 	int position;
@@ -35,7 +37,7 @@ void move(uint8_t sn_sonar,
 
 	int final_position = position + distance;
 	multi_set_tacho_command_inx(motor,TACHO_RUN_FOREVER);
-	while(position<final_position){
+	while(position>final_position){
 
 		if (ev3_search_sensor(LEGO_EV3_GYRO, &sn_sonar,0)){
 
@@ -84,9 +86,9 @@ void move(uint8_t sn_sonar,
 				set_tacho_position_sp( sensor_left, -real_sonar_val+2 );
 				multi_set_tacho_command_inx( motor, TACHO_RUN_TO_REL_POS );
 				//Sleep(gyro_abs*5);
-				//do {
-					//get_tacho_state_flags( sensor_right, &state );
-				//} //while (state);
+				do {
+					get_tacho_state_flags( sensor_right, &state );
+				} while (state);
 			}
 			get_tacho_position(sensor_right, &position);
 			save_curr_position = position - save_curr_position;

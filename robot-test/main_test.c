@@ -1,8 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "move.h"
 #include "ev3.h"
+#include "move.h"
+#include "turn_back.h"
+
+//#include "turn_function_left.h"
+//#include "turn_function_right.h"
 #include "ev3_port.h"
 #include "ev3_tacho.h"
 #include "ev3_sensor.h"
@@ -32,7 +36,7 @@ int s;
 uint8_t sn1;
 uint8_t sn2;
 uint8_t sn3;
-
+FLAGS_T state =1;
 int max_speed;
 float sonar_abs;
 float sonar_val;
@@ -74,10 +78,10 @@ int init(){
 
     //Check for motors
 
-    if (ev3_search_tacho_plugged_in(67,0,&sn1,0) == 0){
+    if (ev3_search_tacho_plugged_in(65,0,&sn1,0) == 0){
         printf("The right engine is not plugged, please plug it");
     }
-    if (ev3_search_tacho_plugged_in(68,0,&sn2,0) == 0){
+    if (ev3_search_tacho_plugged_in(66,0,&sn2,0) == 0){
         printf("The left engine is not plugged, please plug it");
         //here add one for the piliers
     }
@@ -94,7 +98,7 @@ int init(){
     */
 
 
-    if (ev3_search_tacho_plugged_in(67,0,&sn1,0)){
+    if (ev3_search_tacho_plugged_in(65,0,&sn1,0)){
 
 
         printf( "LEGO_EV3_M_MOTOR 1 is found, run for 5 sec...\n" );
@@ -104,7 +108,7 @@ int init(){
 
         set_tacho_stop_action_inx( sn1, TACHO_COAST );
         set_tacho_speed_sp( sn1, max_speed * 3 );
-        set_tacho_time_sp( sn1, 1000 );
+        set_tacho_time_sp( sn1, 5000 );
         set_tacho_ramp_up_sp( sn1, 0 );
         set_tacho_ramp_down_sp( sn1, 0 );
     }  else {
@@ -112,17 +116,17 @@ int init(){
     }
 
 
-    if (ev3_search_tacho_plugged_in(68,0,&sn2,0)){
+    if (ev3_search_tacho_plugged_in(66,0,&sn2,0)){
 
-        printf( "LEGO_EV3_M_MOTOR 1 is found, run for 5 sec...\n" );
+        printf( "LEGO_EV3_M_MOTOR 2 is found, run for 5 sec...\n" );
 
 
         get_tacho_max_speed( sn2, &max_speed );
         printf("  max speed = %d\n", max_speed );
 
         set_tacho_stop_action_inx( sn2, TACHO_COAST );
-        set_tacho_speed_sp( sn2, max_speed * 2 / 3 );
-        set_tacho_time_sp( sn2, 1000 );
+        set_tacho_speed_sp( sn2, max_speed *  3 );
+        set_tacho_time_sp( sn2, 5000 );
         set_tacho_ramp_up_sp( sn2, 0 );
         set_tacho_ramp_down_sp( sn2, 0 );
 
@@ -147,12 +151,12 @@ int init(){
     motor[0]=sn1;
     motor[1]=sn2;
 
-    Sleep(400);
+    Sleep(4000);
 
     return 0;
 }
 
-
+/*
 void* beginner(){
 char string[58];
 printf("I'am the beginner...");
@@ -192,15 +196,15 @@ pthread_mutex_unlock (&mutex_moving);
 case_pos = 0;
 //bouger_sonar(sn1, sn2, sn_gyro, sn_sonar, motor, value, gyro_val, gyro_abs, state, 930);
 case_pos = 6;
-//tourner_gauche(sn1, sn2, sn_gyro, motor, value, gyro_val, gyro_abs, state);
+turn_fuction_left(sn1, sn2, sn_gyro, motor, value, gyro_val, gyro_abs, state);
 case_pos = 3;
 //bouger_sonar(sn1, sn2, sn_gyro, sn_sonar, motor, value, gyro_val, gyro_abs, state, 436);
 case_pos = 6;
-//demi_tour(sn1, sn2, sn_gyro, motor, value, gyro_val, gyro_abs, state);
-//avancer_dst(sn1, sn2, sn_sonar, motor, value, sonar_val, sonar_abs,10);
+turn_back(sn1, sn2, sn_gyro, motor, value, gyro_val, gyro_abs, state);
+move(sn1, sn2, sn_sonar, motor, value, sonar_val, sonar_abs,10);
 
 //drop the ball or drop it and send the message it was done
-poser_balle(sn3);
+//poser_balle(sn3);
 
 *((uint16_t *) string) = msgId++;
 string[2] = TEAM_ID;
@@ -215,15 +219,15 @@ write(s, string, 10);
 
 //From the middle where the ball was to the position 2 (top right)
 case_pos = 4;
-reculer_dst(sn1, sn2, sn_gyro, motor, value, gyro_val, gyro_abs, state, 250);
+go_back(sn1, sn2, sn_gyro, motor, value, gyro_val, gyro_abs, state, 250);
 case_pos = 6;
-demi_tour(sn1, sn2, sn_gyro, motor, value, gyro_val, gyro_abs, state);
+turn_back(sn1, sn2, sn_gyro, motor, value, gyro_val, gyro_abs, state);
 case_pos = 3;
-bouger_sonar(sn1, sn2, sn_gyro, sn_sonar, motor, value, gyro_val, gyro_abs, state, 160);
+///bouger_sonar(sn1, sn2, sn_gyro, sn_sonar, motor, value, gyro_val, gyro_abs, state, 160);
 case_pos = 6;
-tourner_gauche(sn1, sn2, sn_gyro, motor, value, gyro_val, gyro_abs, state);
+turn_function_left(sn1, sn2, sn_gyro, motor, value, gyro_val, gyro_abs, state);
 case_pos = 1;
-bouger_sonar(sn1, sn2, sn_gyro, sn_sonar, motor, value, gyro_val, gyro_abs, state, 230);
+//bouger_sonar(sn1, sn2, sn_gyro, sn_sonar, motor, value, gyro_val, gyro_abs, state, 230);
 
 //Preemptive motors stop
 set_tacho_command_inx( sn1, TACHO_STOP );
@@ -256,10 +260,10 @@ pthread_mutex_unlock (&mutex_moving);
 //From 2 to the zone where the ball is
 bouger_sonar(sn1, sn2, sn_gyro, sn_sonar, motor, value, gyro_val, gyro_abs, state, 750);
 case_pos = 6;
-tourner_droite(sn1, sn2, sn_gyro, motor, value, gyro_val, gyro_abs, state);
+turn_fuction_right(sn1, sn2, sn_gyro, motor, value, gyro_val, gyro_abs, state);
 case_pos = 3;
 bouger_sonar(sn1, sn2, sn_gyro, sn_sonar, motor, value, gyro_val, gyro_abs, state, 510);
-reculer_dst(sn1, sn2, sn_gyro, motor, value, gyro_val, gyro_abs, state, 300);
+go_back(sn1, sn2, sn_gyro, motor, value, gyro_val, gyro_abs, state, 300);
 case_pos = 6;
 
 //search for the ball
@@ -279,11 +283,11 @@ write(s, string, 10);
 
 //from the zone where the ball was to position 1
 case_pos = 3;
-bouger_sonar(sn1, sn2, sn_gyro, sn_sonar, motor, value, gyro_val, gyro_abs, state, 230);
+//bouger_sonar(sn1, sn2, sn_gyro, sn_sonar, motor, value, gyro_val, gyro_abs, state, 230);
 case_pos = 6;
-tourner_droite(sn1, sn2, sn_gyro, motor, value, gyro_val, gyro_abs, state);
+turn_function_right(sn1, sn2, sn_gyro, motor, value, gyro_val, gyro_abs, state);
 case_pos = 0;
-bouger_sonar(sn1, sn2, sn_gyro, sn_sonar, motor, value, gyro_val, gyro_abs, state, 230);
+//bouger_sonar(sn1, sn2, sn_gyro, sn_sonar, motor, value, gyro_val, gyro_abs, state, 230);
 
 //Preemptive motors stop
 set_tacho_command_inx( sn1, TACHO_STOP );
@@ -297,9 +301,12 @@ position=1;
 }
 
 
+*/
+
 int main() {
     init();
-
-    move(sn_sonar,10, 10,  motor, value, sonar_val, sonar_abs,1);
+	
+    move(sn_sonar,10, 10,  motor, value, sonar_val, sonar_abs,state, 1000);
+//turn_back(sn_sonar,6,6 ,  motor, value, sonar_val, sonar_abs,22);
     return 0;
 }

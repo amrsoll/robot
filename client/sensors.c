@@ -16,7 +16,7 @@ void sensor_init(uint8_t *sensorsIndex) {
     // and be brought in as pointers?
     uint8_t sn_color;
     uint8_t sn_sonar;
-    uint8_t sn_compass;
+    uint8_t sn_gyro;
 
     ev3_sensor_init();
     
@@ -28,13 +28,14 @@ void sensor_init(uint8_t *sensorsIndex) {
         sensorsIndex[0] = sn_sonar;
     } else printf("Sonar sensor (port 1) not attached");
 
-    if(ev3_search_sensor( HT_NXT_COMPASS, &sn_compass, 0)) {
-        sensorsIndex[1] = sn_compass;
-    } else printf("Compass sensor (port 2) not attached");
+    if(ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyro, 0)) {
+        sensorsIndex[1] = sn_gyro;
+    } else printf("Gyro sensor (port 2) not attached");
         
     set_sensor_mode(sensorsIndex[1], "COL-COLOR");
 }
 
+/*
 float get_compass_value(uint8_t sn_compass) {
     int i;
     int measurements;
@@ -57,6 +58,7 @@ float get_compass_value(uint8_t sn_compass) {
     return sum/measurements;
 
 }
+*/
 
 float get_sonar_value(uint8_t sn_sonar) {
     int i;
@@ -86,6 +88,14 @@ int get_color_value(uint8_t sn_color) {
     if(!get_sonar_value(0, sn_color, &val) || (val < 0) || (val >= COLOR_COUNT)) val = 0;
 
     return val;
+}
+
+float get_gyro_value(uint8_t sn_gyro) {
+    float value;
+    if ( !get_sensor_value0(sn_gyro, &value )) {
+                    value = 0;
+    }
+    return value;
 }
 
 

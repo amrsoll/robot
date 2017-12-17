@@ -1,10 +1,4 @@
 #include "sensors.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-//#include "ev3.h"
-//#include "ev3_sensor.h"
-
 
 const char const *color[] = { "?", "BLACK", "BLUE", "GREEN", "YELLOW", "RED", "WHITE", "BROWN" };
 #define COLOR_COUNT (( int )( sizeof( color ) / sizeof( color[ 0 ])))
@@ -34,31 +28,6 @@ void sensor_init(uint8_t *sensorsIndex) {
         
     set_sensor_mode(sensorsIndex[1], "COL-COLOR");
 }
-
-/*
-float get_compass_value(uint8_t sn_compass) {
-    int i;
-    int measurements;
-    float sum;
-    float value;
-
-    measurements = 50;
-    sum = 0;
-
-    // calculate average
-    for(i = 0; i < measurements; i++) {
-        if(!get_sensor_value0(sn_compass, &value)) {
-            value = 0;
-        }
-
-        Sleep(100);
-        sum += value;
-
-    }
-    return sum/measurements;
-
-}
-*/
 
 float get_sonar_value(uint8_t sn_sonar) {
     int i;
@@ -99,3 +68,15 @@ float get_gyro_value(uint8_t sn_gyro) {
 }
 
 
+int detect_ball(uint8_t sn_color) {
+    int detected_color;
+
+    while(1) {
+
+        detected_color = (int)get_color_value(sn_color);
+
+        if(detected_color == 5) {
+            return 1;
+        }
+    }
+}

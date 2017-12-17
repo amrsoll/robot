@@ -6,6 +6,7 @@ OS mindstorm project fall 2017 for the best OS team
 Links most of the modules and gives directions.  
 This is a crude estimate of how it should work :
 ```
+Wait for the start signal given by the server
 Do the following while the map is not complete or non-existant (on the first iteration)
 	send position to the server
 	map the surroundings and save it in ~/map/...
@@ -47,6 +48,24 @@ Tells the system if the map is complete or not.
 ## Server communications
 `Vemund`  
 Self explanatory? Still, could you write down here how it is we should use this hypothetical communication function? 
+
+## Detect an other robot
+`Axel`  
+Usually a problem during the mapping. because the robots are kinda boney, scanning through them creates noise. If we compare the scan to it's own low pass filter value we can detect hectic behavior synonym to noise i.e. an other robot.  
+Same goes for when the robot goes in a straight line : if an other robot passes in front of it, it will be able to measure
+
+## Collision handler (secondary)
+`?`  
+Detect collision :
+ - Unpredicted sensor measures (sudden change in acceleration/gyroscope compared to what the robot 
+ - Pressure sensors activated?  
+ 
+Act accordingly :
+ - wait for the end of the disturbance
+ - map the surroundings
+ - compare it to the memorised map
+ - determine the new position & direction
+ - start the process anew
 
 ## Memory
 

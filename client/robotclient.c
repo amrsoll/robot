@@ -11,21 +11,8 @@
 #include "spot.h"
 #include "servercom.h"
 
-#define Sleep( msec ) usleep(( msec ) * 1000 )
-float error=0,correction=0;
-float value;
-float result;
-int maxmedium;
-float initial_ang,min_dist;
-uint8_t sn[2];
-FLAGS_T state;
-float value;
-uint8_t sn_sonar;
-uint8_t sn_gyr;
-int max_speed;
-int maxmedium;
-int i;
-char s[ 256 ];
+
+
 int init() {
     ev3_sensor_init();
     if (ev3_search_sensor(LEGO_EV3_US, &sn_sonar,0) == 0){
@@ -69,7 +56,7 @@ int main(int argc, char **argv) {
     }
 
     //Run motors in order from port A to D
-    int port1=65,port2=66,port3=68;
+    int port1=65,port2=66;
     uint8_t s1,s2;
     if ( ev3_search_tacho_plugged_in(port1,0, &s1, 0 ) && ev3_search_tacho_plugged_in(port2,0, &s2, 0 ))
     {
@@ -109,7 +96,41 @@ int main(int argc, char **argv) {
             }
             continue_until(max_speed,300);
             printf(" NATTTTT %f\n",dist);
+            release();
         }
 
     }
+
+
+    /*
+    startBt();
+    getStartSignal(conn); //blocking function. Does not continue without getting signal
+    int x = 0;
+    int y = 0;
+    //fork a process that will ping the server every 2 sec with the position of the robot
+    while(!mapComplete()) //counterintuitive : in C, the while loop continues as long as it is given an int !=0
+    {
+    sendPosition(x, y);
+    if(map()){
+    printf("failed to map the surroundings");
+    exit(EXIT_FAILURE);}
+    int* spot = getNewSpot();
+    if(getPathTo(*spot[0],*spot[1])) {
+    printf("failed to find the path to the new coordinates");
+    exit(EXIT_FAILURE);}
+    FILE *path = open("~/path");
+    int pathLen = countlines(path);
+    for(int i=0; i<pathLen; i++)
+    {
+    int k = n-i;
+    nextNode = node_init_str(readline(*path, k));
+    if(!(x,y = moveTo(x, y, nextNode.x, nextNode.y)){ //error prone
+    printf("failed to move to the next coordinates");
+    exit(EXIT_FAILURE);}
+    if(k>0)
+    sendPosition(x, y);
+}
+}
+sendMap();
+*/
 }

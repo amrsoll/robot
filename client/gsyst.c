@@ -1,16 +1,17 @@
 #include "gsyst.h"
 
 
+
 int init_mov_motors() {
     //
     if ( ev3_search_tacho_plugged_in(LEFT_MOTOR_PORT,0, &mov_motors[0], 0 ) )
-        printf("is the left motor plugged in? \n", ); //TODO : Is this message printed when the motor is plugged in already?
+        printf("is the left motor plugged in? \n" ); //TODO : Is this message printed when the motor is plugged in already?
 
     if ( ev3_search_tacho_plugged_in(RIGHT_MOTOR_PORT,0, &mov_motors[1],0 ) )
-        printf("is the right motor plugged in? \n", ); //TODO : Is this message printed when the motor is plugged in already?
+        printf("is the right motor plugged in? \n"); //TODO : Is this message printed when the motor is plugged in already?
 
     if ( ev3_search_tacho_plugged_in(GRABBING_MOTOR_PORT,0, &grab_motor,0 ) )
-        printf("is the grabbing motor plugged in? \n", ); //TODO : Is this message printed when the motor is plugged in already?
+        printf("is the grabbing motor plugged in? \n"); //TODO : Is this message printed when the motor is plugged in already?
 }
 
 void go_straight(int time,int max_speed, int a)
@@ -74,6 +75,8 @@ void continue_until(int max_speed, float goal)
 
 void turn_relative(uint8_t ss, int max_speed, int a,float angle)
 {
+    error = 0;
+    correction = 0;
     float res;
     printf("Here we will turn\n");
     if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))

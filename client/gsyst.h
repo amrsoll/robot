@@ -14,7 +14,7 @@
 #ifndef GSYST_H
 #define GSYST_H
 
-float error=0,correction=0;
+float error, correction;
 float value;
 float result;
 int maxmedium;

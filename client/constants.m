@@ -1,3 +1,8 @@
+#include "ev3.h"
+#include "ev3_port.h"
+#include "ev3_tacho.h"
+#include "ev3_sensor.h"
+
 /* physical values for the robot */
 #define ROBOT_RADIUS 25 //completely arbitrary
 #define ULTRASONIC_SENSOR_PRECISION 2 //completely arbitrary

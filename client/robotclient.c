@@ -139,14 +139,14 @@ int main(int argc, char **argv) {
         }
         
         int i;
-        posX=100;
-        posY=100;
+        posX=0x00;
+        posY=0x00;
 
         for (i=0;i<30;i++) {
             send_POSITION(posX, posY);
-            posX+=1;
-            posY-=1;
-            Sleep(1000);
+            posX++;
+            posY++;
+            Sleep(2000);
         }
 
         while(1) {

@@ -1,6 +1,30 @@
 #include "gsyst.h"
 
+float get_angle()
+{
+    float output_angle = 0.0;
+    //float angle_buffer[ANGLE_BUFFER_SIZE];
+    float measured_angle;
+    int i;
+    for(i=0; i<ANGLE_BUFFER_SIZE; i=i+1)
+    if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
+    {
+        get_sensor_value0(sn_gyr,&measured_angle);
+        output_angle = output_angle + measured_angle;
+        sleep(ANGLE_BUFFER_LATENCY);
+        fflush( stdout );
+    }
+    output_angle = output_angle/ANGLE_BUFFER_SIZE;
+    return output_angle;
+}
 
+int get_new_coordinates(float x0, float y0,float distance, float current_angle)
+{
+    float coord[2] = {x0+distance*sin(current_angle), y0+distance*cos(current_angle)};
+    x = coord[0];
+    y = coord[1];
+    return 0;
+}
 
 int init_mov_motors() {
     //
@@ -35,7 +59,6 @@ void go_straight(int time,int max_speed, int a)
 
 void continue_until(int max_speed, float goal)
 {
-    value = 2000.0;
     if (ev3_search_sensor(LEGO_EV3_US, &sn_sonar,0))
     {
         printf("SONAR found, reading sonar...\n");
@@ -47,6 +70,9 @@ void continue_until(int max_speed, float goal)
         fflush( stdout );
     }
     if(value <= goal) return;
+    float init_distance = value;
+    float init_coord[2] = {x,y};
+    angle = get_angle();
     multi_set_tacho_command_inx( mov_motors, TACHO_RESET );
     get_tacho_max_speed( mov_motors[0], &max_speed );
     multi_set_tacho_stop_action_inx( mov_motors, TACHO_COAST );
@@ -59,16 +85,8 @@ void continue_until(int max_speed, float goal)
     // sleep(200);
     while(value > goal)
     {
-        if (ev3_search_sensor(LEGO_EV3_US, &sn_sonar,0))
-        {
-            printf("SONAR found, reading sonar...\n");
-            if ( !get_sensor_value0(sn_sonar, &value ))
-            {
-                value = 0;
-            }
-            printf( "\r(%f) \n", value);
-            fflush( stdout );
-        }
+        angle = get_angle();
+        get_new_coordinates(init_coord[0],init_coord[1],value-init_distance, angle-init_angle);
     }
     multi_set_tacho_command_inx( mov_motors, TACHO_STOP );
 }
@@ -78,11 +96,7 @@ void turn_relative(uint8_t ss, int max_speed, int a,float angle)
     error = 0;
     correction = 0;
     float res;
-    printf("Here we will turn\n");
-    if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
-    {
-        get_sensor_value0(sn_gyr,&res);
-    }
+
     result = res;
     set_tacho_command_inx( ss, TACHO_RESET );
     set_tacho_stop_action_inx( ss, TACHO_COAST );
@@ -98,12 +112,7 @@ void turn_relative(uint8_t ss, int max_speed, int a,float angle)
     {
         while(b*result < b*(res+b*(angle-error)))
         {
-            if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
-            {
-                get_sensor_value0(sn_gyr,&result);
-                printf( "  value %f\n",result);
-            }
-            fflush( stdout );
+            result = get_angle();
 
         }
     }
@@ -111,33 +120,21 @@ void turn_relative(uint8_t ss, int max_speed, int a,float angle)
     {
         while(b*result > b*(res-b*(angle-error)))
         {
-            if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
-            {
-                get_sensor_value0(sn_gyr,&result);
-                printf( "  value %f\n",result);
-            }
-            fflush( stdout );
+            result = get_angle();
         }
     }
     set_tacho_command_inx( ss, TACHO_STOP);
-    Sleep(1000);
-    if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
-    {
-        get_sensor_value0(sn_gyr,&result);
-        printf( "  value %f\n",result);
-    }
-    fflush( stdout );
+    Sleep(500);
+    result = get_angle(); //TODO : necessary?
 
+
+    //TODO : optimise code length. This is commonly called : spaghetti code
     if(a==1)
     {
         while(b*result < b*(res+b*(angle-correction)))
         {
-            if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
-            {
-                get_sensor_value0(sn_gyr,&result);
-                printf( "  value %f\n",result);
-            }
-            fflush( stdout );
+            result = get_angle();
+            printf( "  value %f\n",result);
             set_tacho_command_inx( ss, TACHO_RESET );
             set_tacho_stop_action_inx( ss, TACHO_COAST );
             set_tacho_speed_sp( ss, a*max_speed * 1 / 10 );
@@ -145,20 +142,13 @@ void turn_relative(uint8_t ss, int max_speed, int a,float angle)
             set_tacho_ramp_up_sp( ss, 0 );
             set_tacho_ramp_down_sp( ss, 0 );
             set_tacho_command_inx( ss, TACHO_RUN_TIMED );
-            Sleep(1000);
-            if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
-            {
-                get_sensor_value0(sn_gyr,&result);
-                printf( "  value %f\n",result);
-            }
+            Sleep(500);
+            result = get_angle();
+            printf( "  value %f\n",result);
         }
         while(b*result > b*(res+b*(angle-correction)))
         {
-            if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
-            {
-                get_sensor_value0(sn_gyr,&result);
-                //printf( "  value %f\n",result);
-            }
+            result = get_angle();
             fflush( stdout );
             set_tacho_command_inx( ss, TACHO_RESET );
             set_tacho_stop_action_inx( ss, TACHO_COAST );
@@ -167,23 +157,16 @@ void turn_relative(uint8_t ss, int max_speed, int a,float angle)
             set_tacho_ramp_up_sp( ss, 0 );
             set_tacho_ramp_down_sp( ss, 0 );
             set_tacho_command_inx( ss, TACHO_RUN_TIMED );
-            Sleep(1000);
-            if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
-            {
-                get_sensor_value0(sn_gyr,&result);
-                //printf( "  value %f\n",result);
-            }
+            Sleep(500);
+            result = get_angle();
         }
     }
     else
     {
         while(b*result > b*(res-b*(angle-correction)))
         {
-            if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
-            {
-                get_sensor_value0(sn_gyr,&result);
-                //printf( "  value %f\n",result);
-            }
+            result = get_angle();
+            //printf( "  value %f\n",result);
             fflush( stdout );
             set_tacho_command_inx( ss, TACHO_RESET );
             set_tacho_stop_action_inx( ss, TACHO_COAST );
@@ -192,21 +175,14 @@ void turn_relative(uint8_t ss, int max_speed, int a,float angle)
             set_tacho_ramp_up_sp( ss, 0 );
             set_tacho_ramp_down_sp( ss, 0 );
             set_tacho_command_inx( ss, TACHO_RUN_TIMED );
-            Sleep(1000);
-            if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
-            {
-                get_sensor_value0(sn_gyr,&result);
-                //printf( "  value %f\n",result);
-            }
+            Sleep(500);
+            result = get_angle();
+            //printf( "  value %f\n",result);
         }
         while(b*result < b*(res-b*(angle-correction)))
         {
-            if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
-            {
-                get_sensor_value0(sn_gyr,&result);
-                //printf( "  value %f\n",result);
-            }
-            fflush( stdout );
+            result = get_angle();
+            //printf( "  value %f\n",result);
             set_tacho_command_inx( ss, TACHO_RESET );
             set_tacho_stop_action_inx( ss, TACHO_COAST );
             set_tacho_speed_sp( ss, -1*a*max_speed * 1 / 10 );
@@ -214,12 +190,9 @@ void turn_relative(uint8_t ss, int max_speed, int a,float angle)
             set_tacho_ramp_up_sp( ss, 0 );
             set_tacho_ramp_down_sp( ss, 0 );
             set_tacho_command_inx( ss, TACHO_RUN_TIMED );
-            Sleep(1000);
-            if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
-            {
-                get_sensor_value0(sn_gyr,&result);
-                //printf( "  value %f\n",result);
-            }
+            Sleep(500);
+            result = get_angle();
+            //printf( "  value %f\n",result);
         }
     }
 }
@@ -240,7 +213,7 @@ void turn_absolute(uint8_t ss, int max_speed, int a,float angle)
     if(mov_motors[0]==ss) b=-1;
     else b=1;
     if(a==1){
-        while(b*result < b*(initial_ang+b*(angle-5)))
+        while(b*result < b*(init_angle+b*(angle-5)))
         {
             if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
             {
@@ -253,7 +226,7 @@ void turn_absolute(uint8_t ss, int max_speed, int a,float angle)
     }
     else
     {
-        while(b*result > b*(initial_ang-b*(angle-5)))
+        while(b*result > b*(init_angle-b*(angle-5)))
         {
             if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
             {
@@ -277,7 +250,7 @@ void turn_absolute(uint8_t ss, int max_speed, int a,float angle)
 //////////////  RELEASE THE BALL
 
 
-int grab()
+int release()
 {
     if ( ev3_search_tacho_plugged_in(GRABBING_MOTOR_PORT,0, &grab_motor, 0 )) {
 		int max_speed;
@@ -294,9 +267,10 @@ int grab()
 	} else {
 		printf( "LEGO_EV3_M_MOTOR 1 is NOT found\n" );
 	}
+    return 0;
 }
 
-int release()
+int grab()
 {
     // int max_speed;
     // multi_set_tacho_command_inx( grab_motor, TACHO_RESET );

@@ -10,29 +10,14 @@
 
 //local library
 #include "constants.m"
+#include "gsyst.h"
 
-#ifndef GSYST_H
-#define GSYST_H
 
-float error, correction;
-float value;
-float result;
-int maxmedium;
-float min_dist;
-uint8_t mov_motors[2]; //motors for the movement
-uint8_t grab_motor;
-uint8_t sn_sonar;
-uint8_t sn_gyr;
-int max_speed;
-int maxmedium;
-int i;
-char s[ 256 ];
+#ifndef BALL_H
+#define BALL_H
 
-float get_angle(void);
-
-int get_new_coordinates(float,float,float,float);
-
-int init_mov_motors(void);
+uint8_t sn_col;
+int coulour;
 
 void continue_until(int,float);
 

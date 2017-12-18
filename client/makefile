@@ -6,24 +6,27 @@ EXEC=robotclient
 all: $(EXEC)
 
 $(EXEC): $(EXEC).o gsyst.o #path.o spot.o servercom.o #map.o
-	$(CC) $^ $(LDFLAGS) -o $(EXEC) 
+	$(CC) $^ $(LDFLAGS) -o $(EXEC)
 
-$(EXEC).o: robotclient.c gsyst.h #path.h spot.h servercom.h #map.h
+$(EXEC).o: robotclient.c gsyst.h constants.m #path.h spot.h servercom.h #map.h
 	$(CC) -o $@ -c $< $(LDFLAGS)
 
-# map.o: map.c gsyst.h
+ball.o: ball.c gsyst.h constants.m
+	$(CC) -o $@ -c $< $(LDFLAGS)
+
+# map.o: map.c gsyst.h constants.m
 # 	$(CC) -o $@ -c $< $(LDFLAGS)
 
-# path.o: path.c
+# path.o: path.c constants.m
 # 	$(CC) -o $@ -c $< $(LDFLAGS)
 #
-# spot.o: spot.c
+# spot.o: spot.c constants.m
 # 	$(CC) -o $@ -c $< $(LDFLAGS)
 #
-# servercom.o: servercom.c
+# servercom.o: servercom.c constants.m
 # 	$(CC) -o $@ -c $< $(LDFLAGS)
 
-gsyst.o: gsyst.c
+gsyst.o: gsyst.c constants.m
 	$(CC) -o $@ -c $< $(LDFLAGS)
 
 .PHONY: clean mrproper #tells that clean and mrproper are not filenames

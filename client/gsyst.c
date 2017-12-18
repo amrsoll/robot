@@ -11,7 +11,8 @@ float get_angle()
     {
         get_sensor_value0(sn_gyr,&measured_angle);
         output_angle = output_angle + measured_angle;
-        sleep(ANGLE_BUFFER_LATENCY);
+        printf("measuring angle number %d, it's value is %f\n",i, measured_angle);
+        Sleep(ANGLE_BUFFER_LATENCY);
         fflush( stdout );
     }
     output_angle = output_angle/ANGLE_BUFFER_SIZE;
@@ -85,6 +86,16 @@ void continue_until(int max_speed, float goal)
     // sleep(200);
     while(value > goal)
     {
+        if (ev3_search_sensor(LEGO_EV3_US, &sn_sonar,0))
+        {
+            printf("SONAR found, reading sonar...\n");
+            if ( !get_sensor_value0(sn_sonar, &value ))
+            {
+                value = 0;
+            }
+            printf( "\r(%f) \n", value);
+            fflush( stdout );
+        }
         angle = get_angle();
         get_new_coordinates(init_coord[0],init_coord[1],value-init_distance, angle-init_angle);
     }

@@ -25,9 +25,9 @@ int pincer_state;
 
 //positioning
 #define ANGLE_BUFFER_SIZE 3
-#define ANGLE_BUFFER_LATENCY 1 //the duration of sleep between each measure in the buffer
+#define ANGLE_BUFFER_LATENCY 10 //the duration of sleep between each measure in the buffer
 #define COMPASS_BUFFER_SIZE 4
-#define COMPASS_BUFFER_LATENCY 1
+#define COMPASS_BUFFER_LATENCY 10
 float x;
 float y;
 float init_angle;

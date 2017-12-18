@@ -11,8 +11,9 @@
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/rfcomm.h>
 
-#define SERV_ADDR "60:57:18:3e:03:86"
+#define SERV_ADDR "00:1A:7D:DA:71:06"
 /* ZEN = 60:57:18:3e:03:86 */
+/* OS server = 00:1A:7D:DA:71:06 */
 
 #define TEAM_ID 9
 

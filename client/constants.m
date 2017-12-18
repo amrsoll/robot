@@ -4,7 +4,7 @@
 #include "ev3_sensor.h"
 
 /* physical values for the robot */
-#define ROBOT_RADIUS 25 //completely arbitrary
+#define ROBOT_RADIUS 50 //completely arbitrary
 #define ULTRASONIC_SENSOR_PRECISION 20 //completely arbitrary
 #define LEFT_MOTOR_PORT 65
 #define RIGHT_MOTOR_PORT 66
@@ -14,6 +14,7 @@
 #define PINCER_OPENED 1
 int pincer_state;
 #define DISTANCE_DETECT_MOVABLE 150
+#define DISTANCE_BEFORE_STOP 200
 
 
 /* semaphore names */
@@ -25,9 +26,10 @@ int pincer_state;
 
 //positioning
 #define ANGLE_BUFFER_SIZE 3
-#define ANGLE_BUFFER_LATENCY 10 //the duration of sleep between each measure in the buffer (ms)
+#define ANGLE_BUFFER_LATENCY 10 //duration of sleep between each measure (ms)
 #define COMPASS_BUFFER_SIZE 4
 #define COMPASS_BUFFER_LATENCY 10
+#define POSITION_MESSAGE_DELAY .3 //delay between each position message to the server
 float x;
 float y;
 float init_angle;
@@ -35,6 +37,7 @@ float angle;
 
 
 // Miscellanious
+#define EXPLORE_ANGLE 45
 #define Sleep( msec ) usleep(( msec ) * 1000 )
 #define EV3_BRICK_ADDR "192.168.0.204"
 char s[ 256 ];

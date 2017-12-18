@@ -15,7 +15,7 @@
 #define GSYST_H
 
 float error, correction;
-float value;
+float distance;
 float result;
 int maxmedium;
 float min_dist;
@@ -40,9 +40,12 @@ void turn_relative(uint8_t,int,int,float);
 
 void turn_absolute(uint8_t,int,int,float);
 
-int grab(void);
+void stop_mov_motors(void);
 
-int release(void);
+void start_turn(int, int);
+
+int grab(int);
+
 /* add the signature of any new functions from the .c file here */
 
 #endif

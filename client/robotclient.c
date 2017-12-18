@@ -26,17 +26,20 @@ int init() {
 }
 
 
+
 int main(int argc, char **argv) {
     init();
     #ifndef __ARM_ARCH_4T__
-    /* Disable auto-detection of the brick (you have to set the correct address below) */
-    ev3_brick_addr = EV3_BRICK_ADDR;
+        // Disable auto-detection of the brick
+        //(you have to set the correct address below)
+        ev3_brick_addr = EV3_BRICK_ADDR;
     #endif
     if ( ev3_init() == -1 ) return ( 1 );
     #ifndef __ARM_ARCH_4T__
-    printf( "The EV3 brick auto-detection is DISABLED,\nwaiting %s online with plugged tacho...\n", ev3_brick_addr );
+        printf("The EV3 brick auto-detection is DISABLED,\n");
+        printf("waiting %s online with plugged tacho...\n", ev3_brick_addr );
     #else
-    printf( "Waiting tacho is plugged...\n" );
+        printf( "Waiting tacho is plugged...\n" );
     #endif
 
     while ( ev3_tacho_init() < 1 ) Sleep( 1000 );
@@ -57,11 +60,13 @@ int main(int argc, char **argv) {
     pincer_state = PINCER_OPENED;  //Change according to the starting position of the pincer
     if(pincer_state == PINCER_OPENED)
     {
-        grab();
+        printf("grabbing, pincer state before : %d\n", pincer_state);
+        grab(-1);
         // do
         //     get_tacho_state_flags(grab_motor, &state );
         // while ( state );
         pincer_state = PINCER_CLOSED;
+        printf("grabbing, pincer state after  : %d\n", pincer_state);
     }
 
     //Get the max speed the moving motors can get to
@@ -79,18 +84,12 @@ int main(int argc, char **argv) {
     x = 0.0;
     y = 0.0;
     angle = 0.0;
-    //********go near first obstacle****************
-    Sleep(2000);
-    Sleep(1000);
-    //********first turn to the right****************
-    //    turn_absolute(mov_motors[0],max_speed,1,90.0);
-    //    Sleep(1000);
     float dist;
     int number_turns = 0;
     get_sensor_value0(sn_sonar, &dist );
     while(continue_while)
     {
-        continue_until(max_speed,300);
+        continue_until(max_speed,DISTANCE_BEFORE_STOP);
 
         printf("we found a wall, now turning\n" );
         turn_absolute(mov_motors[0],max_speed,1,90.0);
@@ -100,7 +99,8 @@ int main(int argc, char **argv) {
         printf(" NATTTTT %f\n",dist);
         if(number_turns>3 && pincer_state == PINCER_CLOSED)
         {
-            release();
+            printf("releasing\n");
+            grab(1);
             // do
             //     get_tacho_state_flags(grab_motor, &state );
             // while ( state );

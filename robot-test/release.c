@@ -43,6 +43,7 @@ int grab()
 	} else {
 		printf( "LEGO_EV3_M_MOTOR 1 is NOT found\n" );
 	}
+    return 0;
 }
 
 int release()
@@ -95,11 +96,11 @@ int release()
 	} else {
 		printf( "LEGO_EV3_M_MOTOR 1 is NOT found\n" );
 	}
+    return 0;
 }
 
 int main(int argc, char **argv)
 {
-    sleep(2);
     #ifndef __ARM_ARCH_4T__
     /* Disable auto-detection of the brick (you have to set the correct address below) */
     ev3_brick_addr = "192.168.0.204";
@@ -115,6 +116,6 @@ int main(int argc, char **argv)
     printf( "*** ( EV3 ) Hello! ***\n" );
     printf( "Found tacho motors:\n" );
     //setGrabbingMotor();
-    release();
+    grab();
     return 0;
 }

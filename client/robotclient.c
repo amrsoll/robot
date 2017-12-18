@@ -61,6 +61,7 @@ int main(int argc, char **argv) {
         // do
         //     get_tacho_state_flags(grab_motor, &state );
         // while ( state );
+        pincer_state = PINCER_CLOSED;
     }
 
     //Get the max speed the moving motors can get to
@@ -80,7 +81,6 @@ int main(int argc, char **argv) {
     angle = 0.0;
     //********go near first obstacle****************
     Sleep(2000);
-    continue_until(max_speed,300);
     Sleep(1000);
     //********first turn to the right****************
     //    turn_absolute(mov_motors[0],max_speed,1,90.0);
@@ -88,25 +88,23 @@ int main(int argc, char **argv) {
     float dist;
     int number_turns = 0;
     get_sensor_value0(sn_sonar, &dist );
-    printf("Cas demande %f\n",dist);
     while(continue_while)
     {
-        if(dist<300)
-        {
-            printf("Cas demande\n" );
-            get_sensor_value0(sn_sonar, &dist );
-            printf("Cas demande %f\n",dist);
-            turn_absolute(mov_motors[0],max_speed,1,90.0);
-            Sleep(1000);
-        }
         continue_until(max_speed,300);
+
+        printf("we found a wall, now turning\n" );
+        turn_absolute(mov_motors[0],max_speed,1,90.0);
+        // do
+        //     get_tacho_state_flags(mov_motors[0], &state );
+        // while ( state );
         printf(" NATTTTT %f\n",dist);
-        if(number_turns>3 && pincer_state == PINCER_OPENED)
+        if(number_turns>3 && pincer_state == PINCER_CLOSED)
         {
             release();
             // do
             //     get_tacho_state_flags(grab_motor, &state );
             // while ( state );
+            pincer_state == PINCER_OPENED;
         }
         number_turns = number_turns+1;
     }

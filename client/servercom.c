@@ -1,36 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdarg.h>
-#include <time.h>
-#include <sys/socket.h>
-#include <math.h>
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/rfcomm.h>
+#include "servercom.h"
 
-#define SERV_ADDR "dc:53:60:ad:61:90"   /* update with actual server address */
-#define TEAM_ID 9
-
-#define MSG_ACK 0
-#define MSG_START 1
-#define MSG_STOP 2
-#define MSG_KICK 3
-#define MSG_POSITION 4
-#define MSG_MAPDATA 5
-#define MSG_MAPDONE 6
-#define MSG_OBSTACLE 7
-#define Sleep(msec) usleep((msec)*1000)
-
-
-void debug(const char *fmt, ...) {
-    va_list argp;
-    va_start(argp, fmt);
-    vprintf(fmt, argp);
-    va_end(argp);
-}
-
-int s;   /* socket */
-uint16_t msgId = 0;  /* seq num */
+int s; /* socket */
+uint16_t msgId = 0; /* msg seq num */
 
 int read_from_server(int sock, char *buffer, size_t maxSize) {
     int bytes_read = read(sock, buffer, maxSize);
@@ -46,7 +17,11 @@ int read_from_server(int sock, char *buffer, size_t maxSize) {
     return bytes_read;
 }
 
-int get_message() {
+int send_to_server(char *data, size_t size) {
+    return write(s, data, size);
+}
+
+int parse_message() {
     char string[58];
     int msg;
     uint8_t dst;
@@ -56,7 +31,7 @@ int get_message() {
     uint8_t kick_id;
 
     msg = read_from_server(s, string, 58);
-    
+
     if (msg > 0) {
         dst = (uint8_t)string[3];
         msgType = (uint8_t)string[4];
@@ -86,13 +61,15 @@ int get_message() {
         case MSG_KICK:
             kick_id = (uint8_t)string[5];
             printf("Robot with id=%d was kicked by server!\n", kick_id);
+            if (kick_id == TEAM_ID) {
+                printf("We got kicked!\n");
+            }
             /* check if we got kicked? */
             break;
         case MSG_POSITION:
-            /* what to do with other's position? */
+            /* I don't think we should do anything here */
             break;
-        
-        /* need to clarify which messages the server will send to us, (0xFF) */
+
 
         default:
             printf("Invalid message type!\n");
@@ -102,28 +79,6 @@ int get_message() {
     return msg;
 }
 
-
-int connect_to_server(){
-    struct sockaddr_rc addr = {0};
-    int status;
-
-    /* allocate a socket */
-    s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-    
-    /* set the connection parameters */
-    addr.rc_family = AF_BLUETOOTH;
-    addr.rc_channel = (uint8_t) 1;
-    str2ba(SERV_ADDR, &addr.rc_bdaddr);
-    
-    /* connect to server */
-    status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
-
-    return status;
-}
-
-int send_to_server(char *data, size_t size) {
-    return write(s, data, size);
-}
 
 /* Messages sent by the server should not be acknowledged */
 int send_ACK(uint8_t dst, int16_t id_ack, int8_t state){
@@ -157,7 +112,7 @@ int send_POSITION(int16_t x, int16_t y){
     return send_to_server(string, 9);
 }
 
-/* After the entire map has been generated, the robot */ 
+/* After the entire map has been generated, the robot */
 /* sends the server each 5x5 cm grid one pixel at a time */
 int send_MAPDATA(int16_t x, int16_t y, uint8_t R, uint8_t G, uint8_t B){
     char string[12];
@@ -166,7 +121,7 @@ int send_MAPDATA(int16_t x, int16_t y, uint8_t R, uint8_t G, uint8_t B){
     string[2] = TEAM_ID;
     string[3] = 0xFF;
     string[4] = MSG_MAPDATA;
-    string[5] = x; 
+    string[5] = x;
     string[6] = 0x00;
     string[7] = y;
     string[8] = 0x00;
@@ -186,7 +141,7 @@ int send_MAPDONE() {
     string[2] = TEAM_ID;
     string[3] = 0xFF;
     string[4] = MSG_MAPDONE;
-    
+
     return send_to_server(string, 5);
 }
 
@@ -208,3 +163,64 @@ int send_OBSTACLE(uint8_t act, int16_t x, int16_t y){
 }
 
 
+int main(int argc, char **argv) {
+
+    //printf("hello\n");
+
+    int16_t posX, posY;
+
+    /* SET UP BT CONNECTION TO SERVER */
+    struct sockaddr_rc addr = { 0 };
+    int status;
+
+    s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+
+    addr.rc_family = AF_BLUETOOTH;
+    addr.rc_channel = (uint8_t) 1;
+    str2ba (SERV_ADDR, &addr.rc_bdaddr);
+
+    /* connect */
+    status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
+    printf("status: %d\n", status);
+    /* if connected */
+    if(status==0) {
+        char string[58];
+
+        /* wait for START message */
+        read_from_server(s, string,9);
+        printf("string: %s\n", string);
+        if(string[4] == MSG_START) {
+            printf("Received start message!\n");
+        }
+
+        int i;
+        posX=0x00;
+        posY=0x00;
+
+        for (i=0;i<30;i++) {
+            send_POSITION(posX, posY);
+            posX++;
+            posY++;
+            Sleep(2000);
+        }
+
+        while(1) {
+            read_from_server(s, string, 58);
+            if(string[4] == MSG_STOP) {
+                printf("STOP received!");
+                break;
+            }
+            else if(string[4] == MSG_KICK && string[5] == TEAM_ID) {
+                printf("We got kicked! :(");
+                break;
+            }
+        }
+    } else {
+        fprintf(stderr, "Failed to connect to server...\n");
+        sleep(2);
+        exit(EXIT_FAILURE);
+    }
+
+    close(s);
+    return 0;
+}

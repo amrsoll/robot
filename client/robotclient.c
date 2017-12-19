@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h> //for random
 
 #include "constants.m"
 
@@ -72,11 +73,11 @@ int main(int argc, char **argv) {
     //Get the max speed the moving motors can get to
     init_mov_motors();
     int max_speed;
-    fflush( stdout );
-    multi_set_tacho_command_inx( mov_motors, TACHO_RESET );
-    printf( "2 LEGO_EV3_M_MOTORs  are found, run for 5 sec...\n" );
+    //fflush( stdout );
+    //multi_set_tacho_command_inx( mov_motors, TACHO_RESET );
+    //printf( "2 LEGO_EV3_M_MOTORs  are found, run for 5 sec...\n" );
     get_tacho_max_speed( mov_motors[0], &max_speed );
-    printf("  max speed = %d\n", max_speed );
+    //printf("  max speed = %d\n", max_speed );
 
     //FIRST PROGRAM
     //Initialise the positioning values
@@ -92,7 +93,7 @@ int main(int argc, char **argv) {
         continue_until(max_speed,DISTANCE_BEFORE_STOP);
 
         printf("we found a wall, now turning\n" );
-        turn_absolute(mov_motors[0],max_speed,1,90.0);
+        turn_absolute(mov_motors[rand()%2],max_speed,1,90.0);
         // do
         //     get_tacho_state_flags(mov_motors[0], &state );
         // while ( state );
@@ -104,7 +105,7 @@ int main(int argc, char **argv) {
             // do
             //     get_tacho_state_flags(grab_motor, &state );
             // while ( state );
-            pincer_state == PINCER_OPENED;
+            pincer_state = PINCER_OPENED;
         }
         number_turns = number_turns+1;
     }

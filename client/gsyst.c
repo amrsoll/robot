@@ -19,6 +19,22 @@ float get_angle()
     return output_angle;
 }
 
+float get_distance()
+{
+    float output;
+    if (ev3_search_sensor(LEGO_EV3_US, &sn_sonar,0))
+    {
+        printf("Reading sonar trying to establish how far you can go...\n");
+        get_sensor_value0(sn_sonar, &output );
+        fflush( stdout );
+        return output;
+    } else
+    {
+        printf("failed to connect to the sonar\n");
+        return -1.0;
+    }
+}
+
 int get_new_coordinates(float x0, float y0,float distance, float current_angle)
 {
     float pi = 3.14159265;
@@ -41,77 +57,103 @@ int init_mov_motors() {
         printf("is the grabbing motor plugged in? \n"); //TODO : Is this message printed when the motor is plugged in already?
 }
 
+void start_straight(int max_speed, int a)
+// a positive : move forward   0 < a <  9 depending on speed
+// a negative : move backward  0 > a > -9 depending on speed
+{
+    multi_set_tacho_command_inx( mov_motors, TACHO_RESET );
+    multi_set_tacho_stop_action_inx( mov_motors, TACHO_COAST );
+    multi_set_tacho_speed_sp(mov_motors, a*max_speed * 1 / 11 );
+    multi_set_tacho_ramp_up_sp( mov_motors, 0 );
+    multi_set_tacho_ramp_down_sp( mov_motors, 0 );
+    multi_set_tacho_command_inx( mov_motors, TACHO_RUN_FOREVER );
+    //fflush( stdout );
+}
+
+void start_turn(int max_speed, int a)
+// a positive : turn right 0 < a <  9 depending on speed
+// a negative : turn left  0 > a > -9 depending on speed
+{
+    multi_set_tacho_command_inx( mov_motors, TACHO_RESET );
+    multi_set_tacho_stop_action_inx( mov_motors, TACHO_COAST );
+    set_tacho_speed_sp(mov_motors[0],  a*max_speed * 1 / 10 );
+    set_tacho_speed_sp(mov_motors[1], -a*max_speed * 1 / 10 );
+    multi_set_tacho_ramp_up_sp( mov_motors, 0 );
+    multi_set_tacho_ramp_down_sp( mov_motors, 0 );
+    multi_set_tacho_command_inx( mov_motors, TACHO_RUN_FOREVER );
+    //fflush( stdout );
+}
+
+void stop_mov_motors()
+{
+    multi_set_tacho_command_inx( mov_motors, TACHO_STOP);
+    //fflush( stdout );
+}
+
+int turn_to_angle(float angle)
+{
+    current_angle = get_angle();
+    int turn_direction;
+    if( (current_angle-angle)%360 > 180
+    ||0>(current_angle-angle)%360 >-180)
+        turn_direction = 1;
+    else
+        turn_direction =-1;
+    //get back to initial position.
+    //TODO increment turning speed according to how close both angles are.
+    // (slower the closer you get, probably 3 different speeds)
+    start_turn(max_speed, turn_direction);
+    while(abs(current_angle-angle) > 5) //TODO check if this is the correct formula
+    {
+        current_angle = get_angle();
+    }
+    stop_mov_motors();
+    return 0;
+}
+
+float scan_for_obstacle()
+//will hopefully be obsolete
+{
+    float init_check_angle = get_angle();
+    float check_angle = init_check_angle;
+    float closest_obstacle = get_distance();
+    float checked_distance;
+    //turn around to see how far you can go
+    start_turn(max_speed, 1);
+    while(abs(check_angle-init_check_angle) < EXPLORE_ANGLE)
+        check_angle = get_angle();
+    stop_mov_motors();
+    //turn back the other way and scan.
+    start_turn(max_speed, -1);
+    sleep(100); //wait for the difference to be under the explore angle again
+    check_angle = get_angle();
+    while(abs(check_angle-init_check_angle) < EXPLORE_ANGLE)
+    {
+        get_sensor_value0(sn_sonar, &distance );
+        checked_distance = distance*cos(check_angle - init_check_angle);
+        if(checked_distance < closest_obstacle)
+            closest_obstacle = checked_distance;
+        check_angle = get_angle();
+    }
+    stop_mov_motors();
+    turn_to_angle(init_check_angle)
+}
+
 void continue_until(int max_speed, float goal)
 {
-    // float init_check_angle = get_angle();
-    // float check_angle = init_check_angle;
-    // float closest_obstacle;
-    if (ev3_search_sensor(LEGO_EV3_US, &sn_sonar,0))
-    {
-        printf("Reading sonar trying to establish how far you can go...\n");
-        get_sensor_value0(sn_sonar, &distance );
-    }
-    // closest_obstacle = distance;
-    // int checked_distance;
-    // //turn around to see how far you can go
-    // start_turn(max_speed, 1);
-    // while(abs(check_angle-init_check_angle) < EXPLORE_ANGLE)
-    // {
-    //     get_sensor_value0(sn_sonar, &distance );
-    //     checked_distance = distance*cos(check_angle - init_check_angle);
-    //     if(checked_distance < closest_obstacle)
-    //         closest_obstacle = checked_distance;
-    //     check_angle = get_angle();
-    // }
-    // stop_mov_motors();
-    // start_turn(max_speed, -1);
-    // sleep(100); //wait for the difference to be under the explore angle again
-    // check_angle = get_angle();
-    // init_check_angle = get_angle();
-    // while(abs(check_angle-init_check_angle) < 2*EXPLORE_ANGLE)
-    // {
-    //     get_sensor_value0(sn_sonar, &distance );
-    //     checked_distance = distance*cos(check_angle - init_check_angle);
-    //     if(checked_distance < closest_obstacle)
-    //         closest_obstacle = checked_distance;
-    //     check_angle = get_angle();
-    // }
-    // stop_mov_motors();
-    // start_turn(max_speed, 1);
-    // check_angle = get_angle();
-    // init_check_angle = get_angle();
-    // while(abs(check_angle-init_check_angle) < 1*EXPLORE_ANGLE)
-    // {
-    // }
-    // stop_mov_motors();
-
-
+    float distance;
+    distance = get_distance();
     if(distance <= goal) return;
     float init_distance = distance;
     float init_coord[2] = {x,y};
     angle = get_angle();
-    multi_set_tacho_command_inx( mov_motors, TACHO_RESET );
-    get_tacho_max_speed( mov_motors[0], &max_speed );
-    multi_set_tacho_stop_action_inx( mov_motors, TACHO_COAST );
-    multi_set_tacho_speed_sp( mov_motors, max_speed * 1 / 5 );
-    //multi_set_tacho_time_sp( mov_motors, 500 );
-    multi_set_tacho_ramp_up_sp( mov_motors, 0 );
-    multi_set_tacho_ramp_down_sp( mov_motors, 0 );
-    multi_set_tacho_command_inx( mov_motors, TACHO_RUN_FOREVER );
+    start_straight(max_speed, ROBOT_SPEED_INCREMENT);
     //	Sleep( 300 );
     // sleep(200);
     int init_time = time(NULL);
     while(distance > goal /*&& abs(distance-init_distance) < closest_obstacle - DISTANCE_BEFORE_STOP*/)
     {
-        if (ev3_search_sensor(LEGO_EV3_US, &sn_sonar,0))
-        {
-            if ( !get_sensor_value0(sn_sonar, &distance ))
-            {
-                distance = 0;
-            }
-            //printf( "\r sonar : \n", distance);
-            fflush( stdout );
-        }
+        distance = get_distance();
         angle = get_angle();
         get_new_coordinates(init_coord[0],
                             init_coord[1],
@@ -124,7 +166,7 @@ void continue_until(int max_speed, float goal)
             init_time = time(NULL);
         }
     }
-    multi_set_tacho_command_inx( mov_motors, TACHO_STOP );
+    stop_mov_motors();
 }
 
 void turn_relative(uint8_t ss, int max_speed, int a,float angle)
@@ -233,23 +275,7 @@ void turn_relative(uint8_t ss, int max_speed, int a,float angle)
     }
 }
 
-void start_turn(int max_speed, int a)
-// a positive : turn right 0 < a <  9 depending on speed
-// a negative : turn left  0 > a > -9 depending on speed
-{
-    multi_set_tacho_command_inx( mov_motors, TACHO_RESET );
-    multi_set_tacho_stop_action_inx( mov_motors, TACHO_COAST );
-    set_tacho_speed_sp(mov_motors[0],  a*max_speed * 1 / 10 );
-    set_tacho_speed_sp(mov_motors[1], -a*max_speed * 1 / 10 );
-    multi_set_tacho_ramp_up_sp( mov_motors, 0 );
-    multi_set_tacho_ramp_down_sp( mov_motors, 0 );
-    multi_set_tacho_command_inx( mov_motors, TACHO_RUN_FOREVER );
-}
 
-void stop_mov_motors()
-{
-    multi_set_tacho_command_inx( mov_motors, TACHO_STOP);
-}
 
 void turn_absolute(uint8_t ss, int max_speed, int a,float angle)
 {

@@ -5,6 +5,7 @@
 
 /* physical values for the robot */
 #define ROBOT_RADIUS 50 //completely arbitrary
+#define ROBOT_SPEED_INCREMENT 7 // value between 1 and 9.
 #define ULTRASONIC_SENSOR_PRECISION 20 //completely arbitrary
 #define LEFT_MOTOR_PORT 65
 #define RIGHT_MOTOR_PORT 66
@@ -15,6 +16,7 @@
 int pincer_state;
 #define DISTANCE_DETECT_MOVABLE 150
 #define DISTANCE_BEFORE_STOP 200
+
 
 
 /* semaphore names */

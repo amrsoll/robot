@@ -1,19 +1,13 @@
 #include "servercom.h"
 
-int s; /* socket */
-uint16_t msgId = 0; /* msg seq num */
-
 int read_from_server(int sock, char *buffer, size_t maxSize) {
     int bytes_read = read(sock, buffer, maxSize);
-
     if (bytes_read <= 0) {
         fprintf(stderr, "Server unexpectedly closed connection...\n");
         close(s);
         exit(EXIT_FAILURE);
     }
-
     printf("[DEBUG] received %d bytes\n", bytes_read);
-
     return bytes_read;
 }
 
@@ -29,9 +23,7 @@ int parse_message() {
     uint8_t msgType;
     int16_t id_ack;
     uint8_t kick_id;
-
     msg = read_from_server(s, string, 58);
-
     if (msg > 0) {
         dst = (uint8_t)string[3];
         msgType = (uint8_t)string[4];
@@ -39,12 +31,10 @@ int parse_message() {
         fprintf(stderr, "Receiving error\n");
         return -1;
     }
-
     if (dst != TEAM_ID) {
         printf("Received message for someone else. Ignore!\n");
         return -1;
     }
-
     switch(msgType) {
         case MSG_ACK:
             id_ack = (int16_t)string[5];
@@ -69,21 +59,16 @@ int parse_message() {
         case MSG_POSITION:
             /* I don't think we should do anything here */
             break;
-
-
         default:
             printf("Invalid message type!\n");
             return -1;
     }
-
     return msg;
 }
-
 
 /* Messages sent by the server should not be acknowledged */
 int send_ACK(uint8_t dst, int16_t id_ack, int8_t state){
     char string[8];
-
     *((uint16_t *) string) = msgId++;
     string[2] = TEAM_ID;
     string[3] = dst;
@@ -91,15 +76,12 @@ int send_ACK(uint8_t dst, int16_t id_ack, int8_t state){
     string[5] = id_ack;
     string[6] = 0x00;
     string[7] = state;
-
     return send_to_server(string, 8);
-
 }
 
 /* must be sent every two seconds */
 int send_POSITION(int16_t x, int16_t y){
     char string[9];
-
     *((uint16_t *) string) = msgId++;
     string[2] = TEAM_ID;
     string[3] = 0xFF;
@@ -108,7 +90,6 @@ int send_POSITION(int16_t x, int16_t y){
     string[6] = 0x00;
     string[7] = y;
     string[8] = 0x00;
-
     return send_to_server(string, 9);
 }
 
@@ -116,7 +97,6 @@ int send_POSITION(int16_t x, int16_t y){
 /* sends the server each 5x5 cm grid one pixel at a time */
 int send_MAPDATA(int16_t x, int16_t y, uint8_t R, uint8_t G, uint8_t B){
     char string[12];
-
     *((uint16_t *) string) = msgId++;
     string[2] = TEAM_ID;
     string[3] = 0xFF;
@@ -128,27 +108,22 @@ int send_MAPDATA(int16_t x, int16_t y, uint8_t R, uint8_t G, uint8_t B){
     string[9] = R; // red value of pixel
     string[10] = G; // green value of pixel
     string[11] = B; // blue value of pixel
-
     return send_to_server(string, 12);
-
 }
 
 /* These messages signal to the server that their map is finished */
 int send_MAPDONE() {
     char string[5];
-
     *((uint16_t *) string) = msgId++;
     string[2] = TEAM_ID;
     string[3] = 0xFF;
     string[4] = MSG_MAPDONE;
-
     return send_to_server(string, 5);
 }
 
 /* OBSTACLE messages must be sent when a robot picks up or drop an obstacle */
 int send_OBSTACLE(uint8_t act, int16_t x, int16_t y){
     char string[10];
-
     *((uint16_t *) string) = msgId++;
     string[2] = TEAM_ID;
     string[3] = 0xFF;
@@ -158,69 +133,5 @@ int send_OBSTACLE(uint8_t act, int16_t x, int16_t y){
     string[7] = 0x00;
     string[8] = y;
     string[9] = 0x00;
-
     return send_to_server(string, 10);
-}
-
-
-int main(int argc, char **argv) {
-
-    //printf("hello\n");
-
-    int16_t posX, posY;
-
-    /* SET UP BT CONNECTION TO SERVER */
-    struct sockaddr_rc addr = { 0 };
-    int status;
-
-    s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-
-    addr.rc_family = AF_BLUETOOTH;
-    addr.rc_channel = (uint8_t) 1;
-    str2ba (SERV_ADDR, &addr.rc_bdaddr);
-
-    /* connect */
-    status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
-    printf("status: %d\n", status);
-    /* if connected */
-    if(status==0) {
-        char string[58];
-
-        /* wait for START message */
-        read_from_server(s, string,9);
-        printf("string: %s\n", string);
-        if(string[4] == MSG_START) {
-            printf("Received start message!\n");
-        }
-
-        int i;
-        posX=0x00;
-        posY=0x00;
-
-        for (i=0;i<30;i++) {
-            send_POSITION(posX, posY);
-            posX++;
-            posY++;
-            Sleep(2000);
-        }
-
-        while(1) {
-            read_from_server(s, string, 58);
-            if(string[4] == MSG_STOP) {
-                printf("STOP received!");
-                break;
-            }
-            else if(string[4] == MSG_KICK && string[5] == TEAM_ID) {
-                printf("We got kicked! :(");
-                break;
-            }
-        }
-    } else {
-        fprintf(stderr, "Failed to connect to server...\n");
-        sleep(2);
-        exit(EXIT_FAILURE);
-    }
-
-    close(s);
-    return 0;
 }

@@ -39,5 +39,5 @@ int send_MAPDATA(int16_t, int16_t, uint8_t, uint8_t, uint8_t);
 int send_MAPDONE(void);
 int send_OBSTACLE(uint8_t, int16_t, int16_t);
 
-
+int s; /* socket */
 #endif

@@ -1,8 +1,6 @@
 #include "servercom.h"
 
 int main(int argc, char **argv) {
-    int s; /* socket */
-    uint16_t msgId = 0; /* msg seq num */
 
     //printf("hello\n");
 

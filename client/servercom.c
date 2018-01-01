@@ -1,5 +1,7 @@
 #include "servercom.h"
 
+uint16_t msgId = 0; /* msg seq num */
+
 int read_from_server(int sock, char *buffer, size_t maxSize) {
     int bytes_read = read(sock, buffer, maxSize);
     if (bytes_read <= 0) {

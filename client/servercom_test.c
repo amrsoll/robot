@@ -10,21 +10,19 @@ int main(int argc, char **argv) {
     struct sockaddr_rc addr = { 0 };
     int status;
 
-    s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-
     addr.rc_family = AF_BLUETOOTH;
     addr.rc_channel = (uint8_t) 1;
-    str2ba (SERV_ADDR, &addr.rc_bdaddr);
+    str2ba(SERV_ADDR, &addr.rc_bdaddr);
 
     /* connect */
-    status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
+    status = connect(SOCKET, (struct sockaddr *)&addr, sizeof(addr));
     printf("status: %d\n", status);
     /* if connected */
     if(status==0) {
         char string[58];
 
         /* wait for START message */
-        read_from_server(s, string,9);
+        read_from_server(string,9);
         printf("string: %s\n", string);
         if(string[4] == MSG_START) {
             printf("Received start message!\n");
@@ -42,7 +40,7 @@ int main(int argc, char **argv) {
         }
 
         while(1) {
-            read_from_server(s, string, 58);
+            read_from_server(string, 58);
             if(string[4] == MSG_STOP) {
                 printf("STOP received!");
                 break;
@@ -58,6 +56,6 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    close(s);
+    close(SOCKET);
     return 0;
 }

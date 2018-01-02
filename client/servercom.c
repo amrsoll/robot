@@ -2,11 +2,11 @@
 
 uint16_t msgId = 0; /* msg seq num */
 
-int read_from_server(int sock, char *buffer, size_t maxSize) {
-    int bytes_read = read(sock, buffer, maxSize);
+int read_from_server(char *buffer, size_t maxSize) {
+    int bytes_read = read(SOCKET, buffer, maxSize);
     if (bytes_read <= 0) {
         fprintf(stderr, "Server unexpectedly closed connection...\n");
-        close(s);
+        close(SOCKET);
         exit(EXIT_FAILURE);
     }
     printf("[DEBUG] received %d bytes\n", bytes_read);
@@ -14,7 +14,7 @@ int read_from_server(int sock, char *buffer, size_t maxSize) {
 }
 
 int send_to_server(char *data, size_t size) {
-    return write(s, data, size);
+    return write(SOCKET, data, size);
 }
 
 int parse_message() {
@@ -25,7 +25,7 @@ int parse_message() {
     uint8_t msgType;
     int16_t id_ack;
     uint8_t kick_id;
-    msg = read_from_server(s, string, 58);
+    msg = read_from_server(string, 58);
     if (msg > 0) {
         dst = (uint8_t)string[3];
         msgType = (uint8_t)string[4];

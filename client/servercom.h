@@ -25,12 +25,12 @@
 #define MSG_MAPDATA 5
 #define MSG_MAPDONE 6
 #define MSG_OBSTACLE 7
-
+#define SOCKET socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)
 #define Sleep(msec) usleep ((msec)*1000)
 
 
 //void debug(const char*, ...);
-int read_from_server(int, char*, size_t);
+int read_from_server(char*, size_t);
 int send_to_server(char*, size_t);
 int parse_message(void);
 int send_ACK(uint8_t, int16_t, int8_t);
@@ -39,5 +39,5 @@ int send_MAPDATA(int16_t, int16_t, uint8_t, uint8_t, uint8_t);
 int send_MAPDONE(void);
 int send_OBSTACLE(uint8_t, int16_t, int16_t);
 
-int s; /* socket */
+
 #endif

@@ -46,9 +46,9 @@ spot_test.o: spot_test.c spot.h constants.m
 	$(CC) -o $@ -c $< $(LDFLAGS)
 
 servercom: servercom_test.o servercom.o
-	$(CC) $^ $(LDFLAGS) -o servercom
+	$(CC) $^ $(LDFLAGS) -o servercom $(BT)
 servercom_test.o: servercom_test.c servercom.h constants.m
-	$(CC) -o $@ -c $< $(LDFLAGS)
+	$(CC) -o $@ -c $< $(LDFLAGS) $(BT)
 
 gsyst: gsyst_test.o gsyst.o
 	$(CC) $^ $(LDFLAGS) -o gsyst

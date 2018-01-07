@@ -1,97 +1,69 @@
-
-
-typedef struct Node Node {
-    int ID;
+struct Point Point {
     int x;
     int y;
-    char* toString(){
-        char str[3*sizeOf(int)+2];
-        sprintf(str, "%d,%d,%d",ID,x,y);
-        return str;
-    }
-};
-Node node_init(int ID, int x, int y)
-{
-    Node node;
-    node.ID = ID;
-    node.x = x;
-    node.y = y;
-    return node;
-}
-Node node_init_str(char *str)
-{
-    Node node;
-    int i = 0;
-    int Int = 0;
-    while( *(str+i)!=",")
-    {
-        Int=(*(str+i)-'0')+Int*10;
-        i++;
-    }
-    node.ID = Int;
-    Int = 0;
-    i++;
-    while( *(str+i)!=",")
-    {
-        Int=(*(str+i)-'0')+Int*10;
-        i++;
-    }
-    node.x = Int;
-    Int = 0;
-    i++;
-    while( *(str+i)!=",")
-    {
-        Int=(*(str+i)-'0')+Int*10;
-        i++;
-    }
-    node.y = Int;
-    return node;
 }
 
-typedef struct Vertice Vertice {
-    int ID;
-    Node node1;
-    Node node2;
-    char* toString(){
-        char str[3*sizeOf(int)+2];
-        sprintf(str, "%d,%d,%d",ID,node1.ID,node2.ID);
-        return str;
-    }
-};
-Vertice vertice_init(int ID, Node node1, Node node2) {
-    Vertice vertice;
-    vertice.ID = ID;
-    vertice.node1 = node1;
-    vertice.node2 = node2;
-    return vertice;
+struct fPoint fPoint {
+    float x;
+    float y;
 }
-Node vertice_init_str(char *str)
-{
-    Vertice vertice;
-    int i = 0;
-    int Int = 0;
-    while( *(str+i)!=",")
-    {
-        Int=(*(str+i)-'0')+Int*10;
-        i++;
-    }
-    vertice.ID = Int;
-    Int = 0;
-    i++;
-    while( *(str+i)!=",")
-    {
-        Int=(*(str+i)-'0')+Int*10;
-        i++;
-    }
-    int ID1 = Int;
-    Int = 0;
-    i++;
-    while( *(str+i)!=",")
-    {
-        Int=(*(str+i)-'0')+Int*10;
-        i++;
-    }
-    int ID2 = Int;
 
-    return node;
+struct Pixel Pixel {
+    int x;
+    int y;
+    char type; //undefined : 0, clear : 1 or wall : 2
+};
+
+bool pixel_eq(Pixel p1, Pixel p2)
+{
+    return p1.x == p2.x && p1.y == p2.y;
+}
+
+bool point_eq(Point p1, Point p2)
+{
+    return p1.x == p2.x && p1.y == p2.y;
+}
+
+float norm(fPoint p)
+{
+    return sqrt(p.x*p.x + p.y*p.y);
+}
+
+fPoint project_onto(fPoint v, fPoint p)
+{
+    fPoint output;
+    float norm = norm(v);
+    output.x = v.x*p.x/norm;
+    output.y = v.y*p.y/norm;
+    return output;
+}
+
+float sign (fPoint p1, fPoint p2, fPoint p3)
+{
+    return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+}
+
+bool point_in_triangle (fPoint pt, fPoint v1, fPoint v2, fPoint v3)
+{
+    bool b1, b2, b3;
+
+    b1 = sign(pt, v1, v2) < 0.0f;
+    b2 = sign(pt, v2, v3) < 0.0f;
+    b3 = sign(pt, v3, v1) < 0.0f;
+
+    return ((b1 == b2) && (b2 == b3));
+}
+
+bool intpoint_in_trigon(Point s, Point a, Point b, Point c)
+{
+    int as_x = s.x-a.x;
+    int as_y = s.y-a.y;
+
+    bool s_ab = (b.x-a.x)*as_y-(b.y-a.y)*as_x > 0;
+
+    if((c.x-a.x)*as_y-(c.y-a.y)*as_x > 0 == s_ab) return false;
+
+    if((c.x-b.x)*(s.y-b.y)-(c.y-b.y)*(s.x-b.x) > 0 != s_ab) return false;
+
+    return true;
 }

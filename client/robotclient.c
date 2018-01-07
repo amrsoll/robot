@@ -26,8 +26,6 @@ int init() {
     return 0;
 }
 
-
-
 int main(int argc, char **argv) {
     init();
     #ifndef __ARM_ARCH_4T__
@@ -46,15 +44,7 @@ int main(int argc, char **argv) {
     while ( ev3_tacho_init() < 1 ) Sleep( 1000 );
     printf( "*** ( EV3 ) Hello! ***\n" );
     printf( "Found tacho motors:\n" );
-    for ( i = 0; i < DESC_LIMIT; i++ )
-    {
-        if ( ev3_tacho[ i ].type_inx != TACHO_TYPE__NONE_ )
-        {
-            printf("  type = %s\n", ev3_tacho_type( ev3_tacho[ i ].type_inx ));
-            printf("  port = %s\n", ev3_tacho_port_name( i, s ));
-            printf("  port = %d %d\n", ev3_tacho_desc_port(i), ev3_tacho_desc_extport(i));
-        }
-    }
+    
     //Find the Gyro and get the initial angle from it
     init_angle = get_angle();
     printf("Initial angle value: %f\n",init_angle);

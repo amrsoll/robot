@@ -2,166 +2,134 @@
 #include <sys/stat.h>        /* For mode constants */
 #include <semaphore.h>
 #include "gsyst.h" /* Also contains the ev3 libraries*/
-
+#include "classes.m"
 #include "constants.m"
 
-sem_t * semNodesw    = sem_open(LOCK_FOR_WRITE_NODES, O_CREAT, 0644, 0);
-sem_t * semVerticesw = sem_open(LOCK_FOR_WRITE_VERTI, O_CREAT, 0644, 0);
-sem_t * semNodesr    = sem_open(LOCK_FOR_READ_NODES, O_CREAT, 0644, 0);
-sem_t * semVerticesr = sem_open(LOCK_FOR_READ_VERTI, O_CREAT, 0644, 0);
-
-Nodes* nodes;
-
-int countlines(FILE f)
+int set_char(int i, int j, char value, char* str) //Changes the char value str on line i and j
 {
-    int ch=0;
-    int lines=0;
-    sem_wait(semNodesr);
-    sem_wait(semVerticesr);
-    sem_wait(semNodesw);
-    sem_wait(semVerticesw);
-    sem_post(semNodesr);
-    sem_post(semVerticesr);
-    if (f == NULL);
-        exit(EXIT_FAILURE);
-    while(!feof(f))
+    char c;
+    while(i>0)
     {
-        ch = fgetc(f);
-        if(ch == '\n')
-        {
-            lines++;
-        }
+        while(c!='\n') c = str++[0];
+        i--;
     }
-    sem_post(semNodesw);
-    sem_post(semVerticesw);
-    return lines;
+    str[j] = value;
+    return 0;
 }
 
-Node getNode(int ID)
+char get_char(int i, int j, char* str)
+//i0 and j0 is the position of the origin of the x and y axis
 {
-    sem_wait(semNodesr);
-    sem_post(semNodesr)
-    FILE *nodes = fopen("map/nodes", "r", 0666);
-    if (nodes == NULL)
+    char c;
+    while(i>0)
     {
-        printf("Error opening the node file!\n");
-        exit(1);
+        while(c!='\n') c = str++[0];
+        i--;
     }
-    char ch = 0;
-    int nodeID = 0;
-    while(!feof(f))
+    return str[j];
+}
+
+void free_isolated_cells(char* map)
+//if a pixel is directly surrounded by four pixels of a different type,
+//then turn it into that type
+{
+    // TODO
+    // be carefull with borders
+}
+
+char* scan() //returns the string result of the scan
+{
+    float step_fill_free_space = 0.2;
+    int mm_to_pixel_size = 10*PIXEL_SIZE;
+    char* scanResult = NULL;
+    int width  = 2*SCANNING_MAX_DISTANCE/mm_to_pixel_size+2; //adding one in case of debordement
+    int height = 2*SCANNING_MAX_DISTANCE/mm_to_pixel_size+2;
+    scanResult = malloc((width+1)* //because we add \n at each line
+                        height*
+                        sizeof(char));
+    if (scanResult == NULL) exit(-1); // Error : failed to allocate memory
+    Point robot_coord_in_scanResult_str;
+    robot_coord_in_scanResult_str = {width/2,height/2};
+    float starting_scan_angle = angle; //angle is created in contants and constantly refreshed
+    // float* buffer = NULL;
+    // buffer = malloc(10*sizeof(int)/SCANNING_SPEED);
+    // if (buffer == NULL) exit(-1); // Error : failed to allocate memory
+    // unsigned short int buffer_index = 0;
+    Point last_point; //so as to not constantly change the same pixel
+    last_point.x == NULL;
+    Point measured_point; //coordinates of the tile/pixel the sonar hits into.
+    start_turn(SCANNING_SPEED);
+    float distance;
+    while(abs(starting_scan_angle-angle)<360)
     {
-        ch = fgetc(f);
-        while(ch != ',')
+        angle = get_angle() - init_angle;
+        distance = min(SCANNING_MAX_DISTANCE, get_distance());
+        fPoint fmeasured_point = {(distance*cos(angle/pi)/mm_to_pixel_size),
+                                (distance*sin(angle/pi)/mm_to_pixel_size)};
+        Point measured_point;
+        measured_point.x =(int)fmeasured_point.x;
+        measured_point.y =(int)fmeasured_point.y;
+        if( last_point.x == NULL
+            || point_eq(last_point, measured_point))
         {
-            nodeID = nodeID*10 + (int)(ch-'0');
-            ch = fgetc(f);
-        }
-        if(nodeID == ID)
-        {
-            int x = 0;
-            while(ch != ',')
+            last_point = measures_point;
+            set_char(robot_coord_in_scanResult_str[0]-measured_point.y,
+                     robot_coord_in_scanResult_str[1]+measured_point.x,
+                     WALL_PIXEL,
+                     scanResult);
+            //fill the pixels between the wall and you with free space
+            //if it's not already a wall or free space
+            if( last_point[0]==NULL )
             {
-                x = x*10 + (int)(ch-'0');
-                ch = fgetc(f);
-            }
-            int y = 0;
-            while(ch != ',')
+                int len_steps = (int)distance/mm_to_pixel_size;
+                Point coord_free;
+                Point last_coord_free;
+                last_coord_free.x = NULL;
+                int i=0;
+                while(i<len_steps)
+                {
+                    coord_free.x=(int)( i   *fmeasured_point.x/len_steps);
+                    coord_free.y=(int)((i++)*fmeasured_point.y/len_steps);
+                    previous_pixel_type = get_char( robot_coord_in_scanResult_str[0]-coord_free.y
+                                                    robot_coord_in_scanResult_str[1]+coord_free.x
+                                                    scanResult);
+                    if(previous_pixel_type == WALL_PIXEL) continue; //if it's already a wall, ignore
+                    if(last_coord_free.x == NULL
+                        || point_eq(last_coord_free, coord_free))
+                    {
+                        last_coord_free = coord_free;
+                        set_char(robot_coord_in_scanResult_str[0]-coord_free.y,
+                                 robot_coord_in_scanResult_str[1]+coord_free.x,
+                                 FREE_PIXEL,
+                                 scanResult);
+                    }
+                }
+            } else
             {
-                y = y*10 + (int)(ch-'0');
-                ch = fgetc(f);
+                Point O;
+                O.x = 0;
+                O.y = 0;
+                Point s;
+                int x = min(min(coord_free.x, last_coord_free.x),0) ;
+                int y = min(min(coord_free.y, last_coord_free.y),0) ;
+                while (x< max(max(coord_free.x, last_coord_free.x),0))
+                while (x< max(max(coord_free.y, last_coord_free.y),0))
+                {
+                    s.x = x;
+                    s.y = y;
+                    if(intpoint_in_trigon(s, O, coord_free, last_coord_free))
+                    {
+                        set_char(robot_coord_in_scanResult_str[0]-s.y,
+                             robot_coord_in_scanResult_str[1]+s.x,
+                             FREE_PIXEL,
+                             scanResult);
+                    }
+                }
             }
-            Node node = node_init(ID,x,y);
-            return node;
         }
-        while(ch != '\n')
-            ch = fgetc(f);
     }
-    return -1;
-
-}
-
-int addNode(Node node)
-{
-    sem_wait(semNodesw);
-    sem_wait(semNodesr);
-    FILE *nodes = fopen("map/nodes", "a+", 0666);
-    if (nodes == NULL)
-    {
-        printf("Error opening the node file!\n");
-        return -1;
-    }
-    sem_post(semNodesw);
-    sem_post(semNodesr);
-    int ID = countlines(nodes);
-    sem_wait(semNodesw);
-    sem_wait(semNodesr);
-    fprintf(f, "%s\n", node.toString());
-    fclose(f);
-    sem_post(semNodesw);
-    sem_post(semNodesr);
-    return 0;
-}
-
-int addVertice(Node node1,Node node2)
-{
-
-    sem_wait(semVerticesr);
-    sem_wait(semVerticesw);
-    FILE *vertices = fopen("map/vertices", "a+", 0666);
-    if (vertices == NULL)
-    {
-        printf("Error opening the vertice file!\n");
-        return -1;
-    }
-    sem_post(semVerticesw);
-    sem_post(semVerticesr);
-    int ID = countlines(nodes);
-    sem_wait(semVerticesw);
-    sem_wait(semVerticesr);
-    Vertice vertice = vertice_init(ID,node1,node2);
-    fprintf(f,  "%s\n", vertice.toString());
-    fclose(f);
-    sem_post(semVerticesr);
-    sem_post(semVerticesw);
-    return 0;
-}
-
-int mapComplete()
-{
-    /*TODO : returns 0 if complete, else -1*/
-    return 0;
-}
-
-int eqNodes(Node nodeA, Node nodeB)
-{
-    return (nodeA.x-nodeB.x)*(nodeA.x-nodeB.x) +
-           (nodeA.y-nodeB.y)*(nodeA.y-nodeB.y) <=
-           ULTRASONIC_SENSOR_PRECISION*ULTRASONIC_SENSOR_PRECISION;
-}
-
-int makeClockwise(char *mapPath)
-{
-    FILE *nodes = fopen(mapPath,"r+");
-    int totalNodes = countlines(nodes);
-    sem_wait(semNodesr);
-    sem_wait(semVerticesr);
-    sem_wait(semNodesw);
-    sem_wait(semVerticesw);
-    sem_post(semNodesr);
-    sem_post(semVerticesr);
-    int visitedNodes[totalNodes];
-    /*TODO maybe work around having a local list of nodes instead of using semaphores all the time*/
-}
-
-int clean() {
-    /*Cleans the memory for a new round of mapping*/
-    remove("map/nodes");
-    remove("map/vertices");
-}
-
-int map(int posX,int posY)
-{
-    /*TODO*/
-    // make several turns on itself to gain in precision.
+    free_isolated_cells(scanResult);
+    stop_mov_motors();
+    // free(buffer); //prevent memory leaks
+    return scanResult;
 }

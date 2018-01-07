@@ -1,0 +1,40 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+
+%opening
+\title{}
+\author{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\section{Scanning protocol of the robot}
+Everytime the robot performs a scan, it turns on itself and measures its distance to the surrounding walls. 
+It then writes onto a string representing pixels the surrounding area it scanned (the pixels are either walls, free space, or unknown if it is outside scanning radius or behind an obstacle).
+It alternates the measures on the sonar and the gyroscope, and everytime it hits a wall, the pixel that sits at that location is turned into a wall.
+
+
+\subsection{Add the free space pixels}
+Cercles consécutifs avec des pas de pixel_size/2
+
+listes de starts et de stop 
+
+\subsection{Refining the method}
+Instead of directly asigning the value of wall to a pixel during the scanning, a short buffer 
+
+dist = mean(buffer)
+pixel_angle_width = pixel_width/dist
+pixel
+
+Size of the buffer:
+The faster the robot turns, the less values it wil be able to record, and therefore, the sorter the buffer should be.
+Roughly:
+Nb_recorded_measures = recording_freq*360/turning_speed.
+Thus, buffer_size \linear to \alpha/turning_speed.
+
+\end{document}

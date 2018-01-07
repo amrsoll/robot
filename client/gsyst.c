@@ -37,7 +37,6 @@ float get_distance()
 
 int get_new_coordinates(float x0, float y0,float distance, float current_angle)
 {
-    float pi = 3.14159265;
     float coord[2] = {x0+distance*sin(current_angle/pi),
                       y0+distance*cos(current_angle/pi)};
     x = coord[0];

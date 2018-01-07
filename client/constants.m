@@ -3,28 +3,24 @@
 #include "ev3_tacho.h"
 #include "ev3_sensor.h"
 
+#ifndef CONSTANTS
+#define CONSTANTS
+//math
+float pi = 3.14159265;
+
 /* physical values for the robot */
-#define ROBOT_RADIUS 50 //completely arbitrary
+#define ROBOT_RADIUS 15 //in cm
 #define ROBOT_SPEED_INCREMENT 7 // value between 1 and 9.
-#define ULTRASONIC_SENSOR_PRECISION 20 //completely arbitrary
+#define ULTRASONIC_SENSOR_PRECISION 15 //in mm, like the ultrasonic sensor return values
 #define LEFT_MOTOR_PORT 65
 #define RIGHT_MOTOR_PORT 66
 #define GRABBING_MOTOR_PORT 67
-#define GRAB_SPEED 500 //completely arbitrary
+#define GRAB_SPEED_INCREMENT 500 //completely arbitrary
 #define PINCER_CLOSED 0
 #define PINCER_OPENED 1
 int pincer_state;
 #define DISTANCE_DETECT_MOVABLE 150
 #define DISTANCE_BEFORE_STOP 200
-
-
-
-/* semaphore names */
-#define LOCK_FOR_READ_NODES "/rnodes"
-#define LOCK_FOR_READ_VERTI "/rvertices"
-#define LOCK_FOR_WRITE_NODES "/wnodes"
-#define LOCK_FOR_WRITE_VERTI "/wvertices"
-#define LOCK_AGAINST_STARVATION_NAME "/sem66"
 
 //positioning
 #define ANGLE_BUFFER_SIZE 3
@@ -35,8 +31,29 @@ int pincer_state;
 float x;
 float y;
 float init_angle;
-float angle;
+float angle; // always : angle = get_angle() - init_angle;
+//float distance; //measured distance of the sonar (in mm)
 
+// Mapping
+#define PIXEL_SIZE 5 //Length of a pixel corner in cm as treated by the robot.
+#define PIXEL_SIZE_TO_SERVER 5 //Length of a pixel corner in cm when sent to the server
+#define MAP_PATH "map/pixels"
+#define MAP_WIDTH 500 // the real width is MAP_WIDTH*PIXEL_SIZE cm
+// the real width is MAP_WIDTH_TO_SERVER*PIXEL_SIZE_TO_SERVER cm
+#define MAP_WIDTH_TO_SERVER MAP_WIDTH*PIXEL_SIZE/PIXEL_SIZE_TO_SERVER
+#define UNDEFINED_PIXEL '+' //pixel type
+#define FREE_PIXEL ' ' //pixel type
+#define WALL_PIXEL '#' //pixel type
+#define SCANNING_MAX_DISTANCE 1500 // in mm, like the ultrasonic sensor return values
+#define SCANNING_SPEED 3 // increment of the speed at which the robot turns during mapping scan
+
+
+// semaphore names
+#define LOCK_FOR_READ_NODES "/rnodes"
+#define LOCK_FOR_READ_VERTI "/rvertices"
+#define LOCK_FOR_WRITE_NODES "/wnodes"
+#define LOCK_FOR_WRITE_VERTI "/wvertices"
+#define LOCK_AGAINST_STARVATION_NAME "/sem66"
 
 // Miscellanious
 #define EXPLORE_ANGLE 45
@@ -44,3 +61,5 @@ float angle;
 #define EV3_BRICK_ADDR "192.168.0.204"
 char s[ 256 ];
 FLAGS_T state;
+
+#endif

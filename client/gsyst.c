@@ -7,14 +7,14 @@ float get_angle()
     float measured_angle;
     int i;
     for(i=0; i<ANGLE_BUFFER_SIZE; i=i+1)
-    if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
-    {
-        get_sensor_value0(sn_gyr,&measured_angle);
-        output_angle = output_angle + measured_angle;
-        //printf("measuring angle number %d, it's value is %f\n",i, measured_angle);
-        Sleep(ANGLE_BUFFER_LATENCY);
-        fflush( stdout );
-    }
+        if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
+        {
+            get_sensor_value0(sn_gyr,&measured_angle);
+            output_angle = output_angle + measured_angle;
+            //printf("measuring angle number %d, it's value is %f\n",i, measured_angle);
+            Sleep(ANGLE_BUFFER_LATENCY);
+            fflush( stdout );
+        }
     output_angle = output_angle/ANGLE_BUFFER_SIZE;
     return output_angle;
 }
@@ -91,10 +91,10 @@ void stop_mov_motors()
 
 int turn_to_angle(float angle)
 {
-    current_angle = get_angle();
+    float current_angle = get_angle();
     int turn_direction;
-    if( (current_angle-angle)%360 > 180
-    ||0>(current_angle-angle)%360 >-180)
+    if( (int)(current_angle-angle)%360 > 180
+    ||0>(int)(current_angle-angle)%360 >-180)
         turn_direction = 1;
     else
         turn_direction =-1;
@@ -135,7 +135,7 @@ float scan_for_obstacle()
         check_angle = get_angle();
     }
     stop_mov_motors();
-    turn_to_angle(init_check_angle)
+    turn_to_angle(init_check_angle);
 }
 
 void continue_until(int max_speed, float goal)
@@ -167,114 +167,6 @@ void continue_until(int max_speed, float goal)
     }
     stop_mov_motors();
 }
-
-void turn_relative(uint8_t ss, int max_speed, int a,float angle)
-{
-    error = 0;
-    correction = 0;
-    float res;
-
-    result = res;
-    set_tacho_command_inx( ss, TACHO_RESET );
-    set_tacho_stop_action_inx( ss, TACHO_COAST );
-    set_tacho_speed_sp( ss, a*max_speed * 1 / 10 );
-    set_tacho_ramp_up_sp( ss, 0 );
-    set_tacho_ramp_down_sp( ss, 0 );
-    set_tacho_command_inx( ss, TACHO_RUN_FOREVER );
-    Sleep(100);
-    int b;
-    if(mov_motors[0]==ss) b=-1;
-    else b=1;
-    if(a==1)
-    {
-        while(b*result < b*(res+b*(angle-error)))
-        {
-            result = get_angle();
-
-        }
-    }
-    else
-    {
-        while(b*result > b*(res-b*(angle-error)))
-        {
-            result = get_angle();
-        }
-    }
-    set_tacho_command_inx( ss, TACHO_STOP);
-    Sleep(500);
-    result = get_angle(); //TODO : necessary?
-
-
-    //TODO : optimise code length. This is commonly called : spaghetti code
-    if(a==1)
-    {
-        while(b*result < b*(res+b*(angle-correction)))
-        {
-            result = get_angle();
-            printf( "  distance %f\n",result);
-            set_tacho_command_inx( ss, TACHO_RESET );
-            set_tacho_stop_action_inx( ss, TACHO_COAST );
-            set_tacho_speed_sp( ss, a*max_speed * 1 / 10 );
-            set_tacho_time_sp(ss,100);
-            set_tacho_ramp_up_sp( ss, 0 );
-            set_tacho_ramp_down_sp( ss, 0 );
-            set_tacho_command_inx( ss, TACHO_RUN_TIMED );
-            Sleep(500);
-            result = get_angle();
-            printf( "  distance %f\n",result);
-        }
-        while(b*result > b*(res+b*(angle-correction)))
-        {
-            result = get_angle();
-            fflush( stdout );
-            set_tacho_command_inx( ss, TACHO_RESET );
-            set_tacho_stop_action_inx( ss, TACHO_COAST );
-            set_tacho_speed_sp( ss, -1*a*max_speed * 1 / 10 );
-            set_tacho_time_sp(ss,100);
-            set_tacho_ramp_up_sp( ss, 0 );
-            set_tacho_ramp_down_sp( ss, 0 );
-            set_tacho_command_inx( ss, TACHO_RUN_TIMED );
-            Sleep(500);
-            result = get_angle();
-        }
-    }
-    else
-    {
-        while(b*result > b*(res-b*(angle-correction)))
-        {
-            result = get_angle();
-            //printf( "  distance %f\n",result);
-            fflush( stdout );
-            set_tacho_command_inx( ss, TACHO_RESET );
-            set_tacho_stop_action_inx( ss, TACHO_COAST );
-            set_tacho_speed_sp( ss, a*max_speed * 1 / 10 );
-            set_tacho_time_sp(ss,100);
-            set_tacho_ramp_up_sp( ss, 0 );
-            set_tacho_ramp_down_sp( ss, 0 );
-            set_tacho_command_inx( ss, TACHO_RUN_TIMED );
-            Sleep(500);
-            result = get_angle();
-            //printf( "  distance %f\n",result);
-        }
-        while(b*result < b*(res-b*(angle-correction)))
-        {
-            result = get_angle();
-            //printf( "  distance %f\n",result);
-            set_tacho_command_inx( ss, TACHO_RESET );
-            set_tacho_stop_action_inx( ss, TACHO_COAST );
-            set_tacho_speed_sp( ss, -1*a*max_speed * 1 / 10 );
-            set_tacho_time_sp(ss,100);
-            set_tacho_ramp_up_sp( ss, 0 );
-            set_tacho_ramp_down_sp( ss, 0 );
-            set_tacho_command_inx( ss, TACHO_RUN_TIMED );
-            Sleep(500);
-            result = get_angle();
-            //printf( "  distance %f\n",result);
-        }
-    }
-}
-
-
 
 void turn_absolute(uint8_t ss, int max_speed, int a,float angle)
 {

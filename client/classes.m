@@ -1,14 +1,20 @@
-struct Point Point {
+#ifndef CLASSES
+#define CLASSES
+
+typedef struct Point Point;
+struct Point {
     int x;
     int y;
-}
+};
 
-struct fPoint fPoint {
+typedef struct fPoint fPoint;
+struct fPoint {
     float x;
     float y;
-}
+};
 
-struct Pixel Pixel {
+typedef struct Pixel Pixel;
+struct Pixel {
     int x;
     int y;
     char type; //undefined : 0, clear : 1 or wall : 2
@@ -32,9 +38,9 @@ float norm(fPoint p)
 fPoint project_onto(fPoint v, fPoint p)
 {
     fPoint output;
-    float norm = norm(v);
-    output.x = v.x*p.x/norm;
-    output.y = v.y*p.y/norm;
+    float n = norm(v);
+    output.x = v.x*p.x/n;
+    output.y = v.y*p.y/n;
     return output;
 }
 
@@ -43,7 +49,7 @@ float sign (fPoint p1, fPoint p2, fPoint p3)
     return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
 }
 
-bool point_in_triangle (fPoint pt, fPoint v1, fPoint v2, fPoint v3)
+bool fpoint_in_trigon (fPoint pt, fPoint v1, fPoint v2, fPoint v3)
 {
     bool b1, b2, b3;
 
@@ -54,7 +60,7 @@ bool point_in_triangle (fPoint pt, fPoint v1, fPoint v2, fPoint v3)
     return ((b1 == b2) && (b2 == b3));
 }
 
-bool intpoint_in_trigon(Point s, Point a, Point b, Point c)
+bool intpoint_in_trigon (Point s, Point a, Point b, Point c)
 {
     int as_x = s.x-a.x;
     int as_y = s.y-a.y;
@@ -67,3 +73,4 @@ bool intpoint_in_trigon(Point s, Point a, Point b, Point c)
 
     return true;
 }
+#endif

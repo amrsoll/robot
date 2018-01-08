@@ -1,22 +1,12 @@
 #ifndef MAP_H
 #define MAP_H
+
 /* do not include any other librairies in this file */
 
-int map(int,int);
-
-int countlines(FILE);
-
-Node getNode(int);
-
-int addNode(Node);
-
-int addVertice(Node,Node);
-
-int eqNodes(Node,Node);
-
-int makeClockwise(char*);
-
-int clean(void);
+int set_char(int,int,char,char*);
+char get_char(int,int,char*);
+void free_isolated_cells(char*);
+char* scan();
 /* add the signature of any new functions from the .c file here */
 
 #endif

@@ -1,9 +1,22 @@
 #include <fcntl.h>           /* For O_* constants */
 #include <sys/stat.h>        /* For mode constants */
 #include <semaphore.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "gsyst.h" /* Also contains the ev3 libraries*/
 #include "classes.m"
 #include "constants.m"
+
+#include "map.h"
+
+#define max(a,b) \
+  ({ __typeof__ (a) _a = (a); \
+      __typeof__ (b) _b = (b); \
+    _a > _b ? _a : _b; })
+#define min(a,b) \
+  ({ __typeof__ (a) _a = (a); \
+      __typeof__ (b) _b = (b); \
+    _a < _b ? _a : _b; })
 
 int set_char(int i, int j, char value, char* str) //Changes the char value str on line i and j
 {
@@ -34,7 +47,7 @@ void free_isolated_cells(char* map)
 //then turn it into that type
 {
     // TODO
-    // be carefull with borders
+    // be careful with borders
 }
 
 char* scan() //returns the string result of the scan
@@ -48,17 +61,19 @@ char* scan() //returns the string result of the scan
                         height*
                         sizeof(char));
     if (scanResult == NULL) exit(-1); // Error : failed to allocate memory
-    Point robot_coord_in_scanResult_str;
-    robot_coord_in_scanResult_str = {width/2,height/2};
+    int robot_coord_in_scanResult_str[2] = {width/2,height/2};
     float starting_scan_angle = angle; //angle is created in contants and constantly refreshed
     // float* buffer = NULL;
     // buffer = malloc(10*sizeof(int)/SCANNING_SPEED);
     // if (buffer == NULL) exit(-1); // Error : failed to allocate memory
     // unsigned short int buffer_index = 0;
     Point last_point; //so as to not constantly change the same pixel
-    last_point.x == NULL;
+    last_point.x = 0;
     Point measured_point; //coordinates of the tile/pixel the sonar hits into.
-    start_turn(SCANNING_SPEED);
+    int max_speed;
+    get_tacho_max_speed( mov_motors[0], &max_speed ); //temporary, wait for revision of gsyst
+    printf("max speed : %d\n", max_speed);
+    start_turn(max_speed, SCANNING_SPEED);
     float distance;
     while(abs(starting_scan_angle-angle)<360)
     {
@@ -69,32 +84,33 @@ char* scan() //returns the string result of the scan
         Point measured_point;
         measured_point.x =(int)fmeasured_point.x;
         measured_point.y =(int)fmeasured_point.y;
-        if( last_point.x == NULL
+        if( last_point.x == 0
             || point_eq(last_point, measured_point))
         {
-            last_point = measures_point;
+            last_point = measured_point;
             set_char(robot_coord_in_scanResult_str[0]-measured_point.y,
                      robot_coord_in_scanResult_str[1]+measured_point.x,
                      WALL_PIXEL,
                      scanResult);
             //fill the pixels between the wall and you with free space
             //if it's not already a wall or free space
-            if( last_point[0]==NULL )
+            if( last_point.x==0 )
             {
                 int len_steps = (int)distance/mm_to_pixel_size;
                 Point coord_free;
                 Point last_coord_free;
-                last_coord_free.x = NULL;
+                last_coord_free.x = 0;
                 int i=0;
                 while(i<len_steps)
                 {
                     coord_free.x=(int)( i   *fmeasured_point.x/len_steps);
                     coord_free.y=(int)((i++)*fmeasured_point.y/len_steps);
-                    previous_pixel_type = get_char( robot_coord_in_scanResult_str[0]-coord_free.y
-                                                    robot_coord_in_scanResult_str[1]+coord_free.x
-                                                    scanResult);
+                    char previous_pixel_type =
+                        get_char(robot_coord_in_scanResult_str[0]-coord_free.y,
+                                 robot_coord_in_scanResult_str[1]+coord_free.x,
+                                 scanResult);
                     if(previous_pixel_type == WALL_PIXEL) continue; //if it's already a wall, ignore
-                    if(last_coord_free.x == NULL
+                    if(last_coord_free.x == 0
                         || point_eq(last_coord_free, coord_free))
                     {
                         last_coord_free = coord_free;
@@ -110,14 +126,14 @@ char* scan() //returns the string result of the scan
                 O.x = 0;
                 O.y = 0;
                 Point s;
-                int x = min(min(coord_free.x, last_coord_free.x),0) ;
-                int y = min(min(coord_free.y, last_coord_free.y),0) ;
-                while (x< max(max(coord_free.x, last_coord_free.x),0))
-                while (x< max(max(coord_free.y, last_coord_free.y),0))
+                int x = min(min(measured_point.x, last_point.x),0) ;
+                int y = min(min(measured_point.y, last_point.y),0) ;
+                while (x< max(max(measured_point.x, last_point.x),0))
+                while (x< max(max(measured_point.y, last_point.y),0))
                 {
                     s.x = x;
                     s.y = y;
-                    if(intpoint_in_trigon(s, O, coord_free, last_coord_free))
+                    if(intpoint_in_trigon(s, O, measured_point, last_point))
                     {
                         set_char(robot_coord_in_scanResult_str[0]-s.y,
                              robot_coord_in_scanResult_str[1]+s.x,

@@ -1,4 +1,6 @@
 #include "pixelFunctions.h"
+#include "classes.m"
+
 sem_t * semPixelsw    = sem_open(LOCK_FOR_WRITE_PixelS, O_CREAT, 0644, 0);
 sem_t * semPixelsr    = sem_open(LOCK_FOR_READ_PixelS, O_CREAT, 0644, 0);
 Pixels* Pixels;
@@ -22,6 +24,46 @@ int countlines(FILE f)
     }
     sem_post(semPixelsw);
     return lines;
+}
+
+int create_new_map(int startX, int startY)
+//creates a new map with character a as the start position of the robot
+{
+    FILE * map;
+    map = fopen(MAP_PATH, "r"));
+    if (map){
+        fclose(map);
+        remove(MAP_PATH);
+    }else{
+        map = fopen(MAP_PATH, "w", 0666));
+        int i,j;
+        while(i=0; i<MAP_WIDTH; i++)
+        {
+            while(j=0; i<MAP_WIDTH; j++)
+            {
+                if(startX == j && startY == MAP_WIDTH-i)
+                    fprintf(map, "a");
+                else
+                    fprintf(map, "%c", UNDEFINED_PIXEL);
+            }
+            fprintf(map, "\n");
+        }
+    }
+}
+
+char* load_map()
+//the return value is in malloc, be sure to free memory after use.
+{
+    char *output;
+    long map_file_size;
+    FILE *map = fopen(MAP_PATH, "rb");
+    fseek(map, 0, SEEK_END);
+    map_file_size = ftell(map);
+    rewind(map);
+    output = malloc(map_file_size * (sizeof(char)));
+    fread(output, sizeof(char), map_file_size, map);
+    fclose(map);
+    return output;
 }
 
 Pixel getPixel(int x, int y)

@@ -6,15 +6,15 @@
 #ifndef CONSTANTS
 #define CONSTANTS
 //math
-float pi = 3.14159265;
+#define pi 3.14159265
 
 /* physical values for the robot */
 #define ROBOT_RADIUS 15 //in cm
 #define ROBOT_SPEED_INCREMENT 7 // value between 1 and 9.
 #define ULTRASONIC_SENSOR_PRECISION 15 //in mm, like the ultrasonic sensor return values
 #define LEFT_MOTOR_PORT 65
-#define RIGHT_MOTOR_PORT 66
-#define GRABBING_MOTOR_PORT 67
+#define RIGHT_MOTOR_PORT 68
+#define GRABBING_MOTOR_PORT 66
 #define GRAB_SPEED_INCREMENT 500 //completely arbitrary
 #define PINCER_CLOSED 0
 #define PINCER_OPENED 1

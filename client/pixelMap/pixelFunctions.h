@@ -9,7 +9,7 @@ int countlines(FILE);
 Node getNode(int);
 
 int addNode(Node);
-
+char* load_map(void);
 int addVertice(Node,Node);
 
 int eqNodes(Node,Node);

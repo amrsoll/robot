@@ -1,3 +1,12 @@
+/**
+ * @Author: Natalia Balalaeva <nataliabalalaeva>
+ * @Date:   08/01/2018
+ * @Last modified by:   amrsoll
+ * @Last modified time: 08/01/2018
+ */
+
+
+
 #include "gsyst.h"
 
 float get_angle()
@@ -24,8 +33,8 @@ float get_distance()
     float output;
     if (ev3_search_sensor(LEGO_EV3_US, &sn_sonar,0))
     {
-        printf("Reading sonar trying to establish how far you can go...\n");
         get_sensor_value0(sn_sonar, &output );
+            printf("Sonar : %f\n", output);
         fflush( stdout );
         return output;
     } else
@@ -56,27 +65,27 @@ int init_mov_motors() {
         printf("is the grabbing motor plugged in? \n"); //TODO : Is this message printed when the motor is plugged in already?
 }
 
-void start_straight(int max_speed, int a)
+void start_straight(int a)
 // a positive : move forward   0 < a <  9 depending on speed
 // a negative : move backward  0 > a > -9 depending on speed
 {
     multi_set_tacho_command_inx( mov_motors, TACHO_RESET );
     multi_set_tacho_stop_action_inx( mov_motors, TACHO_COAST );
-    multi_set_tacho_speed_sp(mov_motors, a*max_speed * 1 / 11 );
+    multi_set_tacho_speed_sp(mov_motors, a*MOV_MOTORS_MAX_SPEED * 1 / 11 );
     multi_set_tacho_ramp_up_sp( mov_motors, 0 );
     multi_set_tacho_ramp_down_sp( mov_motors, 0 );
     multi_set_tacho_command_inx( mov_motors, TACHO_RUN_FOREVER );
     //fflush( stdout );
 }
 
-void start_turn(int max_speed, int a)
+void start_turn(int a)
 // a positive : turn right 0 < a <  9 depending on speed
 // a negative : turn left  0 > a > -9 depending on speed
 {
     multi_set_tacho_command_inx( mov_motors, TACHO_RESET );
     multi_set_tacho_stop_action_inx( mov_motors, TACHO_COAST );
-    set_tacho_speed_sp(mov_motors[0],  a*max_speed * 1 / 10 );
-    set_tacho_speed_sp(mov_motors[1], -a*max_speed * 1 / 10 );
+    set_tacho_speed_sp(mov_motors[0],  a*MOV_MOTORS_MAX_SPEED * 1 / 10 );
+    set_tacho_speed_sp(mov_motors[1], -a*MOV_MOTORS_MAX_SPEED * 1 / 10 );
     multi_set_tacho_ramp_up_sp( mov_motors, 0 );
     multi_set_tacho_ramp_down_sp( mov_motors, 0 );
     multi_set_tacho_command_inx( mov_motors, TACHO_RUN_FOREVER );
@@ -101,7 +110,7 @@ int turn_to_angle(float angle)
     //get back to initial position.
     //TODO increment turning speed according to how close both angles are.
     // (slower the closer you get, probably 3 different speeds)
-    start_turn(max_speed, turn_direction);
+    start_turn(turn_direction);
     while(abs(current_angle-angle) > 5) //TODO check if this is the correct formula
     {
         current_angle = get_angle();
@@ -118,12 +127,12 @@ float scan_for_obstacle()
     float closest_obstacle = get_distance();
     float checked_distance;
     //turn around to see how far you can go
-    start_turn(max_speed, 1);
+    start_turn(1);
     while(abs(check_angle-init_check_angle) < EXPLORE_ANGLE)
         check_angle = get_angle();
     stop_mov_motors();
     //turn back the other way and scan.
-    start_turn(max_speed, -1);
+    start_turn(-1);
     sleep(100); //wait for the difference to be under the explore angle again
     check_angle = get_angle();
     while(abs(check_angle-init_check_angle) < EXPLORE_ANGLE)
@@ -138,7 +147,7 @@ float scan_for_obstacle()
     turn_to_angle(init_check_angle);
 }
 
-void continue_until(int max_speed, float goal)
+void continue_until(float goal)
 {
     float distance;
     distance = get_distance();
@@ -146,7 +155,7 @@ void continue_until(int max_speed, float goal)
     float init_distance = distance;
     float init_coord[2] = {x,y};
     angle = get_angle();
-    start_straight(max_speed, ROBOT_SPEED_INCREMENT);
+    start_straight(ROBOT_SPEED_INCREMENT);
     //	Sleep( 300 );
     // sleep(200);
     int init_time = time(NULL);
@@ -168,7 +177,7 @@ void continue_until(int max_speed, float goal)
     stop_mov_motors();
 }
 
-void turn_absolute(uint8_t ss, int max_speed, int a,float angle)
+void turn_absolute(uint8_t ss, int a,float angle)
 {
     int b;
     if(mov_motors[0]==ss)
@@ -182,7 +191,7 @@ void turn_absolute(uint8_t ss, int max_speed, int a,float angle)
 
     float angle_before_turn = get_angle();
     printf("initial angle : %f\n", angle_before_turn);
-    start_turn(max_speed, b);
+    start_turn(b);
     if(a==1){
         printf("next angle : %f \n", b*(angle_before_turn+b*(angle-5)));
         while(b*result < b*(angle_before_turn+b*(angle-5)))
@@ -208,28 +217,20 @@ void turn_absolute(uint8_t ss, int max_speed, int a,float angle)
 int  grab(int instruct)
 {
     ev3_sensor_init();
-    // int max_speed;
     // multi_set_tacho_command_inx( grab_motor, TACHO_RESET );
-    // get_tacho_max_speed( grab_motor[0], &max_speed );
-    // printf("  max speed = %d\n", max_speed );
-    // multi_set_tacho_command_inx( grab_motor, TACHO_RESET );
-    // get_tacho_max_speed( grab_motor[0], &max_speed );
     // multi_set_tacho_stop_action_inx( grab_motor, TACHO_COAST );
-    // multi_set_tacho_speed_sp( grab_motor, max_speed * 1 / 3 );
+    // multi_set_tacho_speed_sp( grab_motor, MOV_MOTORS_MAX_SPEED * 1 / 3 );
     // //multi_set_tacho_time_sp( grab_motor, 500 );
     // multi_set_tacho_ramp_up_sp( grab_motor, 0 );
     // multi_set_tacho_ramp_down_sp( grab_motor, 0 );
     // multi_set_tacho_command_inx( grab_motor, TACHO_RUN_FOREVER );
     // sleep(1);
     // multi_set_tacho_command_inx( grab_motor, TACHO_STOP );
-	if ( ev3_search_tacho_plugged_in(GRABBING_MOTOR_PORT,0, &grab_motor, 0 )) {
-		int max_speed;
-
-		printf( "LEGO_EV3_M_MOTOR 1 is found, run for 5 sec...\n" );
-		get_tacho_max_speed( grab_motor, &max_speed );
-		printf("  max speed = %d\n", max_speed );
+	if ( ev3_search_tacho_plugged_in(GRABBING_MOTOR_PORT,0, &grab_motor, 0 ))
+    {
+		printf( "LEGO_EV3_M_MOTOR grab motor is found, running...\n" );
 		set_tacho_stop_action_inx( grab_motor, TACHO_COAST );
-		set_tacho_speed_sp( grab_motor, instruct*max_speed * 1 / 5 );
+		set_tacho_speed_sp( grab_motor, instruct*MOV_MOTORS_MAX_SPEED * 1 / 5 );
 		set_tacho_time_sp( grab_motor, 800 );
 		set_tacho_ramp_up_sp( grab_motor, 2000 );
 		set_tacho_ramp_down_sp( grab_motor, 2000 );
@@ -242,7 +243,7 @@ int  grab(int instruct)
 		// 	get_tacho_state_flags( grab_motor, &state );
 		// } while ( state );
 		// printf( "run to relative position...\n" );
-		// set_tacho_speed_sp( grab_motor, max_speed / 2 );
+		// set_tacho_speed_sp( grab_motor, MOV_MOTORS_MAX_SPEED / 2 );
 		// set_tacho_ramp_up_sp( grab_motor, 0 );
 		// set_tacho_ramp_down_sp( grab_motor, 0 );
 		// set_tacho_position_sp( grab_motor, 90 );
@@ -252,6 +253,6 @@ int  grab(int instruct)
 		// }
 
 	} else {
-		printf( "LEGO_EV3_M_MOTOR 1 is NOT found\n" );
+		printf( "LEGO_EV3_M_MOTOR grab motor is NOT found\n" );
 	}
 }

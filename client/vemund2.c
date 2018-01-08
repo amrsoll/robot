@@ -1,3 +1,11 @@
+/**
+ * @Author: Vemund Dahle <vemunddahle>
+ * @Date:   19/12/2017
+ * @Last modified by:   amrsoll
+ * @Last modified time: 08/01/2018
+ */
+
+
 #include "vemund.h"
 
 /*
@@ -36,7 +44,7 @@ int parse_message() {
     uint8_t kick_id;
 
     msg = read_from_server(s, string, 58);
-    
+
     if (msg > 0) {
         dst = (uint8_t)string[3];
         msgType = (uint8_t)string[4];
@@ -74,7 +82,7 @@ int parse_message() {
         case MSG_POSITION:
             /* I don't think we should do anything here */
             break;
-        
+
 
         default:
             printf("Invalid message type!\n");
@@ -91,12 +99,12 @@ int connect_to_server(){
 
     /* allocate a socket */
     s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-    
+
     /* set the connection parameters */
     addr.rc_family = AF_BLUETOOTH;
     addr.rc_channel = (uint8_t) 1;
     str2ba(SERV_ADDR, &addr.rc_bdaddr);
-    
+
     /* connect to server */
     status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
 
@@ -139,7 +147,7 @@ int send_POSITION(int16_t x, int16_t y){
     return send_to_server(string, 9);
 }
 
-/* After the entire map has been generated, the robot */ 
+/* After the entire map has been generated, the robot */
 /* sends the server each 5x5 cm grid one pixel at a time */
 int send_MAPDATA(int16_t x, int16_t y, uint8_t R, uint8_t G, uint8_t B){
     char string[12];
@@ -148,7 +156,7 @@ int send_MAPDATA(int16_t x, int16_t y, uint8_t R, uint8_t G, uint8_t B){
     string[2] = TEAM_ID;
     string[3] = 0xFF;
     string[4] = MSG_MAPDATA;
-    string[5] = x; 
+    string[5] = x;
     string[6] = 0x00;
     string[7] = y;
     string[8] = 0x00;
@@ -168,7 +176,7 @@ int send_MAPDONE() {
     string[2] = TEAM_ID;
     string[3] = 0xFF;
     string[4] = MSG_MAPDONE;
-    
+
     return send_to_server(string, 5);
 }
 
@@ -188,6 +196,3 @@ int send_OBSTACLE(uint8_t act, int16_t x, int16_t y){
 
     return send_to_server(string, 10);
 }
-
-
-

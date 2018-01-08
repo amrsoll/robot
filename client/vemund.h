@@ -1,3 +1,12 @@
+/**
+ * @Author: Vemund Dahle <vemunddahle>
+ * @Date:   19/12/2017
+ * @Last modified by:   amrsoll
+ * @Last modified time: 08/01/2018
+ */
+
+
+
 #ifndef SERVERCOM_H
 #define SERVERCOM_H
 
@@ -37,4 +46,3 @@ int send_MAPDONE();
 int send_OBSTACLE(uint8_t, int16_t, int16_t);
 
 #endif
-

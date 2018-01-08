@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
     while ( ev3_tacho_init() < 1 ) Sleep( 1000 );
     printf( "*** ( EV3 ) Hello! ***\n" );
     printf( "Found tacho motors:\n" );
-    
+
     //Find the Gyro and get the initial angle from it
     init_angle = get_angle();
     printf("Initial angle value: %f\n",init_angle);
@@ -59,15 +59,7 @@ int main(int argc, char **argv) {
         pincer_state = PINCER_CLOSED;
         printf("grabbing, pincer state after  : %d\n", pincer_state);
     }
-
-    //Get the max speed the moving motors can get to
     init_mov_motors();
-    int max_speed;
-    //fflush( stdout );
-    //multi_set_tacho_command_inx( mov_motors, TACHO_RESET );
-    //printf( "2 LEGO_EV3_M_MOTORs  are found, run for 5 sec...\n" );
-    get_tacho_max_speed( mov_motors[0], &max_speed );
-    //printf("  max speed = %d\n", max_speed );
 
     //FIRST PROGRAM
     //Initialise the positioning values
@@ -80,10 +72,10 @@ int main(int argc, char **argv) {
     get_sensor_value0(sn_sonar, &dist );
     while(continue_while)
     {
-        continue_until(max_speed,DISTANCE_BEFORE_STOP);
+        continue_until(DISTANCE_BEFORE_STOP);
 
         printf("we found a wall, now turning\n" );
-        turn_absolute(mov_motors[rand()%2],max_speed,1,90.0);
+        turn_absolute(mov_motors[rand()%2],1,90.0);
         // do
         //     get_tacho_state_flags(mov_motors[0], &state );
         // while ( state );

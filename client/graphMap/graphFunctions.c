@@ -1,3 +1,13 @@
+/**
+ * @Author: Axel_Soll <amrsoll>
+ * @Date:   04/01/2018
+ * @Email:  axel.soll@telecom-paristech.fr
+ * @Last modified by:   amrsoll
+ * @Last modified time: 08/01/2018
+ */
+
+
+
 #include "graphFunctions.h"
 
 sem_t * semNodesw    = sem_open(LOCK_FOR_WRITE_NODES, O_CREAT, 0644, 0);

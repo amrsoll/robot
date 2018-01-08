@@ -1,3 +1,11 @@
+# @Author: Axel_Soll <amrsoll>
+# @Date:   08/01/2018
+# @Email:  axel.soll@telecom-paristech.fr
+# @Last modified by:   amrsoll
+# @Last modified time: 08/01/2018
+
+
+
 ARCH=$(shell uname -m)
 
 ifeq ($(ARCH),x86_64) #this means we are on the docker platform
@@ -71,5 +79,12 @@ clean:
 
 mrproper: clean
 	rm -rf $(EXEC)
+	rm -rf ball
+	rm -rf map
+	rm -rf spot
+	rm -rf path
+	rm -rf servercom
+	rm -rf gsyst
+
 
 	# make the test files for the modules

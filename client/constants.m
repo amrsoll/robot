@@ -1,3 +1,13 @@
+/**
+ * @Author: Axel_Soll <amrsoll>
+ * @Date:   08/01/2018
+ * @Email:  axel.soll@telecom-paristech.fr
+ * @Last modified by:   amrsoll
+ * @Last modified time: 08/01/2018
+ */
+
+
+
 #include "ev3.h"
 #include "ev3_port.h"
 #include "ev3_tacho.h"
@@ -7,13 +17,23 @@
 #define CONSTANTS
 //math
 #define pi 3.14159265
+#define max(a,b) \
+  ({ __typeof__ (a) _a = (a); \
+      __typeof__ (b) _b = (b); \
+    _a > _b ? _a : _b; })
+#define min(a,b) \
+  ({ __typeof__ (a) _a = (a); \
+      __typeof__ (b) _b = (b); \
+    _a < _b ? _a : _b; })
+
 
 /* physical values for the robot */
 #define ROBOT_RADIUS 15 //in cm
+#define MOV_MOTORS_MAX_SPEED 1050
 #define ROBOT_SPEED_INCREMENT 7 // value between 1 and 9.
 #define ULTRASONIC_SENSOR_PRECISION 15 //in mm, like the ultrasonic sensor return values
-#define LEFT_MOTOR_PORT 65
-#define RIGHT_MOTOR_PORT 68
+#define LEFT_MOTOR_PORT 68
+#define RIGHT_MOTOR_PORT 65
 #define GRABBING_MOTOR_PORT 66
 #define GRAB_SPEED_INCREMENT 500 //completely arbitrary
 #define PINCER_CLOSED 0
@@ -45,7 +65,7 @@ float angle; // always : angle = get_angle() - init_angle;
 #define FREE_PIXEL ' ' //pixel type
 #define WALL_PIXEL '#' //pixel type
 #define SCANNING_MAX_DISTANCE 1500 // in mm, like the ultrasonic sensor return values
-#define SCANNING_SPEED 3 // increment of the speed at which the robot turns during mapping scan
+#define SCANNING_SPEED 1 // increment of the speed at which the robot turns during mapping scan
 
 
 // semaphore names
@@ -61,5 +81,6 @@ float angle; // always : angle = get_angle() - init_angle;
 #define EV3_BRICK_ADDR "192.168.0.204"
 char s[ 256 ];
 FLAGS_T state;
+
 
 #endif

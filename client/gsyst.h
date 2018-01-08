@@ -1,3 +1,12 @@
+/**
+ * @Author: Natalia Balalaeva <nataliabalalaeva>
+ * @Date:   08/01/2018
+ * @Last modified by:   amrsoll
+ * @Last modified time: 08/01/2018
+ */
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -26,13 +35,13 @@ float get_angle(void);
 float get_distance(void);
 int get_new_coordinates(float,float,float,float);
 int init_mov_motors(void);
-void start_straight(int,int);
-void start_turn(int,int);
+void start_straight(int);
+void start_turn(int);
 void stop_mov_motors(void);
 int turn_to_angle(float);
 float scan_for_obstacle(void);
-void continue_until(int,float);
-void turn_absolute(uint8_t,int,int,float);
+void continue_until(float);
+void turn_absolute(uint8_t,int,float);
 int grab(int);
 
 /* add the signature of any new functions from the .c file here */

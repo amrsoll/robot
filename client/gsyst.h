@@ -2,7 +2,7 @@
  * @Author: Natalia Balalaeva <nataliabalalaeva>
  * @Date:   08/01/2018
  * @Last modified by:   amrsoll
- * @Last modified time: 08/01/2018
+ * @Last modified time: 09/01/2018
  */
 
 
@@ -23,16 +23,15 @@
 #ifndef GSYST_H
 #define GSYST_H
 
-float distance;
-float result;
 uint8_t mov_motors[2]; //motors for the movement
 uint8_t grab_motor;
 uint8_t sn_sonar;
 uint8_t sn_gyr;
-int max_speed;
 
 float get_angle(void);
 float get_distance(void);
+int refresh_distance(void);
+int refresh_angle(void);
 int get_new_coordinates(float,float,float,float);
 int init_mov_motors(void);
 void start_straight(int);

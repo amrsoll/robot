@@ -2,7 +2,7 @@
  * @Author: Natalia Balalaeva <nataliabalalaeva>
  * @Date:   08/01/2018
  * @Last modified by:   amrsoll
- * @Last modified time: 08/01/2018
+ * @Last modified time: 09/01/2018
  */
 
 
@@ -41,6 +41,48 @@ float get_distance()
     {
         printf("failed to connect to the sonar\n");
         return -1.0;
+    }
+}
+
+int refresh_distance()
+//refreshes the global variable distance
+{
+    if (ev3_search_sensor(LEGO_EV3_US, &sn_sonar,0))
+    {
+        get_sensor_value0(sn_sonar, &distance );
+            printf("Sonar : %f\n", distance);
+        fflush( stdout );
+        return 0;
+    } else
+    {
+        printf("failed to connect to the sonar\n");
+        return -1;
+    }
+}
+
+int refresh_angle()
+//refreshes the global variable angle
+{
+    get_sensor_value0(sn_gyr,&angle);
+    Sleep(ANGLE_BUFFER_LATENCY);
+    fflush( stdout );
+    //float angle_buffer[ANGLE_BUFFER_SIZE];
+    float measured_angle;
+    int i;
+    if ( ev3_search_sensor( LEGO_EV3_GYRO, &sn_gyr ,0))
+    {
+        for(i=1; i<ANGLE_BUFFER_SIZE; i=i+1)
+        {
+            get_sensor_value0(sn_gyr,&measured_angle);
+            angle = angle + measured_angle;
+            //printf("measuring angle number %d, it's value is %f\n",i, measured_angle);
+            Sleep(ANGLE_BUFFER_LATENCY);
+            fflush( stdout );
+        }
+        angle = angle - init_angle;
+        return 0;
+    } else{
+        return -1;
     }
 }
 
@@ -179,6 +221,7 @@ void continue_until(float goal)
 
 void turn_absolute(uint8_t ss, int a,float angle)
 {
+    float result;
     int b;
     if(mov_motors[0]==ss)
     {

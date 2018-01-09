@@ -3,10 +3,10 @@
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 08/01/2018
+ * @Last modified time: 09/01/2018
  */
 
-
+#include <math.h>
 
 #include "ev3.h"
 #include "ev3_port.h"
@@ -17,6 +17,7 @@
 #define CONSTANTS
 //math
 #define pi 3.14159265
+#define SQRT2 (float)sqrt(2)
 #define max(a,b) \
   ({ __typeof__ (a) _a = (a); \
       __typeof__ (b) _b = (b); \
@@ -52,6 +53,7 @@ float x;
 float y;
 float init_angle;
 float angle; // always : angle = get_angle() - init_angle;
+float distance;
 //float distance; //measured distance of the sonar (in mm)
 
 // Mapping

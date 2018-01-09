@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "gsyst.h" /* Also contains the ev3 libraries*/
-#include "classes.m"
+#include "classes.h"
 #include "constants.m"
 
 int set_char(tCoord,int,int,char,char*);

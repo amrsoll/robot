@@ -38,9 +38,9 @@ ball: ball_test.o ball.o
 ball_test.o: ball_test.c ball.h constants.m
 	$(CC) -o $@ -c $< $(LDFLAGS)
 
-map: map_test.o gsyst.o map.o
+map: map_test.o gsyst.o map.o classes.o
 	$(CC) $^ $(LDFLAGS) -o map
-map_test.o: map_test.c map.h gsyst.h constants.m classes.m
+map_test.o: map_test.c map.h gsyst.h constants.m classes.h
 	$(CC) -o $@ -c $< $(LDFLAGS)
 
 path: path_test.o path.o

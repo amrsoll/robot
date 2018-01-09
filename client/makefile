@@ -2,7 +2,7 @@
 # @Date:   08/01/2018
 # @Email:  axel.soll@telecom-paristech.fr
 # @Last modified by:   amrsoll
-# @Last modified time: 08/01/2018
+# @Last modified time: 09/01/2018
 
 
 
@@ -40,7 +40,7 @@ ball_test.o: ball_test.c ball.h constants.m
 
 map: map_test.o gsyst.o map.o
 	$(CC) $^ $(LDFLAGS) -o map
-map_test.o: map_test.c map.h gsyst.h constants.m
+map_test.o: map_test.c map.h gsyst.h constants.m classes.m
 	$(CC) -o $@ -c $< $(LDFLAGS)
 
 path: path_test.o path.o

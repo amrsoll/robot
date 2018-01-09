@@ -3,7 +3,7 @@
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 08/01/2018
+ * @Last modified time: 09/01/2018
  */
 
 
@@ -17,11 +17,39 @@ struct Point {
     int y;
 };
 
+Point Point_new(int x, int y) {
+  Point p;
+  p.x = x;
+  p.y = y;
+  return p;
+}
+
+//named for coordibates in a table
+typedef struct tCoord tCoord;
+struct tCoord {
+    int i;
+    int j;
+};
+
+tCoord tCoord_new(int i, int j) {
+  tCoord p;
+  p.i = i;
+  p.j = j;
+  return p;
+}
+
 typedef struct fPoint fPoint;
 struct fPoint {
     float x;
     float y;
 };
+
+fPoint fPoint_new(float x, float y) {
+  fPoint p;
+  p.x = x;
+  p.y = y;
+  return p;
+}
 
 typedef struct Pixel Pixel;
 struct Pixel {
@@ -29,6 +57,29 @@ struct Pixel {
     int y;
     char type; //undefined : 0, clear : 1 or wall : 2
 };
+
+Pixel Pixel_new(int x, int y, char type) {
+  Pixel p;
+  p.x = x;
+  p.y = y;
+  p.type = type;
+  return p;
+}
+
+Point fPoint_to_Point(fPoint f)
+{
+    return Point_new((int)f.x,(int)f.y);
+}
+
+tCoord Point_to_tCoord(Point p, tCoord origin)
+//converts the cordinates of a point from a cartesian plot
+//to table coordinates, where origin is the position of the
+//cartesian plot's origin point inside the table.
+{
+    tCoord q = tCoord_new(origin.i-p.y,
+                          origin.j+p.x);
+    return q;
+}
 
 bool pixel_eq(Pixel p1, Pixel p2)
 {

@@ -42,6 +42,7 @@
 int pincer_state;
 #define DISTANCE_DETECT_MOVABLE 150
 #define DISTANCE_BEFORE_STOP 200
+#define FULL_TURN_ANGLE 1040.0
 
 //positioning
 #define ANGLE_BUFFER_SIZE 3
@@ -56,7 +57,7 @@ float angle; // always : angle = get_angle() - init_angle;
 float distance; //measured distance of the sonar (in mm)
 
 // Mapping
-#define PIXEL_SIZE 5 //Length of a pixel corner in cm as treated by the robot.
+#define PIXEL_SIZE 2 //Length of a pixel corner in cm as treated by the robot.
 #define PIXEL_SIZE_TO_SERVER 5 //Length of a pixel corner in cm when sent to the server
 #define MAP_PATH "map/pixels"
 #define MAP_WIDTH 500 // the real width is MAP_WIDTH*PIXEL_SIZE cm
@@ -65,7 +66,7 @@ float distance; //measured distance of the sonar (in mm)
 #define UNDEFINED_PIXEL '+' //pixel type
 #define FREE_PIXEL ' ' //pixel type
 #define WALL_PIXEL '#' //pixel type
-#define SCANNING_MAX_DISTANCE 1500 // in mm, like the ultrasonic sensor return values
+#define SCANNING_MAX_DISTANCE 1500.0 // in mm, like the ultrasonic sensor return values
 #define SCANNING_SPEED 1 // increment of the speed at which the robot turns during mapping scan
 
 

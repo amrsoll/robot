@@ -117,5 +117,33 @@ int main(int argc, char **argv) {
 
     printf("%s\n",tryout);
 #endif
+#ifdef GYRO_TEST
+    init();
+    init_angle = get_angle();
+    refresh_angle();
+    x = 0.0;
+    y = 0.0;
+    int refreshdist = 0;
+    while(refreshdist++<20) refresh_distance();
+    #ifndef __ARM_ARCH_4T__
+        // Disable auto-detection of the brick
+        //(you have to set the correct address below)
+        ev3_brick_addr = EV3_BRICK_ADDR;
+    #endif
+    if ( ev3_init() == -1 ) return ( 1 );
+    #ifndef __ARM_ARCH_4T__
+        printf("The EV3 brick auto-detection is DISABLED,\n");
+        printf("waiting %s online with plugged tacho...\n", ev3_brick_addr );
+    #else
+        printf( "Waiting tacho is plugged...\n" );
+    #endif
 
+    while ( ev3_tacho_init() < 1 ) Sleep( 1000 );
+    float ang;
+    while(1)
+    {
+        refresh_angle();
+        printf("angle : %f\n", angle);
+    }
+#endif
 }

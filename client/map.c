@@ -93,27 +93,20 @@ char* scan() //returns the string result of the scan
     float starting_scan_angle = angle; //angle is created in contants and constantly refreshed
     printf("starting_scan_angle : %f\n", starting_scan_angle);
     tCoord coord;
-    while(abs(starting_scan_angle-angle)<360)
+    while(abs(starting_scan_angle-angle)<FULL_TURN_ANGLE)
     {
         refresh_angle();
-        printf("angle : %f\n", angle);
         refresh_distance();
-        printf("Sonar : %f\n", distance);
+        printf("angle : %f \t\t Sonar : %f\n", angle, distance);
         distance = min(SCANNING_MAX_DISTANCE, distance);
         fPoint fmeasured_point =
-                        fPoint_new(distance*cos(pi*angle/180)/mm_to_pixel_size,
-                                   distance*sin(pi*angle/180)/mm_to_pixel_size);
+            fPoint_new(distance*cos(2*pi*angle/FULL_TURN_ANGLE)/mm_to_pixel_size,
+                       distance*sin(2*pi*angle/FULL_TURN_ANGLE)/mm_to_pixel_size);
         measured_point = fPoint_to_Point(fmeasured_point);
         coord = Point_to_tCoord(measured_point, robot_coord_in_scanResult_str);
         if( Point_eq(last_point,O) || !Point_eq(last_point, measured_point) )
         {
-            if(distance > SCANNING_MAX_DISTANCE - 1.0)
-                set_char(coord,width,height,FREE_PIXEL,scanResult);
-            else
-            {
-                set_char(coord,width,height,WALL_PIXEL,scanResult);
-                printf("wall pixel set\n" );
-            }
+
             //printf("I have set the wall pixel (%d : %d)\n",
                 // measured_point.x ,
                 // measured_point.y);
@@ -124,16 +117,16 @@ char* scan() //returns the string result of the scan
             Point s = Point_new(min(min(measured_point.x, last_point.x),0),
                                 min(min(measured_point.y, last_point.y),0));
             int sy=s.y;
-            printf("breack1\n");
+            //printf("breack1\n");
             while (s.x< max(max(measured_point.x, last_point.x),0))
             {
-                printf("   breack2\n");
+                //printf("   breack2\n");
                 while (s.y< max(max(measured_point.y, last_point.y),0))
                 {
-                    printf("        breack3\n");
+                    //printf("        breack3\n");
                     tCoord ts = Point_to_tCoord(s,robot_coord_in_scanResult_str);
-                    if(get_char(ts,width,height,scanResult)==WALL_PIXEL)
-                        continue;
+                    // if(get_char(ts,width,height,scanResult)==WALL_PIXEL)
+                    //     continue;
                     if( !Point_eq(last_point,O) ) {
                         if(intpoint_in_trigon(s, O, measured_point, last_point))
                             set_char(ts,width,height,FREE_PIXEL,scanResult);
@@ -149,6 +142,13 @@ char* scan() //returns the string result of the scan
                 s.x++;
             }
             last_point = measured_point;
+            if(distance > SCANNING_MAX_DISTANCE - 1.0)
+                set_char(coord,width,height,FREE_PIXEL,scanResult);
+            else
+            {
+                set_char(coord,width,height,WALL_PIXEL,scanResult);
+                printf("wall pixel set\n" );
+            }
         }
     }
     set_char(robot_coord_in_scanResult_str,width,height,'a',scanResult);

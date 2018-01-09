@@ -85,10 +85,10 @@ int refresh_angle()
     }
 }
 
-int get_new_coordinates(float x0, float y0,float dist, float current_angle)
+int get_new_coordinates(float x0, float y0,float distance, float current_angle)
 {
-    float coord[2] = {x0+dist*sin(current_angle/pi),
-                      y0+dist*cos(current_angle/pi)};
+    float coord[2] = {x0+distance*sin(current_angle/pi),
+                      y0+distance*cos(current_angle/pi)};
     x = coord[0];
     y = coord[1];
     return 0;
@@ -190,6 +190,7 @@ float scan_for_obstacle()
 
 void continue_until(float goal)
 {
+
     distance = get_distance();
     if(distance <= goal) return;
     float init_distance = distance;

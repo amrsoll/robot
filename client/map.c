@@ -98,6 +98,7 @@ char* scan() //returns the string result of the scan
         refresh_angle();
         printf("angle : %f\n", angle);
         refresh_distance();
+        printf("Sonar : %f\n", distance);
         distance = min(SCANNING_MAX_DISTANCE, distance);
         fPoint fmeasured_point =
                         fPoint_new(distance*cos(pi*angle/180)/mm_to_pixel_size,

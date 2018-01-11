@@ -3,7 +3,7 @@
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 09/01/2018
+ * @Last modified time: 11/01/2018
  */
 
 
@@ -86,8 +86,10 @@ char* scan() //returns the string result of the scan
     // buffer = malloc(10*sizeof(int)/SCANNING_SPEED);stdbool.h
     // if (buffer == NULL) exit(-1); // Error : failed to allocate memory
     // unsigned short int buffer_index = 0;
-    Point last_point = Point_new(0,0); //so as to not constantly change the same pixel
     Point measured_point; //coordinates of the tile/pixel the sonar hits into.
+    // last_point will take the value of previously measured point.
+    Point last_point = Point_new(0,0);
+
     start_turn(SCANNING_SPEED);
     refresh_angle();
     float starting_scan_angle = angle; //angle is created in contants and constantly refreshed
@@ -105,54 +107,47 @@ char* scan() //returns the string result of the scan
         measured_point = fPoint_to_Point(fmeasured_point);
         coord = Point_to_tCoord(measured_point, robot_coord_in_scanResult_str);
         if( Point_eq(last_point,O) || !Point_eq(last_point, measured_point) )
+        //so as to not constantly change the same pixels (optimisation)
         {
-
-            //printf("I have set the wall pixel (%d : %d)\n",
-                // measured_point.x ,
-                // measured_point.y);
-            //printf("last_point.x : %d\n", last_point.x);
-            //fill the pixels between the wall and you with free space
-            //if it's not already a wall or free space
-            //optimisation : s is the same wether last point is equal to O or not
+            //shuffle between the boxes contained in the smallest rectangle \
+            consisting of O (robot position), measured_point and last_point
             Point s = Point_new(min(min(measured_point.x, last_point.x),0),
                                 min(min(measured_point.y, last_point.y),0));
             int sy=s.y;
-            //printf("breack1\n");
             while (s.x< max(max(measured_point.x, last_point.x),0))
             {
-                //printf("   breack2\n");
                 while (s.y< max(max(measured_point.y, last_point.y),0))
                 {
-                    //printf("        breack3\n");
                     tCoord ts = Point_to_tCoord(s,robot_coord_in_scanResult_str);
-                    // if(get_char(ts,width,height,scanResult)==WALL_PIXEL)
-                    //     continue;
                     if( !Point_eq(last_point,O) ) {
+                        //free all the pixels contained in the triangle defined by
+                        //the two last measured points and the position of the robot
                         if(intpoint_in_trigon(s, O, measured_point, last_point))
                             set_char(ts,width,height,FREE_PIXEL,scanResult);
                     }
-                    else{
+                    else{ //if it is the first measure, last_point == O
+                        //fill the pixels between the wall and you with free space
                         if(intsquare_fray_intersect(s,Point_to_fPoint(O),fmeasured_point))
                             set_char(ts,width,height,FREE_PIXEL,scanResult);
                     }
-
                     s.y++;
                 }
                 s.y = sy;
                 s.x++;
             }
-            last_point = measured_point;
-            if(distance > SCANNING_MAX_DISTANCE - 1.0)
-                set_char(coord,width,height,FREE_PIXEL,scanResult);
-            else
+            // And set the furthest pixel to become a wall if appropriate.
+            if(distance < SCANNING_MAX_DISTANCE - .4) //-.4 because of rounding errors
             {
                 set_char(coord,width,height,WALL_PIXEL,scanResult);
                 printf("wall pixel set\n" );
             }
+            last_point = measured_point;
         }
     }
-    set_char(robot_coord_in_scanResult_str,width,height,'a',scanResult);
+    // smooth the map out / remove scattered pixels
     free_isolated_cells(scanResult);
+    // mark the position of the robot during the scan
+    set_char(robot_coord_in_scanResult_str,width,height,'a',scanResult);
     stop_mov_motors();
     // free(buffer); //prevent memory leaks
     return scanResult;

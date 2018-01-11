@@ -3,7 +3,7 @@
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 09/01/2018
+ * @Last modified time: 11/01/2018
  */
 
 
@@ -59,6 +59,21 @@ tCoord Point_to_tCoord(Point p, tCoord origin)
     return q;
 }
 
+Point Padd(Point a, Point b)
+{
+    return Point_new(a.x+b.x, a.y+b.y);
+}
+
+fPoint fadd(fPoint a, fPoint b)
+{
+    return fPoint_new(a.x+b.x, a.y+b.y);
+}
+
+tCoord tadd(tCoord a, tCoord b)
+{
+    return tCoord_new(a.i+b.i, a.j+b.j);
+}
+
 bool intsquare_fray_intersect(Point sqCoord,fPoint r0,fPoint r1)
 //sqCoord is the coordinate of the bottom left summit of the square.
 //The square is supposed to be of size 1.
@@ -86,6 +101,11 @@ bool Point_eq(Point p1, Point p2)
     return p1.x == p2.x && p1.y == p2.y;
 }
 
+bool tCoord_eq(tCoord p1, tCoord p2)
+{
+    return p1.i == p2.j && p1.i == p2.j;
+}
+
 // float norm(fPoint p)
 // {
 //     return sqrt(p.x*p.x + p.y*p.y);
@@ -109,9 +129,9 @@ bool fPoint_in_trigon (fPoint pt, fPoint v1, fPoint v2, fPoint v3)
 {
     bool b1, b2, b3;
 
-    b1 = sign(pt, v1, v2) < 0.0f;
-    b2 = sign(pt, v2, v3) < 0.0f;
-    b3 = sign(pt, v3, v1) < 0.0f;
+    b1 = sign(pt, v1, v2) <= 0.0f;
+    b2 = sign(pt, v2, v3) <= 0.0f;
+    b3 = sign(pt, v3, v1) <= 0.0f;
 
     return ((b1 == b2) && (b2 == b3));
 }
@@ -121,11 +141,39 @@ bool intpoint_in_trigon (Point s, Point a, Point b, Point c)
     int as_x = s.x-a.x;
     int as_y = s.y-a.y;
 
-    bool s_ab = (b.x-a.x)*as_y-(b.y-a.y)*as_x > 0;
+    bool s_ab = (b.x-a.x)*as_y-(b.y-a.y)*as_x >= 0;
 
-    if((c.x-a.x)*as_y-(c.y-a.y)*as_x > 0 == s_ab) return false;
+    if((c.x-a.x)*as_y-(c.y-a.y)*as_x >= 0 == s_ab) return false;
 
-    if((c.x-b.x)*(s.y-b.y)-(c.y-b.y)*(s.x-b.x) > 0 != s_ab) return false;
+    if((c.x-b.x)*(s.y-b.y)-(c.y-b.y)*(s.x-b.x) >= 0 != s_ab) return false;
 
     return true;
+}
+
+int set_char(tCoord coord, int width, int height, char value, char* str) //Changes the char value str on line i and j
+{
+    if(coord.i>=height){
+        printf("set_char : index out of range : i = %d and height = %d\n", coord.i, height);
+        return -1;
+    }
+    if(coord.j>=width){
+        printf("set_char : index out of range : j = %d and width = %d\n", coord.j, width);
+        return -1;
+    }
+    str[coord.i*width+coord.j] = value;
+    return 0;
+}
+
+char get_char(tCoord coord, int width, int height, char* str)
+//i0 and j0 is the position of the origin of the x and y axis
+{
+    if(coord.i>=height){
+        printf("get_char : index out of range : i = %d and height = %d\n", coord.i, height);
+        return -1;
+    }
+    if(coord.j>=width){
+        printf("get_char : index out of range : j = %d and width = %d\n", coord.j, width);
+        return -1;
+    }
+    return str[coord.i*width+coord.j];
 }

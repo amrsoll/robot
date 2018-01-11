@@ -10,33 +10,6 @@
 
 #include "map.h"
 
-int set_char(tCoord coord, int width, int height, char value, char* str) //Changes the char value str on line i and j
-{
-    if(coord.i>=height){
-        printf("set_char : index out of range : i = %d and height = %d\n", coord.i, height);
-        return -1;
-    }
-    if(coord.j>=width){
-        printf("set_char : index out of range : j = %d and width = %d\n", coord.j, width);
-        return -1;
-    }
-    str[coord.i*width+coord.j] = value;
-    return 0;
-}
-
-char get_char(tCoord coord, int width, int height, char* str)
-//i0 and j0 is the position of the origin of the x and y axis
-{
-    if(coord.i>=height){
-        printf("get_char : index out of range : i = %d and height = %d\n", coord.i, height);
-        return -1;
-    }
-    if(coord.j>=width){
-        printf("get_char : index out of range : j = %d and width = %d\n", coord.j, width);
-        return -1;
-    }
-    return str[coord.i*width+coord.j];
-}
 
 char* get_new_local_map(int width, int height)
 //be sure to free the output when finished using #memory leak
@@ -74,7 +47,6 @@ char* scan() //returns the string result of the scan
 //remember to free the returned value
 {
     Point O = Point_new(0,0);
-    float step_fill_free_space = 0.2;
     int mm_to_pixel_size = 10*PIXEL_SIZE;
     int width  = 2*SCANNING_MAX_DISTANCE/mm_to_pixel_size+2; //adding one in case of debordement
     int height = 2*SCANNING_MAX_DISTANCE/mm_to_pixel_size+2;
@@ -88,7 +60,7 @@ char* scan() //returns the string result of the scan
     // unsigned short int buffer_index = 0;
     Point measured_point; //coordinates of the tile/pixel the sonar hits into.
     // last_point will take the value of previously measured point.
-    Point last_point = Point_new(0,0);
+    Point last_point =  Point_new(0,0);
 
     start_turn(SCANNING_SPEED);
     refresh_angle();
@@ -97,10 +69,12 @@ char* scan() //returns the string result of the scan
     tCoord coord;
     while(abs(starting_scan_angle-angle)<FULL_TURN_ANGLE)
     {
+        // TODO : manual or clock interpolation to counter the wall curvatures.
         refresh_angle();
         refresh_distance();
         printf("angle : %f \t\t Sonar : %f\n", angle, distance);
         distance = min(SCANNING_MAX_DISTANCE, distance);
+        // TODO : adapt speed to the measured distance (precision)
         fPoint fmeasured_point =
             fPoint_new(distance*cos(2*pi*angle/FULL_TURN_ANGLE)/mm_to_pixel_size,
                        distance*sin(2*pi*angle/FULL_TURN_ANGLE)/mm_to_pixel_size);
@@ -118,6 +92,8 @@ char* scan() //returns the string result of the scan
             {
                 while (s.y< max(max(measured_point.y, last_point.y),0))
                 {
+                    //TODO : set a maximum limit to where the scan can overwrite\
+                     pixels that were already known (precision)
                     tCoord ts = Point_to_tCoord(s,robot_coord_in_scanResult_str);
                     if( !Point_eq(last_point,O) ) {
                         //free all the pixels contained in the triangle defined by

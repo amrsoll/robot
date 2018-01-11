@@ -3,7 +3,7 @@
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 09/01/2018
+ * @Last modified time: 11/01/2018
  */
 
 
@@ -19,8 +19,6 @@
 #include "classes.h"
 #include "constants.m"
 
-int set_char(tCoord,int,int,char,char*);
-char get_char(tCoord,int,int,char*);
 char* get_new_local_map(int, int);
 void free_isolated_cells(char*);
 char* scan();

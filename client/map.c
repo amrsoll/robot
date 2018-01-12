@@ -3,7 +3,7 @@
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 11/01/2018
+ * @Last modified time: 12/01/2018
  */
 
 
@@ -48,6 +48,7 @@ char* scan() //returns the string result of the scan
 {
     Point O = Point_new(0,0);
     int mm_to_pixel_size = 10*PIXEL_SIZE;
+    float distance_before_setting_a_new_wall = SCANNING_MAX_DISTANCE - .4;
     int width  = 2*SCANNING_MAX_DISTANCE/mm_to_pixel_size+2; //adding one in case of debordement
     int height = 2*SCANNING_MAX_DISTANCE/mm_to_pixel_size+2;
     char* scanResult = get_new_local_map(width, height);
@@ -60,7 +61,7 @@ char* scan() //returns the string result of the scan
     // unsigned short int buffer_index = 0;
     Point measured_point; //coordinates of the tile/pixel the sonar hits into.
     // last_point will take the value of previously measured point.
-    Point last_point =  Point_new(0,0);
+    Point last_point =  Point_new(0,0); //initialised like 0 so as to know if nothing has been measured before
 
     start_turn(SCANNING_SPEED);
     refresh_angle();
@@ -72,7 +73,6 @@ char* scan() //returns the string result of the scan
         // TODO : manual or clock interpolation to counter the wall curvatures.
         refresh_angle();
         refresh_distance();
-        printf("angle : %f \t\t Sonar : %f\n", angle, distance);
         distance = min(SCANNING_MAX_DISTANCE, distance);
         // TODO : adapt speed to the measured distance (precision)
         fPoint fmeasured_point =
@@ -87,32 +87,43 @@ char* scan() //returns the string result of the scan
             consisting of O (robot position), measured_point and last_point
             Point s = Point_new(min(min(measured_point.x, last_point.x),0),
                                 min(min(measured_point.y, last_point.y),0));
-            int sy=s.y;
-            while (s.x< max(max(measured_point.x, last_point.x),0))
+            int sy_init=s.y;
+            if( Point_eq(last_point,O) )
             {
-                while (s.y< max(max(measured_point.y, last_point.y),0))
+                while (s.x< max(max(measured_point.x, last_point.x),0))
                 {
-                    //TODO : set a maximum limit to where the scan can overwrite\
-                     pixels that were already known (precision)
-                    tCoord ts = Point_to_tCoord(s,robot_coord_in_scanResult_str);
-                    if( !Point_eq(last_point,O) ) {
-                        //free all the pixels contained in the triangle defined by
-                        //the two last measured points and the position of the robot
-                        if(intpoint_in_trigon(s, O, measured_point, last_point))
-                            set_char(ts,width,height,FREE_PIXEL,scanResult);
-                    }
-                    else{ //if it is the first measure, last_point == O
+                    while (s.y< max(max(measured_point.y, last_point.y),0))
+                    {
+                        //TODO : set a maximum limit to where the scan can overwrite\
+                         pixels that were already known (precision)
+                        tCoord ts = Point_to_tCoord(s,robot_coord_in_scanResult_str);
+                        //if it is the first measure, last_point == O
                         //fill the pixels between the wall and you with free space
                         if(intsquare_fray_intersect(s,Point_to_fPoint(O),fmeasured_point))
                             set_char(ts,width,height,FREE_PIXEL,scanResult);
                     }
                     s.y++;
                 }
-                s.y = sy;
+                s.y = sy_init;
+                s.x++;
+            } else
+            {
+                while (s.x< max(max(measured_point.x, last_point.x),0))
+                {
+                    while (s.y< max(max(measured_point.y, last_point.y),0))
+                    {
+                        //free all the pixels contained in the triangle defined by
+                        //the two last measured points and the position of the robot
+                        if(intpoint_in_trigon(s, O, measured_point, last_point))
+                            set_char(ts,width,height,FREE_PIXEL,scanResult);
+                    }
+                    s.y++;
+                }
+                s.y = sy_init;
                 s.x++;
             }
             // And set the furthest pixel to become a wall if appropriate.
-            if(distance < SCANNING_MAX_DISTANCE - .4) //-.4 because of rounding errors
+            if(distance < distance_before_setting_a_new_wall) //-.4 because of rounding errors
             {
                 set_char(coord,width,height,WALL_PIXEL,scanResult);
                 printf("wall pixel set\n" );

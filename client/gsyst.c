@@ -2,7 +2,7 @@
  * @Author: Natalia Balalaeva <nataliabalalaeva>
  * @Date:   08/01/2018
  * @Last modified by:   amrsoll
- * @Last modified time: 09/01/2018
+ * @Last modified time: 12/01/2018
  */
 
 
@@ -47,16 +47,7 @@ float get_distance()
 int refresh_distance()
 //refreshes the global variable distance
 {
-    if (ev3_search_sensor(LEGO_EV3_US, &sn_sonar,0))
-    {
-        get_sensor_value0(sn_sonar, &distance );
-        fflush( stdout );
-        return 0;
-    } else
-    {
-        printf("failed to connect to the sonar\n");
-        return -1;
-    }
+    get_sensor_value0(sn_sonar, &distance );
 }
 
 int refresh_angle()

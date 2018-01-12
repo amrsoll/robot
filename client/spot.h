@@ -10,6 +10,7 @@
 
 #ifndef SPOT_H
 #define SPOT_H
+#include <string.h>
 #include "constants.m"
 #include "classes.h"
 
@@ -19,10 +20,12 @@
 #define DIST_MIN_FROM_WALLS = DIST_MIN_FROM_WALLS_cm/PIXEL_SIZE ; //multiple of pixels.
 #define CONNEX_MAX_BUFFER_SIZE = MAP_WIDTH*MAP_WIDTH;
 
+tCoord* get_neighbours_of_same_char(tCoord,char,int,int,char*);
+bool tCoord_explored(tCoord,tCoord*,size_t);
+void get_connex_tCoord_of_same_char(tCoord,char,int,int,char*,tCoord*,size_t*);
 
-Pixel* get_connex_Pixels(Pixel);
-Point* get_connex_Pixels_coords(Pixel);
-int* getNewSpot(void);
+
+int* getNewSpot(void); //TODO
 
 /* add the signature of any new functions from the .c file here */
 

@@ -3,7 +3,7 @@
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 11/01/2018
+ * @Last modified time: 12/01/2018
  */
 
 #include <math.h>
@@ -44,9 +44,12 @@ int pincer_state;
 #define DISTANCE_BEFORE_STOP 200
 #define FULL_TURN_ANGLE 1040.0
 
+//sensors
+#define GYRO_SAMPLE_RATE 1000 // in HZ // Sample rate of 1 kHz
+
 //positioning
 #define ANGLE_BUFFER_SIZE 3
-#define ANGLE_BUFFER_LATENCY 10 //duration of sleep between each measure (ms)
+#define ANGLE_BUFFER_LATENCY 1000/GYRO_SAMPLE_RATE+1 //duration of sleep between each measure (ms)
 #define COMPASS_BUFFER_SIZE 4
 #define COMPASS_BUFFER_LATENCY 10
 #define POSITION_MESSAGE_DELAY .3 //delay between each position message to the server

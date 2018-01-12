@@ -96,11 +96,13 @@ char* scan() //returns the string result of the scan
                     {
                         //TODO : set a maximum limit to where the scan can overwrite\
                          pixels that were already known (precision)
-                        tCoord ts = Point_to_tCoord(s,robot_coord_in_scanResult_str);
                         //if it is the first measure, last_point == O
                         //fill the pixels between the wall and you with free space
                         if(intsquare_fray_intersect(s,Point_to_fPoint(O),fmeasured_point))
-                            set_char(ts,width,height,FREE_PIXEL,scanResult);
+                            set_char(Point_to_tCoord(s,robot_coord_in_scanResult_str)
+                                    ,width,height
+                                    ,FREE_PIXEL
+                                    ,scanResult);
                     }
                     s.y++;
                 }
@@ -115,7 +117,11 @@ char* scan() //returns the string result of the scan
                         //free all the pixels contained in the triangle defined by
                         //the two last measured points and the position of the robot
                         if(intpoint_in_trigon(s, O, measured_point, last_point))
-                            set_char(ts,width,height,FREE_PIXEL,scanResult);
+                            set_char(Point_to_tCoord(s,robot_coord_in_scanResult_str)
+                                    ,width
+                                    ,height
+                                    ,FREE_PIXEL
+                                    ,scanResult);
                     }
                     s.y++;
                 }

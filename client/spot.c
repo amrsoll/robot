@@ -8,6 +8,7 @@
 
 #include "spot.h"
 
+
 int number_of_set_bits(int i)
 //found on stackoverflow
 {
@@ -16,35 +17,40 @@ int number_of_set_bits(int i)
      return (((i + (i >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
 }
 
-tCoord* get_neighbours_of_same_char(tCoord tc, char c, int width, int height, char* map)
+void get_neighbours_of_same_char(tCoord tc, char c,tCoord* output, int width, int height, char* map)
 {
-    int* offset[3] = {-1,0,1};
+    int offset[3] = {-1,0,1};
     int i=0;
     tCoord neighbour;
     int j=0;
+    printf("                  break 4\n");
     while(i<4)
     {
         neighbour = tCoord_new(tc.i+offset[i%3], tc.j+offset[(i+1)%3]);
-        if(c==get_char(neighbour,width,height,map)
-            &&neighbour.i>-1
-            &&neighbour.i<height
-            &&neighbour.j>-1) // no &&neighbour.j<width because of \n
+        printf("####    break 5\n");
+        if(neighbour.i>-1
+           &&neighbour.i<height
+           &&neighbour.j>-1
+           &&c==get_char(neighbour,width,height,map)
+        ) // no &&neighbour.j<width because of \n
             j|=1;
+        printf("####    break 6\n");
         j<<=1;
         i++;
     }
-    int k = numberOfSetBits(j)+1
-    tCoord* neighbours[k];
+    int k = number_of_set_bits(j)+1;
+    //tCoord output[k];
     k--;
-    neighbours[k] = tc;
+    output[k] = tc;
+    printf("                 break 7\n");
     while(i>0){
         if(j&1){
             k--;
-            neighbours[k]=tCoord_new(tc.i+offset[i%3], tc.j+offset[(i--+1)%3]);
+            output[k]=tCoord_new(tc.i+offset[i%3], tc.j+offset[(i--+1)%3]);
+            printf("####    break 8\n");
         }
         j>>=1;
     }
-    return neighbours;
 }
 
 bool tCoord_explored(tCoord tc, tCoord* connextCoords, size_t sizeof_connextCoords)
@@ -68,15 +74,21 @@ void get_connex_tCoord_of_same_char(tCoord tc,
 // tCoord* connextCoords[strlen(map)-height+1]; do not count the \n in the map
 // size_t sizeof_connextCoords = 0;
 {
-    if(!tCoord_explored(tc, connextCoords, &sizeof_connextCoords))
+    printf("break 1\n");
+    if(!tCoord_explored(tc, connextCoords, *sizeof_connextCoords))
     {
-        connextCoords[sizeof_connextCoords] = tc;
+        printf("      break 2\n");
+        printf("      size_t sizeof_connextCoords : %d\n", (int)*sizeof_connextCoords );
+        tCoord neighbourBuffer[4];
+        connextCoords[(int)*sizeof_connextCoords] = tc;
         sizeof_connextCoords++;
-        tCoord* neighbours = get_neighbours_of_same_char(tc,c, width, height, map);
+        printf("              break 3\n");
+        get_neighbours_of_same_char(tc,c, neighbourBuffer, width, height, map);
         int i=0;
-        while(!tCoord_eq(neighbours[i],tc))
+            printf("                      break 9\n");
+        while(!tCoord_eq(neighbourBuffer[i],tc))
         {
-            get_connex_tCoord_of_same_char(tc[i], c, width, height, map, connextCoords, sizeof_connextCoords);
+            get_connex_tCoord_of_same_char(neighbourBuffer[i], c, width, height, map, connextCoords, sizeof_connextCoords);
             i++;
         }
     }

@@ -2,7 +2,7 @@
 # @Date:   08/01/2018
 # @Email:  axel.soll@telecom-paristech.fr
 # @Last modified by:   amrsoll
-# @Last modified time: 11/01/2018
+# @Last modified time: 12/01/2018
 
 
 
@@ -48,9 +48,9 @@ path: path_test.o path.o
 path_test.o: path_test.c path.h constants.m
 	$(CC) -o $@ -c $< $(LDFLAGS)
 
-spot: spot_test.o spot.o
+spot: spot_test.o spot.o classes.o map.o gsyst.o
 	$(CC) $^ $(LDFLAGS) -o spot
-spot_test.o: spot_test.c spot.h constants.m
+spot_test.o: spot_test.c spot.h classes.h map.h gsyst.h constants.m
 	$(CC) -o $@ -c $< $(LDFLAGS)
 
 servercom: servercom_test.o servercom.o

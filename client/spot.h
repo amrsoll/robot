@@ -3,7 +3,7 @@
  * @Date:   17/12/2017
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 11/01/2018
+ * @Last modified time: 12/01/2018
  */
 
 
@@ -20,7 +20,8 @@
 #define DIST_MIN_FROM_WALLS = DIST_MIN_FROM_WALLS_cm/PIXEL_SIZE ; //multiple of pixels.
 #define CONNEX_MAX_BUFFER_SIZE = MAP_WIDTH*MAP_WIDTH;
 
-tCoord* get_neighbours_of_same_char(tCoord,char,int,int,char*);
+int number_of_set_bits(int);
+void get_neighbours_of_same_char(tCoord,char,tCoord*,int,int,char*);
 bool tCoord_explored(tCoord,tCoord*,size_t);
 void get_connex_tCoord_of_same_char(tCoord,char,int,int,char*,tCoord*,size_t*);
 

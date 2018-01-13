@@ -8,6 +8,10 @@
 
 ARCH=$(shell uname -m)
 
+	CC=arm-linux-gnueabi-gcc
+	CFLAGS=-W -Wall -ansi -pedantic
+	LDFLAGS=-I/src/ev3dev-c/source/ev3/ -lm /src/ev3dev-c/lib/libev3dev-c.a
+	BT=
 ifeq ($(ARCH),x86_64) #this means we are on the docker platform
 	CC=arm-linux-gnueabi-gcc
 	CFLAGS=-W -Wall -ansi -pedantic

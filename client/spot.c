@@ -23,44 +23,56 @@ void get_neighbours_of_same_char(tCoord tc, char c,tCoord* output, int width, in
     int i=0;
     tCoord neighbour;
     int j=0;
-    printf("                  break 4\n");
+    printf("                  break 4       tc.i=%d  ,  tc.j=%d\n",tc.i,tc.j);
     while(i<4)
     {
+        j<<=1;
         neighbour = tCoord_new(tc.i+offset[i], tc.j+offset[(i+1)%4]);
-        printf("####    break 5\n");
         if(neighbour.i>-1
            &&neighbour.i<height
            &&neighbour.j>-1
            &&c==get_char(neighbour,width,height,map)
         ) // no &&neighbour.j<width because of \n
+        {
+            printf("####    break 5        n.i=%d  ,  n.j=%d\n",neighbour.i,neighbour.j);
             j|=1;
-        printf("####    break 6\n");
-        j<<=1;
+        }
         i++;
     }
-    int k = number_of_set_bits(j)+1;
-    //tCoord output[k];
-    k--;
-    output[k] = tc;
-    printf("                 break 7\n");
+    int k = number_of_set_bits(j)-1;
+    if(k<3)
+    {
+      output[k+1] = tc;
+    }
+    printf("                 break 7   k=%d  ,  j=%d\n",k,j);
     while(i>0){
         if(j&1){
+            output[k]=tCoord_new(tc.i+offset[i-1], tc.j+offset[i%4]);
+            //printf("####    break 8  indice =%d\n",3-k);
             k--;
-            output[k]=tCoord_new(tc.i+offset[i], tc.j+offset[(i+1)%4]);
-            printf("####    break 8\n");
         }
         i--;
         j>>=1;
     }
+    printf("output get_neighbours_of_same_char :   ");
+    for(i=0;i<4;i++)
+      printf("(%d , %d)  ", output[i].i,output[i].j);
+    printf("\n");
 }
 
 bool tCoord_explored(tCoord tc, tCoord* connextCoords, size_t sizeof_connextCoords)
 {
     int i=0;
-    while(i<sizeof_connextCoords)
+    //printf("sizeof_connextCoords : %d , i \n", sizeof_connextCoords);
+    while(i<(int)sizeof_connextCoords)
     {
         if(tCoord_eq(tc, connextCoords[i]))
+        {
+            // printf(" tCoord_explored : tc                  i=%d  ,  j=%d\n",tc.i,tc.j);
+            // printf(" tCoord_explored : connextCoords[i]    i=%d  ,  j=%d\n",tc.i,tc.j);
             return true;
+        }
+        i++;
     }
     return false;
 }
@@ -75,19 +87,22 @@ void get_connex_tCoord_of_same_char(tCoord tc,
 // tCoord* connextCoords[strlen(map)-height+1]; do not count the \n in the map
 // size_t sizeof_connextCoords = 0;
 {
-    printf("break 1\n");
+    printf("break 1             tc.i=%d  ,  tc.j=%d\n",tc.i,tc.j);
     if(!tCoord_explored(tc, connextCoords, *sizeof_connextCoords))
     {
-        printf("      break 2\n");
-        printf("      size_t sizeof_connextCoords : %d\n", (int)*sizeof_connextCoords );
-        tCoord neighbourBuffer[4];
         connextCoords[(int)*sizeof_connextCoords] = tc;
-        sizeof_connextCoords++;
-        printf("              break 3\n");
+        sizeof_connextCoords[0]++;
+        tCoord neighbourBuffer[4];
+        printf("break 2                                 size_t sizeof_connextCoords : %d\n", (int)*sizeof_connextCoords );
+        printf("break 2                                 connextCoords : " );
+        int k;
+        for(k=0;k<sizeof_connextCoords[0];k++)
+          if(connextCoords[k].i<0 || connextCoords[k].i>9 || connextCoords[k].j<0 || connextCoords[k].j>9 || k>sizeof_connextCoords[0]-3)
+            printf("(%d , %d)  ", connextCoords[k].i,connextCoords[k].j);
+        printf("\n");
         get_neighbours_of_same_char(tc,c, neighbourBuffer, width, height, map);
         int i=0;
-            printf("                      break 9\n");
-        while(!tCoord_eq(neighbourBuffer[i],tc))
+        while(!tCoord_eq(neighbourBuffer[i],tc) || i<4)
         {
             get_connex_tCoord_of_same_char(neighbourBuffer[i], c, width, height, map, connextCoords, sizeof_connextCoords);
             i++;

@@ -18,8 +18,9 @@ int main(int argc, char **argv) {
     tCoord origin = tCoord_new(2,2);
     char* map = "++++++++++\n++++++++++\n++++++++++\n++++++++++\n++++++++++\n++++++++++\n++++++++++\n++++++++++\n++++++++++\n++++++++++\n";
     width++;
-    tCoord connextCoords[strlen(map)-height+1]; // do not count the \n in the map
-    size_t sizeof_connextCoords[1] = {0};
+    tCoord connextCoords[5*strlen(map)+1]; // do not count the \n in the map
+    size_t sizeof_connextCoords[1];
+    sizeof_connextCoords[0] = 0;
     printf("map freed of connex: \n%s\n", map);
 
     get_connex_tCoord_of_same_char(tCoord_new(5,5),

@@ -103,7 +103,7 @@ bool Point_eq(Point p1, Point p2)
 
 bool tCoord_eq(tCoord p1, tCoord p2)
 {
-    return p1.i == p2.j && p1.i == p2.j;
+    return p1.i == p2.i && p1.j == p2.j;
 }
 
 // float norm(fPoint p)

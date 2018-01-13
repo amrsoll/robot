@@ -1,10 +1,40 @@
 #include "servercom.h"
 
+
+volatile int DONE_EXPLORING = 0;
+int16_t posX, posY;
+
+/* dummy */
+int setPosition() {
+    posX += 1;
+    posY += 2;
+}
+
+void *thSendPosition() {
+    while(!DONE_EXPLORING) {
+        Sleep(2000);
+        setPosition();
+        send_POSITION(posX, posY);
+    }
+    pthread_exit(NULL);
+}
+
+void *thReceiveFromServer() {
+    while(!DONE_EXPLORING) {
+        parse_message();
+    }
+    pthread_exit(NULL);
+}
+
 int main(int argc, char **argv) {
 
-    //printf("hello\n");
-
-    int16_t posX, posY;
+    /* start position */
+    posX = 0;
+    posY = 0;
+    
+    /* threads */
+    pthread_t positioning;
+    pthread_t receiving;
 
     /* SET UP BT CONNECTION TO SERVER */
     struct sockaddr_rc addr = { 0 };
@@ -28,28 +58,36 @@ int main(int argc, char **argv) {
             printf("Received start message!\n");
         }
 
-        int i;
-        posX=0x00;
-        posY=0x00;
+        if(pthread_create(&positioning, NULL, thSendPosition, NULL)) {
+            fprintf(stderr, "Error creating thread\n");
+            return 1;
+        }
+        if(pthread_create(&receiving, NULL, thReceiveFromServer, NULL)) {
+            fprintf(stderr, "Error creating thread\n");
+            return 1;
+        }
+        printf("Threads created successfully\n");
 
-        for (i=0;i<30;i++) {
-            send_POSITION(posX, posY);
-            posX++;
-            posY++;
-            Sleep(2000);
+        Sleep(20000);
+
+        printf("Done exploring\n");
+        DONE_EXPLORING = 1;
+
+        if (!pthread_join(positioning, NULL)) {
+            printf("Thread positioning joined.\n");
+        } else {
+            printf("Error joining threads.\n");
+        }
+        if (!pthread_join(thread, NULL)) {
+            printf("Thread receiving joined.\n");
+        } else {
+            printf("Error joining threads.\n");
         }
 
-        while(1) {
-            read_from_server(string, 58);
-            if(string[4] == MSG_STOP) {
-                printf("STOP received!");
-                break;
-            }
-            else if(string[4] == MSG_KICK && string[5] == TEAM_ID) {
-                printf("We got kicked! :(");
-                break;
-            }
-        }
+
+
+
+
     } else {
         fprintf(stderr, "Failed to connect to server...\n");
         sleep(2);

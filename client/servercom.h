@@ -10,6 +10,7 @@
 #include <math.h>
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/rfcomm.h>
+#include <pthread.h>
 
 #define SERV_ADDR "00:19:0E:10:72:CB" //This is my address(Axel) //"00:1A:7D:DA:71:06"
 /* ZEN = 60:57:18:3e:03:86 */

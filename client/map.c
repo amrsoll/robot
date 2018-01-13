@@ -35,12 +35,21 @@ char* get_new_local_map(int width, int height)
 }
 
 
-void free_isolated_cells(char* map)
+void free_isolated_cells(tCoord cell, char* map, int width, int height)
 //if a pixel is directly surrounded by four pixels of a different type,
 //then turn it into that type
 {
-    // TODO
-    // be careful with borders
+    last_row = height*width;
+    tCoord output[4];
+    char c;
+    if (!(cell.i=0 || cell.j=width || cell.i=last_row || cell.j=0)) {
+        get_neighbours_of_same_char(cell, c, output, width, height, map)
+        if (get_char(output[0], width, height, map) == get_char(output[1], width, height, map)
+        == get_char(output[2], width, height, map) == get_char(output[3], width, height, map)
+        !== get_char(cell, width, height, str)) {
+            value = get_char(output[0], width, height, map)
+            set_char(cell, width, height, value, map)
+        
 }
 
 char* scan() //returns the string result of the scan

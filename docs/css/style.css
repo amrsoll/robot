@@ -70,7 +70,9 @@ tr:nth-child(even) {
 .modules td {
 	padding-right: 20px;
 }
-
+.darken {
+	filter: brightness(75%);
+}
 .btn {
 	border-radius: 0;
     font-weight: 500;

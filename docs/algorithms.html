@@ -83,41 +83,130 @@
                             <th>Path</td>                   <th>Description</td>
                         </tr>
                         <tr>
-                            <td>client/robotclient.c</td>   <td>This is the file containing the main functions</td>
+                            <td><span class="darken">client/</span>robotclient.c</td>
+                            <td class="darken">This is the file containing the main functions</td>
                         </tr>
                         <tr>
-                            <td>client/constants.m</td>     <td>File defining a number of useful global
-                                                                variables used by many functions</td>
+                            <td><span class="darken">client/</span>constants.m</td>
+                            <td class="darken">File defining a number of useful global variables
+                                used by many functions</td>
                         </tr>
                         <tr>
-                            <td>client/classes.c</td>       <td>Here we define a few fundamental
-                                                                structures helpful to handle the positioning
-                                                                of the robot and the mapping in general</td>
+                            <td><span class="darken">client/</span>classes.c</td>
+                            <td class="darken">Here we define a few fundamental structures helpful to
+                                handle the positioning of the robot and the mapping in general</td>
                         </tr>
                         <tr>
-                            <td>client/makefile</td>        <td>Builds both the robot client and
-                                                                the test files we made during the project</td>
+                            <td><span class="darken">client/</span>makefile</td>
+                            <td class="darken">Builds both the robot client and the test
+                                files we made during the project</td>
                         </tr>
                         <tr>
-                            <td>client/gsyst.c</td>         <td>Defines functions for the interactions with
-                                                                the motors and sensors</td>
+                            <td><span class="darken">client/</span>gsyst.c</td>
+                            <td class="darken">Defines functions for the interactions with
+                                the motors and sensors</td>
                         </tr>
                         <tr>
-                            <td>client/servercom.c</td>     <td>Functions for the communication with the server</td>
+                            <td><span class="darken">client/</span>servercom.c</td>
+                            <td class="darken">Functions for the communication with the server</td>
                         </tr>
                         <tr>
-                            <td>client/map.c</td>           <td>Map related functions for scanning the arena</td>
+                            <td><span class="darken">client/</span>map.c</td>
+                            <td class="darken">Map related functions for scanning the arena</td>
                         </tr>
                         <tr>
-                            <td>client/spot.c</td>          <td>Determines in which spot to be in order to scan optimaly</td>
+                            <td><span class="darken">client/</span>spot.c</td>
+                             <td class="darken">Determines in which spot to be in order
+                                 to scan optimaly</td>
                         </tr>
                         <tr>
-                            <td>client/path.c</td>          <td>The pathfinding functions helping the robot
-                                                                to move around the arena</td>
+                            <td><span class="darken">client/</span>path.c</td>
+                            <td class="darken">The pathfinding functions helping the robot
+                                to move around the arena</td>
                         </tr>
                     </table>
                 </div>
             </div>
+
+            <div id="acordeon" class="row language-makefile">
+                <div class="panel-group" id="accordion">
+                    <div class="panel panel-default">
+                        <h4 class="panel-title panel-heading">
+                            <a data-target="#makefile" href="#makefile" data-toggle="gsdk-collapse">
+                                The makefile : compile from multiple sources
+                            </a>
+                        </h4>
+                        <div id="makefile" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <!-- TODO : Update this section when done -->
+                                <p>Our makefile detects the system architecture and compiles accordingly.
+                                    This helps if you use docker to compile your program, which you should
+                                    because the robot is very slow at compiling. The makefile will know
+                                    wether it's executing in docker/your computer or the robot using
+                                    the <code>uname -m</code> bash command.
+                                <br>
+                                The order in which we present the structure of the makefile is meant to help
+                                understanding, but is different from the actual file.</p>
+<pre><code>
+ARCH=$(shell uname -m)
+
+ifeq ($(ARCH),x86_64) #this means we are on the docker platform
+	CC=arm-linux-gnueabi-gcc
+	CFLAGS=-W -Wall -ansi -pedantic
+	LDFLAGS=-I/src/ev3dev-c/source/ev3/ -lm /src/ev3dev-c/lib/libev3dev-c.a
+	BT=  #we didn't manage to make the bluetooth work when compiling from docker.
+endif
+ifeq ($(ARCH),armv5tejl) #this means we are compiling on the brick
+	CC=gcc
+	CFLAGS=-W -Wall -ansi -pedantic
+	LDFLAGS=
+	BT=-lbluetooth  #we didn't manage to make the bluetooth work when compiling from docker.
+endif
+</code></pre>
+                                <p><code>%.o: %.c</code> is triggered whenever a .o file is requested,
+                                    and depends on the homonymous .c file. This is meant to pre-compile our modules.</p>
+<pre><code>%.o: %.c constants.m
+	$(CC) -o $@ -c $< $(LDFLAGS)
+</code></pre>
+                                <p>The compililation of the main executable is then pretty straight forward :</p>
+<pre><code>EXEC=robotclient
+
+all: $(EXEC)
+
+$(EXEC): $(EXEC).o gsyst.o path.o spot.o servercom.o map.o
+	$(CC) $^ $(LDFLAGS) -o $(EXEC)
+
+$(EXEC).o: robotclient.c gsyst.h constants.m path.h spot.h servercom.h map.h
+	$(CC) -o $@ -c $< $(LDFLAGS)
+</code></pre>
+                                <p>During the project, we kept a number of test files for each module in order to test out their functions.</p>
+<pre><code>
+
+module_name: module_name_test.o module1.o module2.o module3.o module4.o
+	$(CC) $^ $(LDFLAGS) -o spot
+module_name_test.o: module_name_test.c module1.h module2.h module3.h module4.h constants.m
+	$(CC) -o $@ -c $< $(LDFLAGS)
+</code></pre>
+                    <p>Finally, a cleaning command is made to delete the binary files (useful to do before a <code> git add . </code>
+                        to avoid including them in your repo)</p>
+<pre><code>.PHONY: clean mrproper #tells that clean and mrproper are not filenames
+
+clean:
+	rm -rf *.o
+
+mrproper: clean
+	rm -rf $(EXEC)
+	rm -rf module_name
+</code></pre>
+
+
+                                <br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end of acordeon -->
 
             <div class="row case language-C" id="protocol">
                 <h3>Our protocol</h3>
@@ -136,13 +225,11 @@
             <div id="acordeon" class="row">
                 <div class="panel-group" id="accordion">
                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a data-target="#strategy-further" href="#strategy-further" data-toggle="gsdk-collapse">
-                                    Learn more - Protocol
-                                </a>
-                            </h4>
-                        </div>
+                        <h4 class="panel-title panel-heading">
+                            <a data-target="#strategy-further" href="#strategy-further" data-toggle="gsdk-collapse">
+                                Learn more - Protocol
+                            </a>
+                        </h4>
                         <div id="strategy-further" class="panel-collapse collapse">
                             <div class="panel-body">
                                 <p>yup yup</p><br>
@@ -151,7 +238,7 @@
                     </div>
                 </div>
             </div>
-
+            <!-- end o acordeon -->
             <div class="row case language-C" id="gsyst">
                 <h3>Guidance System</h3>
                 <div class="col-lg-10 col-lg-offset-1 col-sm-12" style="text-align:justify">
@@ -206,7 +293,7 @@
     float distance_before_setting_a_new_wall = SCANNING_MAX_DISTANCE - .4; //-.4 because of rounding errors
     Point measured_point; //coordinates of the tile/pixel the sonar hits into.
     // last_point will take the value of previously measured point.
-    Point last_point =  Point_new(0,0); //initialised like 0 so as to know if nothing has been measured before
+    Point last_point =  Point_new(0,0); //initialised like O so as to know if nothing has been measured before
 
     refresh_angle(); //refreshes the global variable angle
     float starting_scan_angle = angle;
@@ -218,7 +305,7 @@
         distance = min(SCANNING_MAX_DISTANCE, distance);
         fPoint fmeasured_point = fPoint_new(distance*cos(2*pi*angle/FULL_TURN_ANGLE)/mm_to_pixel_size,
                                             distance*sin(2*pi*angle/FULL_TURN_ANGLE)/mm_to_pixel_size);
-        measured_point = fPoint_to_Point(fmeasured_point);
+        measured_point = fPoint_to_Point(fmeasured_point); //Converts a point's coordinates from floats to integers.                                     '
         tCoord coord = Point_to_tCoord(measured_point, robot_coord_on_map);
         if( Point_eq(last_point,O) )
         {
@@ -246,13 +333,11 @@
             <div id="acordeon" class="row language-C">
                 <div class="panel-group" id="accordion">
                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a data-target="#collapseOne" href="#collapseOne" data-toggle="gsdk-collapse">
-                                    Technical difficulties
-                                </a>
-                            </h4>
-                        </div>
+                        <h4 class="panel-title panel-heading">
+                            <a data-target="#collapseOne" href="#collapseOne" data-toggle="gsdk-collapse">
+                                Technical difficulties
+                            </a>
+                        </h4>
                         <div id="collapseOne" class="panel-collapse collapse">
                             <div class="panel-body">
                                 <p>With this simple scanning function, we had the following problems :

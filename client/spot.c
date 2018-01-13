@@ -3,7 +3,7 @@
  * @Date:   19/12/2017
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 12/01/2018
+ * @Last modified time: 13/01/2018
  */
 
 #include "spot.h"
@@ -19,14 +19,14 @@ int number_of_set_bits(int i)
 
 void get_neighbours_of_same_char(tCoord tc, char c,tCoord* output, int width, int height, char* map)
 {
-    int offset[3] = {-1,0,1};
+    int offset[4] = {-1,0,1,0};
     int i=0;
     tCoord neighbour;
     int j=0;
     printf("                  break 4\n");
     while(i<4)
     {
-        neighbour = tCoord_new(tc.i+offset[i%3], tc.j+offset[(i+1)%3]);
+        neighbour = tCoord_new(tc.i+offset[i], tc.j+offset[(i+1)%4]);
         printf("####    break 5\n");
         if(neighbour.i>-1
            &&neighbour.i<height
@@ -46,9 +46,10 @@ void get_neighbours_of_same_char(tCoord tc, char c,tCoord* output, int width, in
     while(i>0){
         if(j&1){
             k--;
-            output[k]=tCoord_new(tc.i+offset[i%3], tc.j+offset[(i--+1)%3]);
+            output[k]=tCoord_new(tc.i+offset[i], tc.j+offset[(i+1)%4]);
             printf("####    break 8\n");
         }
+        i--;
         j>>=1;
     }
 }

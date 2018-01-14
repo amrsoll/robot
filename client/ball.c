@@ -10,7 +10,7 @@
 
 // #include "ball.h"
 //
-// const char const *colourName[] = { "?", "BLACK", "BLUE", "GREEN", "YELLOW", "RED", "WHITE", "BROWN" };
+//  char  *colourName[] = { "?", "BLACK", "BLUE", "GREEN", "YELLOW", "RED", "WHITE", "BROWN" };
 // #define NB_COLOUR  (( int )( sizeof( colourName ) / sizeof( colourName[ 0 ])))
 //
 // int init_colour()

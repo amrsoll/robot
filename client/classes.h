@@ -3,7 +3,7 @@
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 14/01/2018
+ * @Last modified time: 15/01/2018
  */
 
 
@@ -54,9 +54,11 @@ Point tCoord_to_Point(tCoord, tCoord);
 //to table coordinates, where origin is the position of the
 //cartesian plot's origin point inside the table.
 bool intsquare_fray_intersect(Point,fPoint,fPoint);
-bool pixel_eq(Pixel p1, Pixel p2);
-bool point_eq(Point p1, Point p2);
-float norm(fPoint);
+bool pixel_eq(Pixel, Pixel);
+bool point_eq(Point, Point);
+float intnorm(Point)
+float fnorm(fPoint);
+float tcnorm(tCoord);
 //
 // fPoint fproject_onto(fPoint, fPoint);
 float sign (fPoint,fPoint,fPoint);

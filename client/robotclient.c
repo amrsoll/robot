@@ -3,7 +3,7 @@
  * @Date:   13/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 14/01/2018
+ * @Last modified time: 15/01/2018
  */
 
 
@@ -128,13 +128,13 @@ int main(int argc, char **argv) {
     printf("Threads created successfully\n");
 
     const char* map = get_new_local_map(width, height);
-    tCoord start_position = tCoord_new(width/2, height -300*MM_TO_PIX_SIZE);
-    width++; //compatibility with functions TODO : work on compatibility
+    start_position = tCoord_new(width/2, height -300*MM_TO_PIX_SIZE);
 
 
     // scan a first time to get the surroundings :
     scan(robotPosition, start_position, width, height, map);
-
+    tCoord previousSpots[4*width*height/(DIST_MIN_FROM_WALLS*DIST_MIN_FROM_WALLS)];
+    size_t size_previousSpots = 0;
     while(!mapComplete(map))
     {
         tCoord spot = getNewSpot(); //reads & writes into path file.
@@ -148,8 +148,7 @@ int main(int argc, char **argv) {
         int i;
         for(i=0; i<pathLen; i++)
         {
-            tCoord checkPoint = getCheckpoint(i);
-            tCoord_init_str(getLine(path, pathLen-i));
+            tCoord checkPoint = getCheckpoint(i, pathLen);
             if(moveTo(checkPoint, start_position, map)) //error prone
             {
                 printf("failed to move to the next coordinates");

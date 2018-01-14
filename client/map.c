@@ -172,13 +172,13 @@ int moveTo(tCoord tc, tCoord start_position, char* map)
     fPoint vector = fsub(goal, robotPosition);
     float vector_angle = (float)atan2(vector.y,vector.x);
     turn_to_angle(vector_angle);
-    collision = moveThisDistance(norm(vector));
+    collision = moveThisDistance(fnorm(vector));
     while(collision)
     {
         if(collision==-1)
         {
             sleep(5000);
-            collision = moveThisDistance(norm(vector));
+            collision = moveThisDistance(fnorm(vector));
         } else
         if(collision==-2)
         {
@@ -186,7 +186,7 @@ int moveTo(tCoord tc, tCoord start_position, char* map)
             Point wall = fPoint_to_Point(fPoint_new(distance*MM_TO_PIX_SIZE*cos(2*pi*angle/FULL_TURN_ANGLE),
                                                     distance*MM_TO_PIX_SIZE*sin(2*pi*angle/FULL_TURN_ANGLE)));
             set_char(Point_to_tCoord(wall,start_position),width,height,FREE_PIXEL,map);
-            collision = moveThisDistance(norm(vector));
+            collision = moveThisDistance(fnorm(vector));
         }
     }
 }

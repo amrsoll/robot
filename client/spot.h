@@ -11,6 +11,7 @@
 #ifndef SPOT_H
 #define SPOT_H
 #include <string.h>
+#include <stdbool.h>
 #include "constants.m"
 #include "classes.h"
 

@@ -3,7 +3,7 @@
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 14/01/2018
+ * @Last modified time: 15/01/2018
  */
 
 
@@ -149,15 +149,26 @@ bool tCoord_eq(tCoord p1, tCoord p2)
     return p1.i == p2.i && p1.j == p2.j;
 }
 
-float norm(fPoint p)
+float intnorm(Point p)
 {
     return sqrt(p.x*p.x + p.y*p.y);
 }
 
+float fnorm(fPoint p)
+{
+    return sqrt(p.x*p.x + p.y*p.y);
+}
+
+float tcnorm(tCoord tc)
+{
+    return sqrt(tc.i*tc.i + tc.j*tc.j);
+}
+
+
 // fPoint fproject_onto(fPoint v, fPoint p)
 // {
 //     fPoint output;
-//     float n = norm(v);
+//     float n = fnorm(v);
 //     output.x = v.x*p.x/n;
 //     output.y = v.y*p.y/n;
 //     return output;f
@@ -203,7 +214,7 @@ int set_char(tCoord coord, int width, int height, char value, char* str) //Chang
         printf("set_char : index out of range : j = %d and width = %d\n", coord.j, width);
         return -1;
     }
-    str[coord.i*width+coord.j] = value;
+    str[coord.i*(width+1)+coord.j] = value;
     return 0;
 }
 
@@ -218,5 +229,5 @@ char get_char(tCoord coord, int width, int height, char* str)
         printf("get_char : index out of range : j = %d and width = %d\n", coord.j, width);
         return -1;
     }
-    return str[coord.i*width+coord.j];
+    return str[coord.i*(width+1)+coord.j];
 }

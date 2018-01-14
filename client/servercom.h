@@ -41,7 +41,7 @@
 //#define SOCKET socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)
 
 
-//void debug(const char*, ...);
+//void debug( char*, ...);
 int read_from_server(int, char*, size_t);
 int send_to_server(int, char*, size_t);
 int parse_message(int);

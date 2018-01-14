@@ -3,7 +3,7 @@
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 14/01/2018
+ * @Last modified time: 15/01/2018
  */
 
 #include <math.h>
@@ -55,6 +55,7 @@ int pincer_state;
 #define COMPASS_BUFFER_LATENCY 10
 #define POSITION_MESSAGE_DELAY .3 //delay between each position message to the server
 fPoint robotPosition;
+tCoord start_position;
 volatile float init_angle;
 volatile float angle; // always : angle = get_angle() - init_angle;
 volatile float distance; //measured distance of the sonar (in mm)

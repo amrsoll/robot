@@ -3,7 +3,7 @@
  * @Date:   19/12/2017
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 14/01/2018
+ * @Last modified time: 15/01/2018
  */
 
 #include "spot.h"
@@ -111,7 +111,70 @@ void get_connex_tCoord_of_same_char(tCoord tc,
     }
 }
 
-tCoord getNewSpot()
+bool noCharInCircle(tCoord tcenter, int radius, char type) //it's actually a square LOL #Need4speed
 {
-    /*TODO*/
+    tCoord tc_test = tCoord_new(tc.i - radius),
+                                tc.j - radius));
+    for( ; tc_test.i<tc.i + radius ; tc_test.i++)
+    for( ; tc_test.j<tc.j + radius ; tc_test.j++)
+        if(tc_test==type)
+            return false;
+    return true;
+}
+
+tCoord getClosestCellFromList(tCoord tc, tCoord* tcells, int tcells_size)
+{
+    float min_dist = -1.0;
+    tCoord closest_cell:
+    int i = 0;
+    while(i<tcells_size)
+    {
+        if(tcnorm(tsub(tc,tcells[i])) < min_dist || min_dist<0)
+        {
+            min_dist = tcnorm(tsub(tc,tcells[i]));
+            closest_cell = tcells[i];
+        }
+    }
+    return closest_cell;
+}
+
+tCoord getNewSpot(tCoord* previousSpots)
+{
+    tCoord tc, newSpot;
+    int index_valid_pix = 0;
+    int index_valid_pix_planB = 0;
+    tCoord* valid_free_pixels[MAP_WIDTH*MAP_WIDTH];
+    tCoord* valid_free_pixels_planB[MAP_WIDTH*MAP_WIDTH];
+
+    for(tc.i=0 ; tc.i<width  ; tc.i++)
+    for(tc.j=0 ; tc.j<height ; tc.j++)
+    {
+        char c = get_char(tc.i,tc.j,width,height,map);
+        if(c == FREE_PIXEL && tc.i >DIST_MIN_FROM_WALLS && tc.j >DIST_MIN_FROM_WALLS/2)
+            if(noCharInCircle(tc, DIST_MIN_FROM_WALLS , WALL_PIXEL))
+            {
+                valid_free_pixels[index_valid_pix++] = tc;
+                valid_free_pixels_planB[index_valid_pix_planB++] = tc;
+            } else
+            if(noCharInCircle(tc, DIST_MIN_FROM_WALLS/2 , WALL_PIXEL)){
+                valid_free_pixels_planB[index_valid_pix_planB++] = tc;
+            }
+    }
+    if(index_valid_pix==0 && index_valid_pix_planB==0)
+    {
+        printf("no more intersting spots left to scan from\n");
+        exit(EXIT_FAILURE);
+    } else
+    if(index_valid_pix>0)
+    {
+        newSpot = getClosestCellFromList(Point_to_tCoord(fPoint_to_Point(robotPosition), start_position)
+                                         , valid_free_pixels
+                                         , index_valid_pix);
+    } else
+    {
+        newSpot = getClosestCellFromList(Point_to_tCoord(fPoint_to_Point(robotPosition), start_position)
+                                         , valid_free_pixels_planB
+                                         , index_valid_pix_planB);
+    }
+    return newSpot;
 }

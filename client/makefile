@@ -16,7 +16,7 @@ ifeq ($(ARCH),x86_64) #this means we are on the docker platform
 	CC=arm-linux-gnueabi-gcc
 	CFLAGS=-W -Wall -ansi -pedantic
 	LDFLAGS=-I/src/ev3dev-c/source/ev3/ -lm /src/ev3dev-c/lib/libev3dev-c.a
-	BT=
+	BT= -lbluetooth
 endif
 ifeq ($(ARCH),armv5tejl) #this means we are compiling on the brick
 	CC=gcc
@@ -30,10 +30,10 @@ EXEC=robotclient
 all: $(EXEC)
 
 $(EXEC): $(EXEC).o gsyst.o #path.o spot.o servercom.o #map.o
-	$(CC) $^ $(LDFLAGS) -o $(EXEC)
+	$(CC) $^ $(LDFLAGS) -o $(EXEC) $(BT)
 
 $(EXEC).o: robotclient.c gsyst.h constants.m #path.h spot.h servercom.h #map.h
-	$(CC) -o $@ -c $< $(LDFLAGS)
+	$(CC) -o $@ -c $< $(LDFLAGS) $(BT)
 
 ###### compile the test files for each module
 

@@ -39,6 +39,27 @@ Pixel Pixel_new(int x, int y, char type) {
   return p;
 }
 
+tCoord tCoord_init_str(char* str,size_t size)
+{
+    char* I,J;
+    int i,j;
+    i=0
+    while(str[0]!=','){
+        i++;
+    }
+    str[i] = '\0';
+    j = atoi(&(str[i+1]));
+    i = atoi(str);
+    return tCoord_new(i,j);
+}
+
+char* tCoord_to_str(tCoord tc)
+{
+    char* str;
+    fprintf(str, "%d,%d\n", tc.i, tc.j);
+    return str;
+}
+
 Point fPoint_to_Point(fPoint f)
 {
     return Point_new((int)f.x,(int)f.y);
@@ -158,16 +179,16 @@ bool fPoint_in_trigon (fPoint pt, fPoint v1, fPoint v2, fPoint v3)
     return ((b1 == b2) && (b2 == b3));
 }
 
-bool intpoint_in_trigon (Point s, Point a, Point b, Point c)
+bool intpoint_in_trigon (Point p, Point a, Point b, Point c)
 {
-    int as_x = s.x-a.x;
-    int as_y = s.y-a.y;
+    int as_x = p.x-a.x;
+    int as_y = p.y-a.y;
 
     bool s_ab = (b.x-a.x)*as_y-(b.y-a.y)*as_x >= 0;
 
     if((c.x-a.x)*as_y-(c.y-a.y)*as_x >= 0 == s_ab) return false;
 
-    if((c.x-b.x)*(s.y-b.y)-(c.y-b.y)*(s.x-b.x) >= 0 != s_ab) return false;
+    if((c.x-b.x)*(p.y-b.y)-(c.y-b.y)*(p.x-b.x) >= 0 != s_ab) return false;
 
     return true;
 }

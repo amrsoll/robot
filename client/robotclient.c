@@ -128,40 +128,40 @@ int main(int argc, char **argv) {
     printf("Threads created successfully\n");
 
     const char* map = get_new_local_map(width, height);
-    tCoord start_position = tCoord_new(width/2, height -300*MM_TO_PIX_SIZE)
+    tCoord start_position = tCoord_new(width/2, height -300*MM_TO_PIX_SIZE);
     width++; //compatibility with functions TODO : work on compatibility
 
-    //The file onto which we will write the nodes for when the robot moves around
-    const FILE *path = open("~/path");
 
     // scan a first time to get the surroundings :
-    scan(robotPosition, start_position, width, height, scanResult);
+    scan(robotPosition, start_position, width, height, map);
 
     while(!mapComplete(map))
     {
-        tCoord spot = getNewSpot(); //writes into path file.
-        if(getPathTo(spot)
+        tCoord spot = getNewSpot(); //reads & writes into path file.
+        if(getPathTo(spot))
         {
             printf("failed to find the path to the new coordinates");
             exit(EXIT_FAILURE);
         }
 
         int pathLen = countlines(path);
-        for(int i=0; i<pathLen; i++)
+        int i;
+        for(i=0; i<pathLen; i++)
         {
-            tCoord checkPoint = tCoord_init_str(popLine(path, pathLen-i));
-            if(moveTo(checkPoint)) //error prone
+            tCoord checkPoint = getCheckpoint(i);
+            tCoord_init_str(getLine(path, pathLen-i));
+            if(moveTo(checkPoint, start_position, map)) //error prone
             {
                 printf("failed to move to the next coordinates");
                 exit(EXIT_FAILURE);}
             }
-            if(k>0)
+            if(i>1)
             {
                 setPosition();
-                send_POSITION(s, posX, posY);
+                send_POSITION(s, posX, posY); //send position when the robot stops
             }
         }
-        scan(robotPosition, start_position, width, height, scanResult);
+        scan(robotPosition, start_position, width, height, map);
     }
     DONE_EXPLORING = 1;
     sendMap();

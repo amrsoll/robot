@@ -54,50 +54,50 @@ void free_isolated_cells(tCoord cell, char* map, int width, int height)
 
 void free_pixels_between(Point p1, Point p2, char* map)
 {
-    Point s = Point_new(min(min(measured_point.x, last_point.x),0),
+    Point p = Point_new(min(min(measured_point.x, last_point.x),0),
                         min(min(measured_point.y, last_point.y),0));
-    int sy_init=s.y;
-    while (s.x< max(max(measured_point.x, last_point.x),0))
+    int py_init=p.y;
+    while (p.x< max(max(measured_point.x, last_point.x),0))
     {
-        while (s.y< max(max(measured_point.y, last_point.y),0))
+        while (p.y< max(max(measured_point.y, last_point.y),0))
         {
             //TODO : set a maximum limit to where the scan can overwrite\
              pixels that were already known (precision)
             //if it is the first measure, last_point == O
             //fill the pixels between the wall and you with free space
-            if(intsquare_fray_intersect(s,Point_to_fPoint(O),fmeasured_point))
-                set_char(Point_to_tCoord(s,start_position)
+            if(intsquare_fray_intersect(p,Point_to_fPoint(O),fmeasured_point))
+                set_char(Point_to_tCoord(p,start_position)
                         ,width,height
                         ,FREE_PIXEL
                         ,map);
-            s.y++;
+            p.y++;
         }
-        s.y = sy_init;
-        s.x++;
+        p.y = py_init;
+        p.x++;
     }
 }
 
 void free_pixels_in_trigon(Point p1, Point p2, Point p3, char* map)
 {
-    Point s = Point_new(min(min(p3.x, p2.x),p1.x),
+    Point p = Point_new(min(min(p3.x, p2.x),p1.x),
                         min(min(p3.y, p2.y),p1.y));
-    int sy_init=s.y;
-    while (s.x< max(max(p3.x, p2.x),p1.x))
+    int py_init=p.y;
+    while (p.x< max(max(p3.x, p2.x),p1.x))
     {
-        while (s.y< max(max(p3.y, p2.y),p1.y))
+        while (p.y< max(max(p3.y, p2.y),p1.y))
         {
             //free all the pixels contained in the triangle defined by
             //the two last measured points and the position of the robot
-            if(intpoint_in_trigon(s, p1, p2, p3))
-                set_char(Point_to_tCoord(s,start_position)
+            if(intpoint_in_trigon(p, p1, p2, p3))
+                set_char(Point_to_tCoord(p,start_position)
                         ,width
                         ,height
                         ,FREE_PIXEL
                         ,map);
-            s.y++;
+            p.y++;
         }
-        s.y = sy_init;
-        s.x++;
+        p.y = py_init;
+        p.x++;
     }
 }
 
@@ -195,4 +195,5 @@ int mapComplete(char* map)
 {
     //TODO : if all of the free cells do not have an unknown
     //cell as a neighbour, then the map is complete
+    return 1;
 }

@@ -24,6 +24,7 @@
 #include <pthread.h>
 
 #define SERV_ADDR "00:19:0E:10:72:CB" //This is my address(Axel) //"00:1A:7D:DA:71:06"
+#define EV3_BRICK_ADDR "192.168.0.204"
 /* ZEN = 60:57:18:3e:03:86 */
 /* OS server = 00:1A:7D:DA:71:06 */
 
@@ -38,7 +39,6 @@
 #define MSG_MAPDONE 6
 #define MSG_OBSTACLE 7
 //#define SOCKET socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)
-#define Sleep(msec) usleep ((msec)*1000)
 
 
 //void debug(const char*, ...);

@@ -44,6 +44,8 @@ Point Point_new(int,int);
 tCoord tCoord_new(int,int);
 fPoint fPoint_new(float,float);
 Pixel Pixel_new(int,int,char);
+char* tCoord_to_str(tCoord);
+tCoord tCoord_init_str(char*,size_t);
 Point fPoint_to_Point(fPoint);
 fPoint Point_to_fPoint(Point);
 tCoord Point_to_tCoord(Point, tCoord);

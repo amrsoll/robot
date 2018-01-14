@@ -3,7 +3,7 @@
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 09/01/2018
+ * @Last modified time: 14/01/2018
  */
 
 
@@ -87,29 +87,29 @@ int main(int argc, char **argv) {
     Point p1 = Point_new(5,15);
     Point p2 = Point_new(15,5);
     Point O = Point_new(2,2);
-    Point s = Point_new(min(min(p1.x, p2.x),O.x),
+    Point p = Point_new(min(min(p1.x, p2.x),O.x),
                         min(min(p1.y, p2.y),O.y));
-    int sy=s.y;
+    int sy=p.y;
     tCoord origin = tCoord_new(height-1,0);
 
-    while (s.x< max(max(p1.x, p2.x),0))
+    while (p.x< max(max(p1.x, p2.x),0))
     {
-        while (s.y< max(max(p1.y, p2.y),0))
+        while (p.y< max(max(p1.y, p2.y),0))
         {
-            tCoord ts = Point_to_tCoord(s,origin);
+            tCoord ts = Point_to_tCoord(p,origin);
             if( i==0 ) {
-                if(intpoint_in_trigon(s, O, p1, p2))
+                if(intpoint_in_trigon(p, O, p1, p2))
                     set_char(ts,width,height,FREE_PIXEL,tryout);
             }
             else{
-                if(intsquare_fray_intersect(s,Point_to_fPoint(O),Point_to_fPoint(p1)))
+                if(intsquare_fray_intersect(p,Point_to_fPoint(O),Point_to_fPoint(p1)))
                     set_char(ts,width,height,FREE_PIXEL,tryout);
             }
             //set_char(ts,width,height,FREE_PIXEL,tryout);
-            s.y++;
+            p.y++;
         }
-        s.y=sy;
-        s.x++;
+        p.y=sy;
+        p.x++;
     }
     set_char(Point_to_tCoord(p1,origin),width,height,'A',tryout);
     set_char(Point_to_tCoord(p2,origin),width,height,'B',tryout);

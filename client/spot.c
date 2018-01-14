@@ -3,7 +3,7 @@
  * @Date:   19/12/2017
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 13/01/2018
+ * @Last modified time: 14/01/2018
  */
 
 #include "spot.h"
@@ -111,7 +111,7 @@ void get_connex_tCoord_of_same_char(tCoord tc,
     }
 }
 
-int* getNewSpot()
+tCoord getNewSpot()
 {
     /*TODO*/
 }

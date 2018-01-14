@@ -85,8 +85,6 @@ volatile float init_distance;
 // Miscellanious
 #define EXPLORE_ANGLE 45
 #define Sleep( msec ) usleep(( msec ) * 1000 )
-#define EV3_BRICK_ADDR "192.168.0.204"
-char s[ 256 ];
 FLAGS_T state;
 
 

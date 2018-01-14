@@ -55,8 +55,8 @@ int motors_init() {
 }
 
 int setPosition() {
-    posX = (int16_t)(x*MM_TO_PIX_SIZE_TO_SERVER);
-    posY = (int16_t)(y*MM_TO_PIX_SIZE_TO_SERVER);
+    posX = (int16_t)(robotPosition.x*MM_TO_PIX_SIZE_TO_SERVER);
+    posY = (int16_t)(robotPosition.y*MM_TO_PIX_SIZE_TO_SERVER);
 }
 
 void *thSendPosition() {
@@ -114,8 +114,7 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE); //if we fail to connect or get the startsignal
 
     // initialise the position of the robot
-    x = .0;
-    y = .0;
+    robotPosition = fPoint_new(.0,.0);
 
     //fork a process that will ping the server every 2 sec with the position of the robot
     if(pthread_create(&positioning, NULL, thSendPosition, NULL)) {
@@ -129,9 +128,13 @@ int main(int argc, char **argv) {
     printf("Threads created successfully\n");
 
     char* map = get_new_local_map(width, height);
+    tCoord start_position = tCoord_new(width/2, height -300*MM_TO_PIX_SIZE)
     width++; //compatibility with functions TODO : work on compatibility
 
-    while(!mapComplete())
+    // scan a first time to get the surroundings :
+    scan(robotPosition, start_position, width, height, scanResult);
+
+    while(!mapComplete(map))
     {
         if(map())
         {
@@ -144,8 +147,6 @@ int main(int argc, char **argv) {
             printf("failed to find the path to the new coordinates");
             exit(EXIT_FAILURE);
         }
-        FILE *path = open("~/path");
-        int pathLen = countlines(path);
         for(int i=0; i<pathLen; i++)
         {
             int k = n-i;

@@ -24,6 +24,7 @@ void free_isolated_cells(char*);
 void free_pixels_between(Point, Point, char* );
 void free_pixels_in_trigon(Point, Point, Point, char* );
 char* scan();
+int mapComplete(char*);
 /* add the signature of any new functions from the .c file here */
 
 #endif

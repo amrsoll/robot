@@ -3,7 +3,7 @@
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 11/01/2018
+ * @Last modified time: 14/01/2018
  */
 
 
@@ -13,7 +13,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "constants.m"
 typedef struct Point Point;
 struct Point {
     int x;

@@ -12,6 +12,7 @@
 #include "ev3_port.h"
 #include "ev3_tacho.h"
 #include "ev3_sensor.h"
+#include "classes.h"
 
 #ifndef CONSTANTS
 #define CONSTANTS
@@ -53,8 +54,7 @@ int pincer_state;
 #define COMPASS_BUFFER_SIZE 4
 #define COMPASS_BUFFER_LATENCY 10
 #define POSITION_MESSAGE_DELAY .3 //delay between each position message to the server
-float x; // in mm
-float y; // in mm
+fPoint robotPosition;
 float init_angle;
 float angle; // always : angle = get_angle() - init_angle;
 float distance; //measured distance of the sonar (in mm)

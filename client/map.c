@@ -77,7 +77,7 @@ void free_pixels_between(Point p1, Point p2, char* map)
     }
 }
 
-void free_pixels_in_trigon(O,last_point, measured_point, map)
+void free_pixels_in_trigon(Point O, Point last_point, Point measured_point, char* map)
 {
     Point s = Point_new(min(min(measured_point.x, last_point.x),0),
                         min(min(measured_point.y, last_point.y),0));
@@ -163,4 +163,9 @@ char* scan(fPoint robotPosition, int width, int height, char* scanResult) //retu
     stop_mov_motors();
     // free(buffer); //prevent memory leaks
     return scanResult;
+}
+
+int mapComplete(char* map){
+    //TODO : if all of the free cells do not have an unknown
+    //cell as a neighbour, then the map is complete
 }

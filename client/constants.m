@@ -58,6 +58,7 @@ float y; // in mm
 float init_angle;
 float angle; // always : angle = get_angle() - init_angle;
 float distance; //measured distance of the sonar (in mm)
+float init_distance;
 
 // Mapping
 #define PIXEL_SIZE 2 //Length of a pixel corner in cm as treated by the robot.

@@ -3,7 +3,7 @@
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 11/01/2018
+ * @Last modified time: 14/01/2018
  */
 
 
@@ -21,6 +21,8 @@
 
 char* get_new_local_map(int, int);
 void free_isolated_cells(char*);
+void free_pixels_between(Point, Point, char* );
+void free_pixels_in_trigon(Point, Point, Point, char* );
 char* scan();
 /* add the signature of any new functions from the .c file here */
 

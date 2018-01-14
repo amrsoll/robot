@@ -35,8 +35,10 @@ int sensor_init() {
         printf("Gyro missing\n");
         return -1;
     }
+    get_sensor_value0(sn_gyr,&init_angle);
     refresh_angle();
     refresh_distance();
+    init_distance = distance;
     return 0;
 }
 
@@ -108,13 +110,14 @@ int main(int argc, char **argv) {
     status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
     printf("status: %d\n", status);
 
-    if(status!=0 || getStartSignal()) { //if we fail to connect or get the startsignal
-        exit(EXIT_FAILURE);
+    if(status!=0 || getStartSignal()) {  //counterintuitive : in C, the while loop continues as long as it is given an int !=0
+        exit(EXIT_FAILURE); //if we fail to connect or get the startsignal
 
-
-    // initialise the position  and the sensor values of the robot
+    // initialise the position of the robot
     x = .0;
     y = .0;
+
+    //fork a process that will ping the server every 2 sec with the position of the robot
     if(pthread_create(&positioning, NULL, thSendPosition, NULL)) {
         fprintf(stderr, "Error creating thread\n");
         exit(EXIT_FAILURE);
@@ -128,8 +131,7 @@ int main(int argc, char **argv) {
     char* map = get_new_local_map(width, height);
     width++; //compatibility with functions TODO : work on compatibility
 
-    //fork a process that will ping the server every 2 sec with the position of the robot
-    while(!mapComplete()) //counterintuitive : in C, the while loop continues as long as it is given an int !=0
+    while(!mapComplete())
     {
         if(map())
         {

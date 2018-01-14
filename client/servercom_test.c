@@ -1,3 +1,13 @@
+/**
+ * @Author: Axel_Soll <amrsoll>
+ * @Date:   13/01/2018
+ * @Email:  axel.soll@telecom-paristech.fr
+ * @Last modified by:   amrsoll
+ * @Last modified time: 13/01/2018
+ */
+
+
+
 #include "servercom.h"
 
 
@@ -31,7 +41,7 @@ int main(int argc, char **argv) {
     /* start position */
     posX = 0;
     posY = 0;
-    
+
     /* threads */
     pthread_t positioning;
     pthread_t receiving;
@@ -49,12 +59,12 @@ int main(int argc, char **argv) {
     printf("status: %d\n", status);
     /* if connected */
     if(status==0) {
-        char string[58];
+        char msg[9];
 
         /* wait for START message */
-        read_from_server(string,9);
-        printf("string: %s\n", string);
-        if(string[4] == MSG_START) {
+        read_from_server(msg,9);
+        printf("msg: %s\n", msg);
+        if(msg[4] == MSG_START) {
             printf("Received start message!\n");
         }
 
@@ -78,7 +88,7 @@ int main(int argc, char **argv) {
         } else {
             printf("Error joining threads.\n");
         }
-        if (!pthread_join(thread, NULL)) {
+        if (!pthread_join(receiving, NULL)) {
             printf("Thread receiving joined.\n");
         } else {
             printf("Error joining threads.\n");

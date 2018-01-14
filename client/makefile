@@ -2,7 +2,7 @@
 # @Date:   08/01/2018
 # @Email:  axel.soll@telecom-paristech.fr
 # @Last modified by:   amrsoll
-# @Last modified time: 12/01/2018
+# @Last modified time: 13/01/2018
 
 
 
@@ -21,7 +21,7 @@ endif
 ifeq ($(ARCH),armv5tejl) #this means we are compiling on the brick
 	CC=gcc
 	CFLAGS=-W -Wall -ansi -pedantic
-	LDFLAGS=
+	LDFLAGS= -pthread
 	BT=-lbluetooth
 endif
 #delete LDFLAGS when on the robot

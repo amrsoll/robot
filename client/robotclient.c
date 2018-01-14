@@ -1,3 +1,13 @@
+/**
+ * @Author: Axel_Soll <amrsoll>
+ * @Date:   13/01/2018
+ * @Email:  axel.soll@telecom-paristech.fr
+ * @Last modified by:   amrsoll
+ * @Last modified time: 13/01/2018
+ */
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -25,6 +35,11 @@ int init() {
     }
     return 0;
 }
+
+
+#define LARGE_ARENA
+
+#ifdef SMALL_ARENA
 
 int main(int argc, char **argv) {
     init();
@@ -91,36 +106,53 @@ int main(int argc, char **argv) {
         }
         number_turns = number_turns+1;
     }
+}
+#endif
 
-    /*
+
+#ifdef LARGE_ARENA
+
+int main(int argc, char **argv) {
+    init();
+    #ifndef __ARM_ARCH_4T__
+        // Disable auto-detection of the brick
+        //(you have to set the correct address below)
+        ev3_brick_addr = EV3_BRICK_ADDR;
+    #endif
+    if ( ev3_init() == -1 ) return ( 1 );
+
+    while ( ev3_tacho_init() < 1 ) Sleep( 1000 );
+    printf( "*** ( EV3 ) Hello! ***\n" );
+    printf( "Found tacho motors:\n" );
+
     startBt();
     getStartSignal(conn); //blocking function. Does not continue without getting signal
-    int x = 0;
-    int y = 0;
+    x = .0;
+    y = .0;
     //fork a process that will ping the server every 2 sec with the position of the robot
     while(!mapComplete()) //counterintuitive : in C, the while loop continues as long as it is given an int !=0
     {
-    sendPosition(x, y);
-    if(map()){
-    printf("failed to map the surroundings");
-    exit(EXIT_FAILURE);}
-    int* spot = getNewSpot();
-    if(getPathTo(*spot[0],*spot[1])) {
-    printf("failed to find the path to the new coordinates");
-    exit(EXIT_FAILURE);}
-    FILE *path = open("~/path");
-    int pathLen = countlines(path);
-    for(int i=0; i<pathLen; i++)
-    {
-    int k = n-i;
-    nextNode = node_init_str(readline(*path, k));
-    if(!(x,y = moveTo(x, y, nextNode.x, nextNode.y)){ //error prone
-    printf("failed to move to the next coordinates");
-    exit(EXIT_FAILURE);}
-    if(k>0)
-    sendPosition(x, y);
-}
-}
-sendMap();
-*/
+        sendPosition(x, y);
+        if(map()){
+            printf("failed to map the surroundings");
+            exit(EXIT_FAILURE);}
+            int* spot = getNewSpot();
+            if(getPathTo(*spot[0],*spot[1])) {
+                printf("failed to find the path to the new coordinates");
+                exit(EXIT_FAILURE);}
+                FILE *path = open("~/path");
+                int pathLen = countlines(path);
+                for(int i=0; i<pathLen; i++)
+                {
+                    int k = n-i;
+                    nextNode = node_init_str(readline(*path, k));
+                    if(!(x,y = moveTo(x, y, nextNode.x, nextNode.y)){ //error prone
+                        printf("failed to move to the next coordinates");
+                        exit(EXIT_FAILURE);}
+                        if(k>0)
+                        sendPosition(x, y);
+                    }
+                }
+                sendMap();
+
 }

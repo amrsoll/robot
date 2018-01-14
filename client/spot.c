@@ -86,6 +86,7 @@ void get_connex_tCoord_of_same_char(tCoord tc,
                                    size_t* sizeof_connextCoords)
 // tCoord* connextCoords[strlen(map)-height+1]; do not count the \n in the map
 // size_t sizeof_connextCoords = 0;
+//does not work because of some strange overflow between the variables.
 {
     printf("break 1             tc.i=%d  ,  tc.j=%d\n",tc.i,tc.j);
     if(!tCoord_explored(tc, connextCoords, *sizeof_connextCoords))

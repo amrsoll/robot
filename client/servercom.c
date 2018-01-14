@@ -1,9 +1,22 @@
+/**
+ * @Author: Axel_Soll <amrsoll>
+ * @Date:   13/01/2018
+ * @Email:  axel.soll@telecom-paristech.fr
+ * @Last modified by:   amrsoll
+ * @Last modified time: 14/01/2018
+ */
+
+
+
 #include "servercom.h"
 
 uint16_t msgId = 0; /* msg seq num */
 
-int read_from_server(char *buffer, size_t maxSize) {
-    int bytes_read = read(SOCKET, buffer, maxSize);
+int read_from_server(char *msg, size_t maxSize) {
+    ssize_t bytes_read;
+    printf("meh\n");
+    bytes_read = read(SOCKET, msg, maxSize);
+    printf("meh?\n");
     if (bytes_read <= 0) {
         fprintf(stderr, "Server unexpectedly closed connection...\n");
         close(SOCKET);

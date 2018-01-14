@@ -12,6 +12,25 @@
 
 uint16_t msgId = 0; /* msg seq num */
 
+int getStartSignal() //blocking function. Does not continue without getting signal
+{
+    /* if connected */
+        char msg[52];
+
+        /* wait for START message */
+        read_from_server(s, msg,52);
+        printf("msg: %s\n", msg);
+        if(msg[4] == MSG_START) {
+            printf("Received start message!\n");
+        }
+        return 0;
+    } else {
+        fprintf(stderr, "Failed to connect to server...\n");
+        sleep(.5);
+        return -1;
+    }
+}
+
 ssize_t read_from_server(int sock, char *msg, size_t maxSize) {
     printf("meh\n");
     ssize_t bytes_read = read(sock, msg, maxSize);

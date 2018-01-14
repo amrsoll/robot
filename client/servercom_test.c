@@ -63,10 +63,10 @@ int main(int argc, char **argv) {
     printf("status: %d\n", status);
     /* if connected */
     if(status==0) {
-        char msg[9];
+        char msg[52];
 
         /* wait for START message */
-        read_from_server(s, msg,9);
+        read_from_server(s, msg,52);
         printf("msg: %s\n", msg);
         if(msg[4] == MSG_START) {
             printf("Received start message!\n");

@@ -3,7 +3,7 @@
  * @Date:   13/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 13/01/2018
+ * @Last modified time: 14/01/2018
  */
 
 
@@ -11,19 +11,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <time.h> //for random
+#include <time.h> //for use of the random function
 
 #include "constants.m"
 
 #include "gsyst.h"
-//#include "map.h"
+#include "map.h"
 #include "path.h"
 #include "spot.h"
 #include "servercom.h"
 
+volatile int DONE_EXPLORING = 0;
+int16_t posX, posY; //positions sent to the server
+int s; //socket
 
-
-int init() {
+int sensor_init() {
     ev3_sensor_init();
     if (ev3_search_sensor(LEGO_EV3_US, &sn_sonar,0) == 0){
         printf("SONAR missing\n");
@@ -33,11 +35,133 @@ int init() {
         printf("Gyro missing\n");
         return -1;
     }
+    refresh_angle();
+    refresh_distance();
     return 0;
 }
 
+int motors_init() {
+    #ifndef __ARM_ARCH_4T__
+    // Disable auto-detection of the brick
+    //(you have to set the correct address below)
+    ev3_brick_addr = EV3_BRICK_ADDR;
+    #endif
+    if ( ev3_init() == -1 ) return ( 1 );
+    while ( ev3_tacho_init() < 1 ) Sleep( 1000 );
+    printf( "Found tacho motors:\n" );
+    return 0;
+}
+
+int setPosition() {
+    posX = (int16_t)(x*MM_TO_PIX_SIZE_TO_SERVER);
+    posY = (int16_t)(y*MM_TO_PIX_SIZE_TO_SERVER);
+}
+
+void *thSendPosition() {
+    while(!DONE_EXPLORING) {
+        Sleep(2000);
+        setPosition();
+        send_POSITION(s, posX, posY);
+    }
+    pthread_exit(NULL);
+}
+
+void *thReceiveFromServer() {
+    while(!DONE_EXPLORING) {
+        parse_message(s);
+    }
+    pthread_exit(NULL);
+}
 
 #define LARGE_ARENA
+////////////////////////////////////////////////////////////////////////////////
+#ifdef LARGE_ARENA
+
+int main(int argc, char **argv) {
+    if(argc!=3)
+    {
+        printf("you must precise the width and height of the map : \n");
+        printf("./servercom <width> <height>\n");
+    }
+    int width = atoi(argv[1]); //DOES NOT INCLUDE THE \n at the right edge of the mapstring
+    int height = atoi(argv[2]);
+
+
+    sensor_init();
+    motors_init();
+
+    s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+
+    /* threads */
+    pthread_t positioning;
+    pthread_t receiving;
+
+    /* SET UP BT CONNECTION TO SERVER */
+    struct sockaddr_rc addr = { 0 };
+    int status;
+
+    addr.rc_family = AF_BLUETOOTH;
+    addr.rc_channel = (uint8_t) 1;
+    str2ba(SERV_ADDR, &addr.rc_bdaddr);
+
+    /* connect */
+    status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
+    printf("status: %d\n", status);
+
+    if(status!=0 || getStartSignal()) { //if we fail to connect or get the startsignal
+        exit(EXIT_FAILURE);
+
+
+    // initialise the position  and the sensor values of the robot
+    x = .0;
+    y = .0;
+    if(pthread_create(&positioning, NULL, thSendPosition, NULL)) {
+        fprintf(stderr, "Error creating thread\n");
+        exit(EXIT_FAILURE);
+    }
+    if(pthread_create(&receiving, NULL, thReceiveFromServer, NULL)) {
+        fprintf(stderr, "Error creating thread\n");
+        exit(EXIT_FAILURE);
+    }
+    printf("Threads created successfully\n");
+
+    char* map = get_new_local_map(width, height);
+    width++; //compatibility with functions TODO : work on compatibility
+
+    //fork a process that will ping the server every 2 sec with the position of the robot
+    while(!mapComplete()) //counterintuitive : in C, the while loop continues as long as it is given an int !=0
+    {
+        if(map())
+        {
+            printf("failed to map the surroundings");
+            exit(EXIT_FAILURE);
+        }
+        int* spot = getNewSpot();
+        if(getPathTo(*spot[0],*spot[1]))
+        {
+            printf("failed to find the path to the new coordinates");
+            exit(EXIT_FAILURE);
+        }
+        FILE *path = open("~/path");
+        int pathLen = countlines(path);
+        for(int i=0; i<pathLen; i++)
+        {
+            int k = n-i;
+            nextNode = node_init_str(readline(*path, k));
+            if(!(x,y = moveTo(x, y, nextNode.x, nextNode.y)) //error prone
+            {
+                printf("failed to move to the next coordinates");
+                exit(EXIT_FAILURE);}
+                if(k>0)
+                sendPosition(x, y);
+            }
+        }
+        DONE_EXPLORING = 1;
+        sendMap();
+    }
+}
+#endif
+////////////////////////////////////////////////////////////////////////////////
 
 #ifdef SMALL_ARENA
 
@@ -108,51 +232,3 @@ int main(int argc, char **argv) {
     }
 }
 #endif
-
-
-#ifdef LARGE_ARENA
-
-int main(int argc, char **argv) {
-    init();
-    #ifndef __ARM_ARCH_4T__
-        // Disable auto-detection of the brick
-        //(you have to set the correct address below)
-        ev3_brick_addr = EV3_BRICK_ADDR;
-    #endif
-    if ( ev3_init() == -1 ) return ( 1 );
-
-    while ( ev3_tacho_init() < 1 ) Sleep( 1000 );
-    printf( "*** ( EV3 ) Hello! ***\n" );
-    printf( "Found tacho motors:\n" );
-
-    startBt();
-    getStartSignal(conn); //blocking function. Does not continue without getting signal
-    x = .0;
-    y = .0;
-    //fork a process that will ping the server every 2 sec with the position of the robot
-    while(!mapComplete()) //counterintuitive : in C, the while loop continues as long as it is given an int !=0
-    {
-        sendPosition(x, y);
-        if(map()){
-            printf("failed to map the surroundings");
-            exit(EXIT_FAILURE);}
-            int* spot = getNewSpot();
-            if(getPathTo(*spot[0],*spot[1])) {
-                printf("failed to find the path to the new coordinates");
-                exit(EXIT_FAILURE);}
-                FILE *path = open("~/path");
-                int pathLen = countlines(path);
-                for(int i=0; i<pathLen; i++)
-                {
-                    int k = n-i;
-                    nextNode = node_init_str(readline(*path, k));
-                    if(!(x,y = moveTo(x, y, nextNode.x, nextNode.y)){ //error prone
-                        printf("failed to move to the next coordinates");
-                        exit(EXIT_FAILURE);}
-                        if(k>0)
-                        sendPosition(x, y);
-                    }
-                }
-                sendMap();
-
-}

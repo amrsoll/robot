@@ -3,7 +3,7 @@
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 12/01/2018
+ * @Last modified time: 14/01/2018
  */
 
 #include <math.h>
@@ -53,8 +53,8 @@ int pincer_state;
 #define COMPASS_BUFFER_SIZE 4
 #define COMPASS_BUFFER_LATENCY 10
 #define POSITION_MESSAGE_DELAY .3 //delay between each position message to the server
-float x;
-float y;
+float x; // in mm
+float y; // in mm
 float init_angle;
 float angle; // always : angle = get_angle() - init_angle;
 float distance; //measured distance of the sonar (in mm)
@@ -71,7 +71,8 @@ float distance; //measured distance of the sonar (in mm)
 #define WALL_PIXEL '#' //pixel type
 #define SCANNING_MAX_DISTANCE 1500.0 // in mm, like the ultrasonic sensor return values
 #define SCANNING_SPEED 1 // increment of the speed at which the robot turns during mapping scan
-
+#define MM_TO_PIX_SIZE (float)1/(10*PIXEL_SIZE)
+#define MM_TO_PIX_SIZE_TO_SERVER (float)1/(10*PIXEL_SIZE_TO_SERVER)
 
 // semaphore names
 #define LOCK_FOR_READ_NODES "/rnodes"

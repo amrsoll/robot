@@ -3,7 +3,7 @@
  * @Date:   13/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 13/01/2018
+ * @Last modified time: 14/01/2018
  */
 
 
@@ -11,9 +11,11 @@
 #include "servercom.h"
 
 
+
+
 volatile int DONE_EXPLORING = 0;
 int16_t posX, posY;
-
+int s;
 /* dummy */
 int setPosition() {
     posX += 1;
@@ -24,19 +26,21 @@ void *thSendPosition() {
     while(!DONE_EXPLORING) {
         Sleep(2000);
         setPosition();
-        send_POSITION(posX, posY);
+        send_POSITION(s, posX, posY);
     }
     pthread_exit(NULL);
 }
 
 void *thReceiveFromServer() {
     while(!DONE_EXPLORING) {
-        parse_message();
+        parse_message(s);
     }
     pthread_exit(NULL);
 }
 
 int main(int argc, char **argv) {
+
+    s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 
     /* start position */
     posX = 0;
@@ -55,14 +59,14 @@ int main(int argc, char **argv) {
     str2ba(SERV_ADDR, &addr.rc_bdaddr);
 
     /* connect */
-    status = connect(SOCKET, (struct sockaddr *)&addr, sizeof(addr));
+    status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
     printf("status: %d\n", status);
     /* if connected */
     if(status==0) {
         char msg[9];
 
         /* wait for START message */
-        read_from_server(msg,9);
+        read_from_server(s, msg,9);
         printf("msg: %s\n", msg);
         if(msg[4] == MSG_START) {
             printf("Received start message!\n");
@@ -104,6 +108,6 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    close(SOCKET);
+    close(s);
     return 0;
 }

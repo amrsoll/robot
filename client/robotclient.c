@@ -127,45 +127,47 @@ int main(int argc, char **argv) {
     }
     printf("Threads created successfully\n");
 
-    char* map = get_new_local_map(width, height);
+    const char* map = get_new_local_map(width, height);
     tCoord start_position = tCoord_new(width/2, height -300*MM_TO_PIX_SIZE)
     width++; //compatibility with functions TODO : work on compatibility
+
+    //The file onto which we will write the nodes for when the robot moves around
+    const FILE *path = open("~/path");
 
     // scan a first time to get the surroundings :
     scan(robotPosition, start_position, width, height, scanResult);
 
     while(!mapComplete(map))
     {
-        if(map())
-        {
-            printf("failed to map the surroundings");
-            exit(EXIT_FAILURE);
-        }
-        int* spot = getNewSpot();
-        if(getPathTo(*spot[0],*spot[1]))
+        tCoord spot = getNewSpot(); //writes into path file.
+        if(getPathTo(spot)
         {
             printf("failed to find the path to the new coordinates");
             exit(EXIT_FAILURE);
         }
+
+        int pathLen = countlines(path);
         for(int i=0; i<pathLen; i++)
         {
-            int k = n-i;
-            nextNode = node_init_str(readline(*path, k));
-            if(!(x,y = moveTo(x, y, nextNode.x, nextNode.y)) //error prone
+            tCoord checkPoint = tCoord_init_str(popLine(path, pathLen-i));
+            if(moveTo(checkPoint)) //error prone
             {
                 printf("failed to move to the next coordinates");
                 exit(EXIT_FAILURE);}
-                if(k>0)
-                sendPosition(x, y);
+            }
+            if(k>0)
+            {
+                setPosition();
+                send_POSITION(s, posX, posY);
             }
         }
-        DONE_EXPLORING = 1;
-        sendMap();
+        scan(robotPosition, start_position, width, height, scanResult);
     }
+    DONE_EXPLORING = 1;
+    sendMap();
 }
 #endif
 ////////////////////////////////////////////////////////////////////////////////
-
 #ifdef SMALL_ARENA
 
 int main(int argc, char **argv) {

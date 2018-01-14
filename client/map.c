@@ -66,10 +66,10 @@ void free_pixels_between(Point p1, Point p2, char* map)
             //if it is the first measure, last_point == O
             //fill the pixels between the wall and you with free space
             if(intsquare_fray_intersect(s,Point_to_fPoint(O),fmeasured_point))
-                set_char(Point_to_tCoord(s,robot_coord_in_scanResult_str)
+                set_char(Point_to_tCoord(s,start_position)
                         ,width,height
                         ,FREE_PIXEL
-                        ,scanResult);
+                        ,map);
             s.y++;
         }
         s.y = sy_init;
@@ -77,23 +77,23 @@ void free_pixels_between(Point p1, Point p2, char* map)
     }
 }
 
-void free_pixels_in_trigon(Point O, Point last_point, Point measured_point, char* map)
+void free_pixels_in_trigon(Point p1, Point p2, Point p3, char* map)
 {
-    Point s = Point_new(min(min(measured_point.x, last_point.x),0),
-                        min(min(measured_point.y, last_point.y),0));
+    Point s = Point_new(min(min(p3.x, p2.x),p1.x),
+                        min(min(p3.y, p2.y),p1.y));
     int sy_init=s.y;
-    while (s.x< max(max(measured_point.x, last_point.x),0))
+    while (s.x< max(max(p3.x, p2.x),p1.x))
     {
-        while (s.y< max(max(measured_point.y, last_point.y),0))
+        while (s.y< max(max(p3.y, p2.y),p1.y))
         {
             //free all the pixels contained in the triangle defined by
             //the two last measured points and the position of the robot
-            if(intpoint_in_trigon(s, O, measured_point, last_point))
-                set_char(Point_to_tCoord(s,robot_coord_in_scanResult_str)
+            if(intpoint_in_trigon(s, p1, p2, p3))
+                set_char(Point_to_tCoord(s,start_position)
                         ,width
                         ,height
                         ,FREE_PIXEL
-                        ,scanResult);
+                        ,map);
             s.y++;
         }
         s.y = sy_init;
@@ -101,13 +101,12 @@ void free_pixels_in_trigon(Point O, Point last_point, Point measured_point, char
     }
 }
 
-char* scan(fPoint robotPosition, int width, int height, char* scanResult) //returns the string result of the scan
+char* scan(fPoint robotPosition, tCoord start_position, int width, int height, char* scanResult) //returns the string result of the scan
 //remember to free the returned value
 {
     Point O = fPoint_to_Point(robotPosition);
     int mm_to_pixel_size = 10*PIXEL_SIZE;
     float distance_before_setting_a_new_wall = SCANNING_MAX_DISTANCE - .4;
-    tCoord robot_coord_in_scanResult_str = tCoord_new(width/2,height/2);
 
     // float* buffer = NULL;
     // buffer = malloc(10*sizeof(int)/SCANNING_SPEED);
@@ -130,10 +129,10 @@ char* scan(fPoint robotPosition, int width, int height, char* scanResult) //retu
         distance = min(SCANNING_MAX_DISTANCE, distance);
         // TODO : adapt speed to the measured distance (precision)
         fPoint fmeasured_point =
-            fPoint_new(distance*cos(2*pi*angle/FULL_TURN_ANGLE)/mm_to_pixel_size,
-                       distance*sin(2*pi*angle/FULL_TURN_ANGLE)/mm_to_pixel_size);
+            fPoint_new(distance*MM_TO_PIX_SIZE*cos(2*pi*angle/FULL_TURN_ANGLE),
+                       distance*MM_TO_PIX_SIZE*sin(2*pi*angle/FULL_TURN_ANGLE));
         measured_point = fPoint_to_Point(fmeasured_point);
-        coord = Point_to_tCoord(measured_point, robot_coord_in_scanResult_str);
+        coord = Point_to_tCoord(measured_point, start_position);
         if( Point_eq(last_point,O) || !Point_eq(last_point, measured_point) )
         //so as to not constantly change the same pixels (optimisation)
         {
@@ -159,13 +158,41 @@ char* scan(fPoint robotPosition, int width, int height, char* scanResult) //retu
     // smooth the map out / remove scattered pixels
     free_isolated_cells(scanResult);
     // mark the position of the robot during the scan
-    set_char(robot_coord_in_scanResult_str,width,height,'a',scanResult);
+    // set_char(start_position,width,height,'a',scanResult);
     stop_mov_motors();
     // free(buffer); //prevent memory leaks
     return scanResult;
 }
 
-int mapComplete(char* map){
+int moveTo(tCoord tc, tCoord start_position, char* map)
+{
+    Point goal =  tCoord_to_Point(tc, start_position);
+    fPoint fgoal =  fPoint_new(goal.x/MM_TO_PIX_SIZE,
+                               goal.y/MM_TO_PIX_SIZE);
+    fPoint vector = fsub(goal, robotPosition);
+    float vector_angle = (float)atan2(vector.y,vector.x);
+    turn_to_angle(vector_angle);
+    collision = moveThisDistance(norm(vector));
+    while(collision)
+    {
+        if(collision==-1)
+        {
+            sleep(5000);
+            collision = moveThisDistance(norm(vector));
+        } else
+        if(collision==-2)
+        {
+            //better to scan probs
+            Point wall = fPoint_to_Point(fPoint_new(distance*MM_TO_PIX_SIZE*cos(2*pi*angle/FULL_TURN_ANGLE),
+                                                    distance*MM_TO_PIX_SIZE*sin(2*pi*angle/FULL_TURN_ANGLE)));
+            set_char(Point_to_tCoord(wall,start_position),width,height,FREE_PIXEL,map);
+            collision = moveThisDistance(norm(vector));
+        }
+    }
+}
+
+int mapComplete(char* map)
+{
     //TODO : if all of the free cells do not have an unknown
     //cell as a neighbour, then the map is complete
 }

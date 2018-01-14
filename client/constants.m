@@ -55,10 +55,10 @@ int pincer_state;
 #define COMPASS_BUFFER_LATENCY 10
 #define POSITION_MESSAGE_DELAY .3 //delay between each position message to the server
 fPoint robotPosition;
-float init_angle;
-float angle; // always : angle = get_angle() - init_angle;
-float distance; //measured distance of the sonar (in mm)
-float init_distance;
+volatile float init_angle;
+volatile float angle; // always : angle = get_angle() - init_angle;
+volatile float distance; //measured distance of the sonar (in mm)
+volatile float init_distance;
 
 // Mapping
 #define PIXEL_SIZE 2 //Length of a pixel corner in cm as treated by the robot.

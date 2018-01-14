@@ -46,16 +46,17 @@ fPoint fPoint_new(float,float);
 Pixel Pixel_new(int,int,char);
 Point fPoint_to_Point(fPoint);
 fPoint Point_to_fPoint(Point);
-tCoord Point_to_tCoord(Point p, tCoord origin);
+tCoord Point_to_tCoord(Point, tCoord);
+Point tCoord_to_Point(tCoord, tCoord);
 //converts the cordinates of a point from a cartesian plot
 //to table coordinates, where origin is the position of the
 //cartesian plot's origin point inside the table.
 bool intsquare_fray_intersect(Point,fPoint,fPoint);
 bool pixel_eq(Pixel p1, Pixel p2);
 bool point_eq(Point p1, Point p2);
-// float norm(fPoint);
+float norm(fPoint);
 //
-// fPoint project_onto(fPoint, fPoint);
+// fPoint fproject_onto(fPoint, fPoint);
 float sign (fPoint,fPoint,fPoint);
 bool fPoint_in_trigon (fPoint,fPoint,fPoint,fPoint);
 bool intpoint_in_trigon (Point,Point,Point,Point);

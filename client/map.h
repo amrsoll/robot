@@ -15,6 +15,7 @@
 #include <semaphore.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "gsyst.h" /* Also contains the ev3 libraries*/
 #include "classes.h"
 #include "constants.m"
@@ -23,8 +24,10 @@ char* get_new_local_map(int, int);
 void free_isolated_cells(char*);
 void free_pixels_between(Point, Point, char* );
 void free_pixels_in_trigon(Point, Point, Point, char* );
-char* scan();
+char* scan(fPoint, tCoord, int, int, char*);
+int moveTo(tCoord, tCoord, char*);
 int mapComplete(char*);
+
 /* add the signature of any new functions from the .c file here */
 
 #endif

@@ -3,7 +3,7 @@
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 11/01/2018
+ * @Last modified time: 14/01/2018
  */
 
 
@@ -59,6 +59,12 @@ tCoord Point_to_tCoord(Point p, tCoord origin)
     return q;
 }
 
+Point tCoord_to_Point(tCoord tc, tCoord origin)
+{
+    return Point_new(origin.i-tc.i,
+                     tc.j-origin.j);
+}
+
 Point Padd(Point a, Point b)
 {
     return Point_new(a.x+b.x, a.y+b.y);
@@ -73,6 +79,22 @@ tCoord tadd(tCoord a, tCoord b)
 {
     return tCoord_new(a.i+b.i, a.j+b.j);
 }
+
+Point Psub(Point a, Point b)
+{
+    return Point_new(a.x-b.x, a.y-b.y);
+}
+
+fPoint fsub(fPoint a, fPoint b)
+{
+    return fPoint_new(a.x-b.x, a.y-b.y);
+}
+
+tCoord tsub(tCoord a, tCoord b)
+{
+    return tCoord_new(a.i-b.i, a.j-b.j);
+}
+
 
 bool intsquare_fray_intersect(Point sqCoord,fPoint r0,fPoint r1)
 //sqCoord is the coordinate of the bottom left summit of the square.
@@ -106,12 +128,12 @@ bool tCoord_eq(tCoord p1, tCoord p2)
     return p1.i == p2.i && p1.j == p2.j;
 }
 
-// float norm(fPoint p)
-// {
-//     return sqrt(p.x*p.x + p.y*p.y);
-// }
+float norm(fPoint p)
+{
+    return sqrt(p.x*p.x + p.y*p.y);
+}
 
-// fPoint project_onto(fPoint v, fPoint p)
+// fPoint fproject_onto(fPoint v, fPoint p)
 // {
 //     fPoint output;
 //     float n = norm(v);

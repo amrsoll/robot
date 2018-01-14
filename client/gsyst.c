@@ -2,12 +2,14 @@
  * @Author: Natalia Balalaeva <nataliabalalaeva>
  * @Date:   08/01/2018
  * @Last modified by:   amrsoll
- * @Last modified time: 12/01/2018
+ * @Last modified time: 14/01/2018
  */
 
 
 
 #include "gsyst.h"
+
+
 
 float get_angle()
 {
@@ -74,6 +76,15 @@ int refresh_angle()
     } else{
         return -1;
     }
+}
+
+float fmean_value(float* fBuffer, size_t length)
+{
+    int i;
+    float output = .0;
+    for(i=0;i<length;i++)
+        output+=fBuffer[i];
+    return output/length;
 }
 
 int get_new_coordinates(float x0, float y0,float distance, float current_angle)
@@ -207,6 +218,41 @@ void continue_until(float goal)
         }
     }
     stop_mov_motors();
+}
+
+int moveThisDistance(float goal_dist)
+// returns 0 if it makes it to that distance
+// returns -1 if an obstacle suddently appears
+// returns -2 the robot is too close to an obstacle / an obstacle is in the way
+{
+    refresh_distance();
+    float init_dist = distance;
+    float threshold = 100.0; // in mm
+    size_t buffer_size = 8;
+    float dist_buffer[buffer_size];
+    if(distance<goal_dist)
+        return -2;
+
+    start_straight();
+    while(init_dist-distance>goal_dist)
+    {
+        refresh_distance();
+        refresh_angle();
+        float buffer_mean = fmean_value(buffer, buffer_size);
+        float deltaDist = (distance - buffer_mean)*2/(int)buffer_size;
+        robotPosition = fadd(robotPosition,
+                             fPoint_new(deltaDist*cos(2*pi*angle/FULL_TURN_ANGLE),
+                                        deltaDist*sin(2*pi*angle/FULL_TURN_ANGLE)));
+        if(distance < buffer_mean + threshold)
+        {
+            stop_mov_motors();
+            return -1;
+        }
+
+        sleep(1);
+    }
+    stop_mov_motors();
+    return 0;
 }
 
 void turn_absolute(uint8_t ss, int a,float angle)

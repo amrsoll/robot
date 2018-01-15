@@ -75,7 +75,7 @@ void *thReceiveFromServer() {
     pthread_exit(NULL);
 }
 
-#define LARGE_ARENA
+#define SMALL_ARENA
 ////////////////////////////////////////////////////////////////////////////////
 #ifdef LARGE_ARENA
 
@@ -187,14 +187,14 @@ int main(int argc, char **argv) {
         printf( "Waiting tacho is plugged...\n" );
     #endif
 
-    while ( ev3_tacho_init() < 1 ) Sleep( 1000 );
+    while ( ev3_tacho_init() < 1 ) Sleep( 300 );
     printf( "*** ( EV3 ) Hello! ***\n" );
     printf( "Found tacho motors:\n" );
 
     //Find the Gyro and get the initial angle from it
-    init_angle = get_angle();
+    refresh_angle();
     printf("Initial angle value: %f\n",init_angle);
-    pincer_state = PINCER_OPENED;  //Change according to the starting position of the pincer
+    pincer_state = PINCER_CLOSED;  //Change according to the starting position of the pincer
     if(pincer_state == PINCER_OPENED)
     {
         printf("grabbing, pincer state before : %d\n", pincer_state);
@@ -206,26 +206,24 @@ int main(int argc, char **argv) {
         printf("grabbing, pincer state after  : %d\n", pincer_state);
     }
     init_mov_motors();
-
+    sensor_init();
     //FIRST PROGRAM
     //Initialise the positioning values
     int continue_while = 1; // Continue demo until this changes to 0.
-    x = 0.0;
-    y = 0.0;
-    angle = 0.0;
-    float dist;
+    fPoint robotPosition = fPoint_new(.0,.0);
+    fPoint start_position = fPoint_new(.0,.0);
     int number_turns = 0;
     get_sensor_value0(sn_sonar, &dist );
     while(continue_while)
     {
+        float max_dist = scan_for_obstacle();
         continue_until(DISTANCE_BEFORE_STOP);
-
+        int error = moveThisDistance();
         printf("we found a wall, now turning\n" );
-        turn_absolute(mov_motors[rand()%2],1,90.0);
+        turn_absolute(mov_motors[rand()%2],1,FULL_TURN_ANGLE/4);
         // do
         //     get_tacho_state_flags(mov_motors[0], &state );
         // while ( state );
-        printf(" NATTTTT %f\n",dist);
         if(number_turns>3 && pincer_state == PINCER_CLOSED)
         {
             printf("releasing\n");

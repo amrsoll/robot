@@ -2,7 +2,7 @@
  * @Author: Natalia Balalaeva <nataliabalalaeva>
  * @Date:   08/01/2018
  * @Last modified by:   amrsoll
- * @Last modified time: 14/01/2018
+ * @Last modified time: 15/01/2018
  */
 
 
@@ -87,14 +87,14 @@ float fmean_value(float* fBuffer, size_t length)
     return output/length;
 }
 
-int get_new_coordinates(float x0, float y0,float distance, float current_angle)
-{
-    float coord[2] = {x0+distance*sin(current_angle/pi),
-                      y0+distance*cos(current_angle/pi)};
-    x = coord[0];
-    y = coord[1];
-    return 0;
-}
+// int get_new_coordinates(float x0, float y0,float distance, float current_angle)
+// {
+//     float coord[2] = {x0+distance*sin(current_angle/pi),
+//                       y0+distance*cos(current_angle/pi)};
+//     x = coord[0];
+//     y = coord[1];
+//     return 0;
+// }
 
 int init_mov_motors() {
     //
@@ -190,35 +190,35 @@ float scan_for_obstacle()
     turn_to_angle(init_check_angle);
 }
 
-void continue_until(float goal)
-{
-
-    distance = get_distance();
-    if(distance <= goal) return;
-    float init_distance = distance;
-    float init_coord[2] = {x,y};
-    angle = get_angle();
-    start_straight(ROBOT_SPEED_INCREMENT);
-    //	Sleep( 300 );
-    // sleep(200);
-    int init_time = time(NULL);
-    while(distance > goal /*&& abs(distance-init_distance) < closest_obstacle - DISTANCE_BEFORE_STOP*/)
-    {
-        distance = get_distance();
-        angle = get_angle();
-        get_new_coordinates(init_coord[0],
-                            init_coord[1],
-                            distance-init_distance,
-                            angle-init_angle);
-        int current_time = time(NULL)-init_time;
-        if(current_time > POSITION_MESSAGE_DELAY)
-        {
-            printf("x : %f   ;   y : %f\n", x, y);
-            init_time = time(NULL);
-        }
-    }
-    stop_mov_motors();
-}
+// void continue_until(float goal)
+// {
+//
+//     distance = get_distance();
+//     if(distance <= goal) return;
+//     float init_distance = distance;
+//     float init_coord[2] = {x,y};
+//     angle = get_angle();
+//     start_straight(ROBOT_SPEED_INCREMENT);
+//     //	Sleep( 300 );
+//     // sleep(200);
+//     int init_time = time(NULL);
+//     while(distance > goal /*&& abs(distance-init_distance) < closest_obstacle - DISTANCE_BEFORE_STOP*/)
+//     {
+//         distance = get_distance();
+//         angle = get_angle();
+//         get_new_coordinates(init_coord[0],
+//                             init_coord[1],
+//                             distance-init_distance,
+//                             angle-init_angle);
+//         int current_time = time(NULL)-init_time;
+//         if(current_time > POSITION_MESSAGE_DELAY)
+//         {
+//             printf("x : %f   ;   y : %f\n", x, y);
+//             init_time = time(NULL);
+//         }
+//     }
+//     stop_mov_motors();
+// }
 
 int moveThisDistance(float goal_dist)
 // returns 0 if it makes it to that distance
@@ -229,20 +229,23 @@ int moveThisDistance(float goal_dist)
     float init_dist = distance;
     float threshold = 100.0; // in mm
     size_t buffer_size = 8;
+    float buffer[buffer_size];
     float dist_buffer[buffer_size];
     if(distance<goal_dist)
         return -2;
 
-    start_straight();
+    start_straight(ROBOT_SPEED_INCREMENT);
     while(init_dist-distance>goal_dist)
     {
+        //TODO : make the buffer work
         refresh_distance();
         refresh_angle();
         float buffer_mean = fmean_value(buffer, buffer_size);
         float deltaDist = (distance - buffer_mean)*2/(int)buffer_size;
-        robotPosition = fadd(robotPosition,
-                             fPoint_new(deltaDist*cos(2*pi*angle/FULL_TURN_ANGLE),
-                                        deltaDist*sin(2*pi*angle/FULL_TURN_ANGLE)));
+        fPoint delta = fPoint_new(deltaDist*cos(2*pi*angle/FULL_TURN_ANGLE),
+                                  deltaDist*sin(2*pi*angle/FULL_TURN_ANGLE));
+        robotPosition.x += delta.x;
+        robotPosition.y += delta.y;
         if(distance < buffer_mean + threshold)
         {
             stop_mov_motors();

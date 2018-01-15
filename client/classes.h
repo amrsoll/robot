@@ -56,7 +56,7 @@ Point tCoord_to_Point(tCoord, tCoord);
 bool intsquare_fray_intersect(Point,fPoint,fPoint);
 bool pixel_eq(Pixel, Pixel);
 bool point_eq(Point, Point);
-float intnorm(Point)
+float intnorm(Point);
 float fnorm(fPoint);
 float tcnorm(tCoord);
 //

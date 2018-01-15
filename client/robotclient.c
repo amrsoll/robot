@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
 
     if(status!=0 || getStartSignal()) {  //counterintuitive : in C, the while loop continues as long as it is given an int !=0
         exit(EXIT_FAILURE); //if we fail to connect or get the startsignal
-
+    }
     // initialise the position of the robot
     robotPosition = fPoint_new(.0,.0);
 
@@ -127,7 +127,7 @@ int main(int argc, char **argv) {
     }
     printf("Threads created successfully\n");
 
-    const char* map = get_new_local_map(width, height);
+     char* map = get_new_local_map(width, height);
     start_position = tCoord_new(width/2, height -300*MM_TO_PIX_SIZE);
 
 
@@ -143,8 +143,9 @@ int main(int argc, char **argv) {
             printf("failed to find the path to the new coordinates");
             exit(EXIT_FAILURE);
         }
-
+        FILE *path = open("~/path", O_RDWR ,0666);
         int pathLen = countlines(path);
+        close(path);
         int i;
         for(i=0; i<pathLen; i++)
         {
@@ -152,7 +153,7 @@ int main(int argc, char **argv) {
             if(moveTo(checkPoint, start_position, map)) //error prone
             {
                 printf("failed to move to the next coordinates");
-                exit(EXIT_FAILURE);}
+                exit(EXIT_FAILURE);
             }
             if(i>1)
             {

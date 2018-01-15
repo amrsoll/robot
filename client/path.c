@@ -3,7 +3,7 @@
 * @Date:   13/01/2018
 * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   amrsoll
- * @Last modified time: 14/01/2018
+ * @Last modified time: 15/01/2018
 */
 
 
@@ -16,12 +16,26 @@ void append(char* s, char c)
         s[len+1] = '\0';
 }
 
+int countlines(FILE* f)
+{
+    rewind(f);
+    int lines = 0;
+    char ch;
+    while(!feof(f))
+    {
+        ch = fgetc(f);
+        if(ch == '\n')
+            lines++;
+    }
+    return lines;
+}
+
 char* getLine(FILE* f, int i)
 {
     rewind(f);
     char* line[256];
     char ch;
-    while(!feof(f)&&i>1é)
+    while(!feof(f)&&i>1)
     {
         ch = fgetc(f);
         if(ch == '\n')
@@ -47,14 +61,14 @@ int getPathTo(tCoord)
 //clears previous path file and creates a new one.
 {
     //The file onto which we will write the nodes for when the robot moves around
-    const FILE *path = open("~/path", O_RDWR ,0666);
+    FILE *path = open("~/path", O_RDWR ,0666);
     close(path);
     return 0;
 }
 
 tCoord getCheckpoint(int i, int pathLen)
 {
-    const FILE *path = open("~/path", O_RDWR ,0666);
+     FILE *path = open("~/path", O_RDWR ,0666);
 
     tCoord tc = tCoord_init_str(getLine(path, pathLen-i));
     close(path);

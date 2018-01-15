@@ -154,29 +154,37 @@ int turn_to_angle(float angle)
 float scan_for_obstacle()
 //will hopefully be obsolete
 {
-    float init_check_angle = get_angle();
+    refresh_distance()
+    refresh_angle();
+    float init_check_angle = angle;
     float check_angle = init_check_angle;
-    float closest_obstacle = get_distance();
-    float checked_distance;
+    float closest_obstacle = distance;
     //turn around to see how far you can go
     start_turn(1);
-    while(abs(check_angle-init_check_angle) < EXPLORE_ANGLE)
-        check_angle = get_angle();
+    while(abs(check_angle-init_check_angle) < EXPLORE_ANGLE) {
+      refresh_angle();
+    }
     stop_mov_motors();
     //turn back the other way and scan.
     start_turn(-1);
     sleep(100); //wait for the difference to be under the explore angle again
-    check_angle = get_angle();
-    while(abs(check_angle-init_check_angle) < EXPLORE_ANGLE)
+    refresh_angle();
+    init_check_angle = angle;
+    while(abs(angle-init_check_angle) < EXPLORE_ANGLE)
     {
         get_sensor_value0(sn_sonar, &distance );
-        checked_distance = distance*cos(check_angle - init_check_angle);
-        if(checked_distance < closest_obstacle)
-            closest_obstacle = checked_distance;
-        check_angle = get_angle();
+        if(distance*sin(2*pi*(angle-init_check_angle)/FULL_TURN_ANGLE)) < ROBOT_RADIUS
+        && distance*cos(2*pi*(angle-init_check_angle)/FULL_TURN_ANGLE)) < closest_obstacle ) {
+          closest_obstacle = distance*cos(angle - init_check_angle);
+        }
+        refresh_angle();
     }
     stop_mov_motors();
-    turn_to_angle(init_check_angle);
+    start_turn(1);
+    while(abs(check_angle-init_check_angle) < EXPLORE_ANGLE) {
+      refresh_angle();
+    }
+    stop_mov_motors();
 }
 
 void continue_until(float goal)

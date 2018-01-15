@@ -191,9 +191,22 @@ int moveTo(tCoord tc, tCoord start_position, char* map)
     }
 }
 
-int mapComplete(char* map)
+int mapComplete(int width, int height, char* map)
 {
     //TODO : if all of the free cells do not have an unknown
     //cell as a neighbour, then the map is complete
-    return 1;
+    int i;
+    last_cell = height*width
+    for (i=0, i<last_cell, i++) {
+    if (get_char(map[i], width, height, map) == FREE_PIXEL) {
+        char c;
+        tCoord output[4];
+        get_neighbours_of_same_char(map[i], c, output, width, height, map);
+        if (get_char(output[0], width, height, map) != UNDEFINED_PIXEL && get_char(output[1], width, height, map)
+        != UNDEFINED_PIXEL && get_char(output[2], width, height, map) != UNDEFINED_PIXEL 
+        && get_char(output[3], width, height, map) != UNDEFINED_PIXEL) {
+        return 1; }//map is complete
+      }
+    }
 }
+    

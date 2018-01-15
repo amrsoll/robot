@@ -88,7 +88,6 @@ int main(int argc, char **argv) {
     int width = atoi(argv[1]); //DOES NOT INCLUDE THE \n at the right edge of the mapstring
     int height = atoi(argv[2]);
 
-
     sensor_init();
     motors_init();
 
@@ -128,8 +127,7 @@ int main(int argc, char **argv) {
     printf("Threads created successfully\n");
 
      char* map = get_new_local_map(width, height);
-    start_position = tCoord_new(width/2, height -300*MM_TO_PIX_SIZE);
-
+    start_position = tCoord_new(width/2, height - 300*MM_TO_PIX_SIZE);
 
     // scan a first time to get the surroundings :
     scan(robotPosition, start_position, width, height, map);

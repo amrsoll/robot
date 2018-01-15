@@ -9,6 +9,7 @@
 
 
 #include "servercom.h"
+#include "gsyst.h"
 
 uint16_t msgId = 0; /* msg seq num */
 
@@ -78,15 +79,17 @@ int parse_message(int sock) {
             break;
         case MSG_STOP:
             printf("STOP signal received!\n");
-            /* call stop function? */
+            /* call stop function */
+            stop_mov_motors();
             break;
         case MSG_KICK:
             kick_id = (uint8_t)string[5];
             printf("Robot with id=%d was kicked by server!\n", kick_id);
+            /* check if we got kicked */
             if (kick_id == TEAM_ID) {
                 printf("We got kicked!\n");
+                stop_mov_motors();
             }
-            /* check if we got kicked? */
             break;
         case MSG_POSITION:
             /* I don't think we should do anything here */

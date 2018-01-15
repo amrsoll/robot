@@ -312,13 +312,33 @@ int  grab(int instruct)
     // multi_set_tacho_command_inx( grab_motor, TACHO_STOP );
 	if ( ev3_search_tacho_plugged_in(GRABBING_MOTOR_PORT,0, &grab_motor, 0 ))
     {
+        int time;
+        if (instruct == 1)
+        {
+            time = 1100;   
+        } else {
+            time = 1800;
+        }
+
 		printf( "LEGO_EV3_M_MOTOR grab motor is found, running...\n" );
+        //printf("instruct=%d, time=%d\n", instruct, time );
 		set_tacho_stop_action_inx( grab_motor, TACHO_COAST );
-		set_tacho_speed_sp( grab_motor, instruct*MOV_MOTORS_MAX_SPEED * 1 / 5 );
-		set_tacho_time_sp( grab_motor, 800 );
-		set_tacho_ramp_up_sp( grab_motor, 2000 );
-		set_tacho_ramp_down_sp( grab_motor, 2000 );
+		set_tacho_speed_sp( grab_motor, instruct*MOV_MOTORS_MAX_SPEED * 1 / 10 );
+		set_tacho_time_sp( grab_motor, time);
+		//set_tacho_ramp_up_sp( grab_motor, 2000 );
+		//set_tacho_ramp_down_sp( grab_motor, 2000 );
 		set_tacho_command_inx( grab_motor, TACHO_RUN_TIMED );
+
+
+        if (instruct == 1)
+        {
+            //printf("entered if\n");
+            Sleep(2000);
+            set_tacho_stop_action_inx( grab_motor, TACHO_COAST );
+            set_tacho_speed_sp( grab_motor, instruct*MOV_MOTORS_MAX_SPEED * 1 / 10 );
+            set_tacho_time_sp( grab_motor, 600 );     
+            set_tacho_command_inx( grab_motor, TACHO_RUN_TIMED );      
+        }
                 ///////////   RUN TO REAL POSITION
 
 		// /* Wait tacho stop */

@@ -13,6 +13,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <math.h>
+
+#define SQRT2 (float)sqrt(2)
+
 typedef struct Point Point;
 struct Point {
     int x;
@@ -53,6 +57,14 @@ Point tCoord_to_Point(tCoord, tCoord);
 //converts the cordinates of a point from a cartesian plot
 //to table coordinates, where origin is the position of the
 //cartesian plot's origin point inside the table.
+
+Point Padd(Point, Point);
+fPoint fadd(fPoint, fPoint);
+tCoord tadd(tCoord, tCoord);
+Point Psub(Point, Point);
+fPoint fsub(fPoint, fPoint);
+tCoord tsub(tCoord, tCoord);
+
 bool intsquare_fray_intersect(Point,fPoint,fPoint);
 bool pixel_eq(Pixel, Pixel);
 bool point_eq(Point, Point);

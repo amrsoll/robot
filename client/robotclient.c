@@ -135,16 +135,19 @@ int main(int argc, char **argv) {
     size_t size_previousSpots = 0;
     while(!mapComplete(map))
     {
-        tCoord spot = getNewSpot(); //reads & writes into path file.
+        tCoord spot = getNewSpot(Point_to_tCoord(fPoint_to_Point(robotPosition), start_position),
+                                 width,
+                                 height,
+                                 map);
         previousSpots[size_previousSpots] = spot;
-        if(getPathTo(spot))
+        if(getPathTo(spot))  //reads & writes into path file
         {
             printf("failed to find the path to the new coordinates");
             exit(EXIT_FAILURE);
         }
-        FILE *path = open("~/path", O_RDWR ,0666);
+        FILE *path = fopen(PATH_PATH, "r");
         int pathLen = countlines(path);
-        close(path);
+        fclose(path);
         int i;
         for(i=0; i<pathLen; i++)
         {
@@ -156,8 +159,8 @@ int main(int argc, char **argv) {
             }
             if(i>1)
             {
-                setPosition();
-                send_POSITION(s, posX, posY); //send position when the robot stops
+                // setPosition();
+                // send_POSITION(s, posX, posY); //send position when the robot stops
             }
         }
         scan(robotPosition, start_position, width, height, map);

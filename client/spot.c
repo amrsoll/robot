@@ -23,7 +23,7 @@ void get_neighbours_of_same_char(tCoord tc, char c,tCoord* output, int width, in
     int i=0;
     tCoord neighbour;
     int j=0;
-    printf("                  break 4       tc.i=%d  ,  tc.j=%d\n",tc.i,tc.j);
+    printf("                  break 4  %d , %d\n",tc.i,tc.j);
     while(i<4)
     {
         j<<=1;
@@ -34,7 +34,7 @@ void get_neighbours_of_same_char(tCoord tc, char c,tCoord* output, int width, in
            &&c==get_char(neighbour,width,height,map)
         ) // no &&neighbour.j<width because of \n
         {
-            printf("####    break 5        n.i=%d  ,  n.j=%d\n",neighbour.i,neighbour.j);
+            //printf("####    break 5        %d , %d\n",neighbour.i,neighbour.j);
             j|=1;
         }
         i++;
@@ -44,7 +44,7 @@ void get_neighbours_of_same_char(tCoord tc, char c,tCoord* output, int width, in
     {
       output[k+1] = tc;
     }
-    printf("                 break 7   k=%d  ,  j=%d\n",k,j);
+    //printf("                 break 7   k=%d  ,  j=%d\n",k,j);
     while(i>0){
         if(j&1){
             output[k]=tCoord_new(tc.i+offset[i-1], tc.j+offset[i%4]);
@@ -111,13 +111,13 @@ void get_connex_tCoord_of_same_char(tCoord tc,
     }
 }
 
-bool noCharInCircle(tCoord tcenter, int radius, char type) //it's actually a square LOL #Need4speed
+bool noCharInCircle(tCoord tcenter, int radius, char type, int width, int height, char* map) //it's actually a square LOL #Need4speed
 {
-    tCoord tc_test = tCoord_new(tc.i - radius,
-                                tc.j - radius);
-    for( ; tc_test.i<tc.i + radius ; tc_test.i++)
-    for( ; tc_test.j<tc.j + radius ; tc_test.j++)
-        if(tc_test==type)
+    tCoord tc_test = tCoord_new(tcenter.i - radius,
+                                tcenter.j - radius);
+    for( ; tc_test.i<tcenter.i + radius ; tc_test.i++)
+    for( ; tc_test.j<tcenter.j + radius ; tc_test.j++)
+        if(get_char(tc_test,width, height, map) ==type)
             return false;
     return true;
 }
@@ -125,7 +125,7 @@ bool noCharInCircle(tCoord tcenter, int radius, char type) //it's actually a squ
 tCoord getClosestCellFromList(tCoord tc, tCoord* tcells, int tcells_size)
 {
     float min_dist = -1.0;
-    tCoord closest_cell:
+    tCoord closest_cell;
     int i = 0;
     while(i<tcells_size)
     {
@@ -138,25 +138,25 @@ tCoord getClosestCellFromList(tCoord tc, tCoord* tcells, int tcells_size)
     return closest_cell;
 }
 
-tCoord getNewSpot(tCoord* previousSpots)
+tCoord getNewSpot(tCoord* previousSpots, int width, int height,char* map)
 {
     tCoord tc, newSpot;
     int index_valid_pix = 0;
     int index_valid_pix_planB = 0;
-    tCoord* valid_free_pixels[MAP_WIDTH*MAP_WIDTH];
-    tCoord* valid_free_pixels_planB[MAP_WIDTH*MAP_WIDTH];
+    tCoord valid_free_pixels[width*height];
+    tCoord valid_free_pixels_planB[width*height];
 
-    for(tc.i=0 ; tc.i<width  ; tc.i++)
-    for(tc.j=0 ; tc.j<height ; tc.j++)
+    for(tc.i=0 ; tc.i<height  ; tc.i++)
+    for(tc.j=0 ; tc.j<width ; tc.j++)
     {
-        char c = get_char(tc.i,tc.j,width,height,map);
+        char c = get_char(tc,width,height,map);
         if(c == FREE_PIXEL && tc.i >DIST_MIN_FROM_WALLS && tc.j >DIST_MIN_FROM_WALLS/2)
-            if(noCharInCircle(tc, DIST_MIN_FROM_WALLS , WALL_PIXEL))
+            if(noCharInCircle(tc, DIST_MIN_FROM_WALLS , WALL_PIXEL, width, height, map))
             {
                 valid_free_pixels[index_valid_pix++] = tc;
                 valid_free_pixels_planB[index_valid_pix_planB++] = tc;
             } else
-            if(noCharInCircle(tc, DIST_MIN_FROM_WALLS/2 , WALL_PIXEL)){
+            if(noCharInCircle(tc, DIST_MIN_FROM_WALLS/2 , WALL_PIXEL, width, height, map)){
                 valid_free_pixels_planB[index_valid_pix_planB++] = tc;
             }
     }

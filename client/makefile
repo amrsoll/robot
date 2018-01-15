@@ -62,9 +62,9 @@ servercom: servercom_test.o servercom.o
 servercom_test.o: servercom_test.c servercom.h constants.m
 	$(CC) -o $@ -c $< $(LDFLAGS) $(BT)
 
-gsyst: gsyst_test.o gsyst.o
+gsyst: gsyst_test.o gsyst.o classes.o
 	$(CC) $^ $(LDFLAGS) -o gsyst
-gsyst_test.o: gsyst_test.c gsyst.h constants.m
+gsyst_test.o: gsyst_test.c gsyst.h classes.h constants.m
 	$(CC) -o $@ -c $< $(LDFLAGS)
 
 ####### compile the .o files for each module

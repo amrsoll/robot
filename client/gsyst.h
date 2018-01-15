@@ -1,8 +1,8 @@
 /**
  * @Author: Natalia Balalaeva <nataliabalalaeva>
  * @Date:   08/01/2018
- * @Last modified by:   amrsoll
- * @Last modified time: 14/01/2018
+ * @Last modified by:   madafaka
+ * @Last modified time: 15/01/2018
  */
 
 
@@ -19,6 +19,7 @@
 
 //local library
 #include "constants.m"
+#include "classes.h"
 
 #ifndef GSYST_H
 #define GSYST_H
@@ -27,6 +28,7 @@ uint8_t mov_motors[2]; //motors for the movement
 uint8_t grab_motor;
 uint8_t sn_sonar;
 uint8_t sn_gyr;
+uint8_t sn_compass;
 
 float get_angle(void);
 float get_distance(void);

@@ -42,7 +42,7 @@
 int pincer_state;
 #define DISTANCE_DETECT_MOVABLE 150
 #define DISTANCE_BEFORE_STOP 200
-#define FULL_TURN_ANGLE 1040.0
+#define FULL_TURN_ANGLE 360.0
 
 //sensors
 #define GYRO_SAMPLE_RATE 1000 // in HZ // Sample rate of 1 kHz

@@ -172,7 +172,7 @@ int getPathTo(tCoord start_coord, tCoord goal_coord, int width, int height, char
         }
     }
     int number_vertices = k; //int vertices
-
+    //add edges between all of the
     for(v1=0;v1<number_vertices;v1++)
     {
         tCoord neighbours[4];
@@ -182,20 +182,19 @@ int getPathTo(tCoord start_coord, tCoord goal_coord, int width, int height, char
         // because we read the list of free cells from the top left.
         int l;
         for(l=0;l<4;l++)
-        {
-            if(neighbours[l].i>coord_correspond[v1].i
-            || neighbours[l].j>coord_correspond[v1].j)
+            if(  neighbours[l].i>coord_correspond[v1].i
+               ||neighbours[l].j>coord_correspond[v1].j)
             {
                 printf("parent : %d,%d    tested son : %d,%d\n",coord_correspond[v1].i,coord_correspond[v1].j, neighbours[l].i,neighbours[l].j);
                 v2 = get_pos_in_list(coord_correspond, number_vertices, neighbours[l]);
                 adjacencyList[v1] = addEdge(adjacencyList[v1], v2, 1); // the weight will always be 1
             }
-        }
     }
+    printf("start coord : %d,%d ; goal cpoord : %d,%d\n", start_coord.i, start_coord.j, goal_coord.i,goal_coord.j);
 
     int start_Vertex = get_pos_in_list(coord_correspond, number_vertices, start_coord);
     int goal_Vertex =  get_pos_in_list(coord_correspond, number_vertices, goal_coord);
-
+    printf("start ID : %d , goal ID : %d\n", start_Vertex, goal_Vertex);
     dijkstra(adjacencyList, number_vertices, start_Vertex, distances, parent);
 
     //The file onto which we will write the nodes for when the robot moves around

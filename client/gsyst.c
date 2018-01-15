@@ -1,7 +1,7 @@
 /**
  * @Author: Natalia Balalaeva <nataliabalalaeva>
  * @Date:   08/01/2018
- * @Last modified by:   amrsoll
+ * @Last modified by:   madafaka
  * @Last modified time: 15/01/2018
  */
 
@@ -98,13 +98,13 @@ float fmean_value(float* fBuffer, size_t length)
 
 int init_mov_motors() {
     //
-    if ( !ev3_search_tacho_plugged_in(LEFT_MOTOR_PORT,0, &mov_motors[0], 0 ) )
+    if ( ev3_search_tacho_plugged_in(LEFT_MOTOR_PORT,0, &mov_motors[0], 0 ) )
         printf("is the left motor plugged in? \n" ); //TODO : Is this message printed when the motor is plugged in already?
 
-    if ( !ev3_search_tacho_plugged_in(RIGHT_MOTOR_PORT,0, &mov_motors[1],0 ) )
+    if ( ev3_search_tacho_plugged_in(RIGHT_MOTOR_PORT,0, &mov_motors[1],0 ) )
         printf("is the right motor plugged in? \n"); //TODO : Is this message printed when the motor is plugged in already?
 
-    if ( !ev3_search_tacho_plugged_in(GRABBING_MOTOR_PORT,0, &grab_motor,0 ) )
+    if ( ev3_search_tacho_plugged_in(GRABBING_MOTOR_PORT,0, &grab_motor,0 ) )
         printf("is the grabbing motor plugged in? \n"); //TODO : Is this message printed when the motor is plugged in already?
 }
 
@@ -125,7 +125,6 @@ void start_turn(int a)
 // a positive : turn right 0 < a <  9 depending on speed
 // a negative : turn left  0 > a > -9 depending on speed
 {
-    multi_set_tacho_command_inx( mov_motors, TACHO_RESET );
     multi_set_tacho_stop_action_inx( mov_motors, TACHO_COAST );
     set_tacho_speed_sp(mov_motors[0],  a*MOV_MOTORS_MAX_SPEED * 1 / 10 );
     set_tacho_speed_sp(mov_motors[1], -a*MOV_MOTORS_MAX_SPEED * 1 / 10 );
@@ -141,22 +140,25 @@ void stop_mov_motors()
     //fflush( stdout );
 }
 
-int turn_to_angle(float angle)
+int turn_to_angle(float ang)
 {
-    float current_angle = get_angle();
+    refresh_angle();
     int turn_direction;
-    if( (int)(current_angle-angle)%360 > 180
-    ||0>(int)(current_angle-angle)%360 >-180)
+    if( (int)(ang-angle)%(int)FULL_TURN_ANGLE > (int)FULL_TURN_ANGLE/2
+    ||0>(int)(ang-angle)%(int)FULL_TURN_ANGLE >-(int)FULL_TURN_ANGLE/2)
         turn_direction = 1;
     else
         turn_direction =-1;
+    printf("ang - angle         : %d\n", (int)(ang-angle) );
+    printf("ang - angle percent : %d\n", (int)(ang-angle)%(int)FULL_TURN_ANGLE );
+    printf("turn direction : %d\n",turn_direction );
     //get back to initial position.
     //TODO increment turning speed according to how close both angles are.
     // (slower the closer you get, probably 3 different speeds)
     start_turn(turn_direction);
-    while(abs(current_angle-angle) > 5) //TODO check if this is the correct formula
+    while(abs(ang-angle) > 5) //TODO check if this is the correct formula
     {
-        current_angle = get_angle();
+        refresh_angle();
     }
     stop_mov_motors();
     return 0;

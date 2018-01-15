@@ -2,7 +2,7 @@
  * @Author: Axel_Soll <amrsoll>
  * @Date:   13/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
- * @Last modified by:   amrsoll
+ * @Last modified by:   madafaka
  * @Last modified time: 15/01/2018
  */
 
@@ -136,6 +136,7 @@ int main(int argc, char **argv) {
     while(!mapComplete(map))
     {
         tCoord spot = getNewSpot(); //reads & writes into path file.
+        previousSpots[size_previousSpots] = spot;
         if(getPathTo(spot))
         {
             printf("failed to find the path to the new coordinates");

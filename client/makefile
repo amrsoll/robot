@@ -1,8 +1,8 @@
 # @Author: Axel_Soll <amrsoll>
 # @Date:   08/01/2018
 # @Email:  axel.soll@telecom-paristech.fr
-# @Last modified by:   amrsoll
-# @Last modified time: 13/01/2018
+# @Last modified by:   madafaka
+# @Last modified time: 15/01/2018
 
 
 
@@ -47,9 +47,9 @@ map: map_test.o gsyst.o map.o classes.o
 map_test.o: map_test.c map.h gsyst.h constants.m classes.h
 	$(CC) -o $@ -c $< $(LDFLAGS)
 
-path: path_test.o path.o
+path: path_test.o path.o classes.o spot.o
 	$(CC) $^ $(LDFLAGS) -o path
-path_test.o: path_test.c path.h constants.m
+path_test.o: path_test.c path.h classes.h spot.h constants.m
 	$(CC) -o $@ -c $< $(LDFLAGS)
 
 spot: spot_test.o spot.o classes.o map.o gsyst.o
@@ -72,7 +72,7 @@ gsyst_test.o: gsyst_test.c gsyst.h classes.h constants.m
 servercom.o: servercom.c constants.m
 	$(CC) -o $@ -c $< $(LDFLAGS) $(BT)
 #If not, then this is where it is compiles
-%.o: %.c constants.m
+%.o: %.c constants.m classes.h
 	$(CC) -o $@ -c $< $(LDFLAGS)
 
 

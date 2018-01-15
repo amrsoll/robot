@@ -2,7 +2,7 @@
  * @Author: Axel_Soll <amrsoll>
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
- * @Last modified by:   amrsoll
+ * @Last modified by:   madafaka
  * @Last modified time: 15/01/2018
  */
 
@@ -18,7 +18,6 @@
 #define CONSTANTS
 //math
 #define pi 3.14159265
-#define SQRT2 (float)sqrt(2)
 #define max(a,b) \
   ({ __typeof__ (a) _a = (a); \
       __typeof__ (b) _b = (b); \
@@ -75,6 +74,9 @@ float init_distance;
 #define SCANNING_SPEED 1 // increment of the speed at which the robot turns during mapping scan
 #define MM_TO_PIX_SIZE (float)1/(10*PIXEL_SIZE)
 #define MM_TO_PIX_SIZE_TO_SERVER (float)1/(10*PIXEL_SIZE_TO_SERVER)
+
+//Pathing
+#define PATH_PATH "~/map/path"
 
 // semaphore names
 #define LOCK_FOR_READ_NODES "/rnodes"

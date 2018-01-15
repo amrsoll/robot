@@ -2,7 +2,7 @@
  * @Author: Axel_Soll <amrsoll>
  * @Date:   17/12/2017
  * @Email:  axel.soll@telecom-paristech.fr
- * @Last modified by:   amrsoll
+ * @Last modified by:   madafaka
  * @Last modified time: 15/01/2018
  */
 
@@ -25,7 +25,9 @@ int number_of_set_bits(int);
 void get_neighbours_of_same_char(tCoord,char,tCoord*,int,int,char*);
 bool tCoord_explored(tCoord,tCoord*,size_t);
 void get_connex_tCoord_of_same_char(tCoord,char,int,int,char*,tCoord*,size_t*);
-tCoord getNewSpot(void); //TODO
+bool noCharInCircle(tCoord, int, char, int, int, char*); //it's actually a square LOL #Need4speed
+tCoord getClosestCellFromList(tCoord, tCoord*, int);
+tCoord getNewSpot(tCoord*, int, int,char*); //TODO
 
 /* add the signature of any new functions from the .c file here */
 

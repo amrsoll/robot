@@ -13,12 +13,15 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 #include "classes.h"
-/* do not include any other librairies in this file */
+#include "constants.m"
+#include "spot.h"
+
 void append(char*, char);
-int countlines(FILE*);
-char* getLine(FILE*, int);
-int getPathTo(tCoord);
+int countlines( FILE*);
+int getLine( FILE*, int, char*);
+int getPathTo(tCoord,tCoord, int, int, char*);
 tCoord getCheckpoint(int,int);
 
 // Node of the adjacency list
@@ -27,11 +30,12 @@ struct node {
     struct node * next;
 };
 
-struct node * addEdge(struct node * head, int vertex, int weight)
-int getMinVertex(int distances[], int visited[], int vertices)
-void dijkstra(struct node * adjacencyList[], int vertices, int startVertex, int distances[], int parent[])
-void printPath(int parent[], int vertex, int startVertex)
-int get_pos_in_list(tCoord* coord_correspond, tCoord coord)
+struct node * addEdge(struct node*, int, int);
+int getMinVertex(int* , int*, int);
+void dijkstra(struct node**, int, int, int*, int*);
+void fprintPath( FILE*,int*, int, int,tCoord*);
+int get_pos_in_list(tCoord*,size_t, tCoord);
+tCoord getCheckpoint(int, int);
 
 
 /* add the signature of any new functions from the .c file here */

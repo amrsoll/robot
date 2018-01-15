@@ -43,7 +43,7 @@ tCoord tCoord_init_str(char* str,size_t size)
 {
     char* I,J;
     int i,j;
-    i=0
+    i=0;
     while(str[i]!=','){
         i++;
     }

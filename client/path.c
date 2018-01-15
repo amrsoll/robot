@@ -119,17 +119,16 @@ void dijkstra(struct node * adjacencyList[], int vertices, int startVertex, int 
 }
 
 // Recursively looks at a vertex's parent to print the path
-void printPath(int parent[], int vertex, int startVertex)
+void fprintPath(FILE *stream, int parent[], int vertex, int startVertex)
 {
     if (vertex == startVertex) {  // reached the source vertex
-        printf("%d ", startVertex);
+        fprintf_tCoord_to_str(stream, coord_correspond[startVertex]) );
         return;
     } else if (parent[vertex] == 0) { // current vertex has no parent
-      printf("%d ", vertex);
-      return;
-  } else {  // go for the current vertex's parent
-        printPath(parent, parent[vertex], startVertex);
-        printf("%d ", vertex);
+        fprintf_tCoord_to_str(stream, coord_correspond[vertex]) );
+        return;
+    } else {  // go for the current vertex's parent
+        fprintPath(parent, parent[vertex], startVertex);
     }
 }
 
@@ -141,19 +140,9 @@ int get_pos_in_list(tCoord* coord_correspond, size_t size_coord_correspond, tCoo
     return i;
 }
 
-int getPathTo(tCoord)
+int getPathTo(tCoord start_coord, tCoord goal_coord, int width, int height, char* map)
 //clears previous path file and creates a new one.
 {
-    //The file onto which we will write the nodes for when the robot moves around
-    FILE *path = open("~/path", O_RDWR ,0666);
-
-    close(path);
-    return 0;
-}
-
-tCoord getCheckpoint(int i, int pathLen, int width, int height, char* map)
-{
-    FILE *path = open("~/path", O_RDWR ,0666);
 
     int i,j;
     int v1=0;
@@ -194,13 +183,36 @@ tCoord getCheckpoint(int i, int pathLen, int width, int height, char* map)
             &&neighbours[3]!=coord_correspond[k];
             l++)
         {
-            v2 = get_pos_in_list(coord_correspond, number_vertices, neighbours[l])
+            v2 = get_pos_in_list(coord_correspond, number_vertices, neighbours[l]);
             adjacencyList[v1] = addEdge(adjacencyList[v1], v2, 1); // the weight will always be 1
         }
     }
 
-    int startVertex =
+    int start_Vertex = get_pos_in_list(coord_correspond, number_vertices, start_coord);
+    int goal_Vertex =  get_pos_in_list(coord_correspond, number_vertices, goal_coord);
 
+    dijkstra(adjacencyList, number_vertices, start_Vertex, distances, parent);
+
+    //The file onto which we will write the nodes for when the robot moves around
+    FILE *path = open("~/path", O_RDWR ,0666);
+    if (goal_Vertex == startVertex) {  // reached the source goal_Vertex
+        fprintf_tCoord_to_str(path, coord_correspond[goal_Vertex]) );
+        return -1; //we are already at the right position
+    } else if (parent[goal_Vertex] == 0) { // current goal_Vertex has no parent
+        fprintf_tCoord_to_str(path, coord_correspond[goal_Vertex]) );
+        return -2; // path impossible to find
+    } else {  // go for the current goal_Vertex's parent
+        fprintPath(parent, parent[goal_Vertex], startVertex);
+        printf("%d ", goal_Vertex);
+    }
+
+    close(path);
+    return 0;
+}
+
+tCoord getCheckpoint(int i, int pathLen)
+{
+    FILE *path = open("~/path", O_RDWR ,0666);
 
 
     tCoord tc = tCoord_init_str(getLine(path, pathLen-i));

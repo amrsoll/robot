@@ -2,7 +2,7 @@
  * @Author: Axel_Soll <amrsoll>
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
- * @Last modified by:   amrsoll
+ * @Last modified by:   madafaka
  * @Last modified time: 15/01/2018
  */
 
@@ -44,7 +44,7 @@ tCoord tCoord_init_str(char* str,size_t size)
     char* I,J;
     int i,j;
     i=0
-    while(str[0]!=','){
+    while(str[i]!=','){
         i++;
     }
     str[i] = '\0';
@@ -53,11 +53,10 @@ tCoord tCoord_init_str(char* str,size_t size)
     return tCoord_new(i,j);
 }
 
-char* tCoord_to_str(tCoord tc)
+void fprintf_tCoord_to_str(FILE *stream, tCoord tc)
 {
-    char* str;
-    fprintf(str, "%d,%d\n", tc.i, tc.j);
-    return str;
+    fprintf(stream, "%d,%d\n", tc.i, tc.j);
+    return ;
 }
 
 Point fPoint_to_Point(fPoint f)

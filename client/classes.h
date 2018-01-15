@@ -2,7 +2,7 @@
  * @Author: Axel_Soll <amrsoll>
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
- * @Last modified by:   amrsoll
+ * @Last modified by:   madafaka
  * @Last modified time: 15/01/2018
  */
 
@@ -44,7 +44,7 @@ Point Point_new(int,int);
 tCoord tCoord_new(int,int);
 fPoint fPoint_new(float,float);
 Pixel Pixel_new(int,int,char);
-char* tCoord_to_str(tCoord);
+void fprintf_tCoord_to_str(FILE*,tCoord);
 tCoord tCoord_init_str(char*,size_t);
 Point fPoint_to_Point(fPoint);
 fPoint Point_to_fPoint(Point);

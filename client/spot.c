@@ -2,7 +2,7 @@
  * @Author: Axel_Soll <amrsoll>
  * @Date:   19/12/2017
  * @Email:  axel.soll@telecom-paristech.fr
- * @Last modified by:   amrsoll
+ * @Last modified by:   madafaka
  * @Last modified time: 15/01/2018
  */
 
@@ -113,8 +113,8 @@ void get_connex_tCoord_of_same_char(tCoord tc,
 
 bool noCharInCircle(tCoord tcenter, int radius, char type) //it's actually a square LOL #Need4speed
 {
-    tCoord tc_test = tCoord_new(tc.i - radius),
-                                tc.j - radius));
+    tCoord tc_test = tCoord_new(tc.i - radius,
+                                tc.j - radius);
     for( ; tc_test.i<tc.i + radius ; tc_test.i++)
     for( ; tc_test.j<tc.j + radius ; tc_test.j++)
         if(tc_test==type)

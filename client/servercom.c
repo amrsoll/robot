@@ -2,8 +2,8 @@
  * @Author: Axel_Soll <amrsoll>
  * @Date:   13/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
- * @Last modified by:   amrsoll
- * @Last modified time: 14/01/2018
+ * @Last modified by:   madafaka
+ * @Last modified time: 15/01/2018
  */
 
 
@@ -15,14 +15,13 @@ uint16_t msgId = 0; /* msg seq num */
 int getStartSignal() //blocking function. Does not continue without getting signal
 {
     /* if connected */
-        char msg[52];
+    char msg[52];
 
-        /* wait for START message */
-        read_from_server(s, msg,52);
-        printf("msg: %s\n", msg);
-        if(msg[4] == MSG_START) {
-            printf("Received start message!\n");
-        }
+    /* wait for START message */
+    read_from_server(s, msg,52);
+    printf("msg: %s\n", msg);
+    if(msg[4] == MSG_START) {
+        printf("Received start message!\n");
         return 0;
     } else {
         fprintf(stderr, "Failed to connect to server...\n");

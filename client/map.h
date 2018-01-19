@@ -16,6 +16,7 @@ int eqNodes(Node,Node);
 
 int makeClockwise(char*);
 
+int clean(void);
 /* add the signature of any new functions from the .c file here */
 
 #endif

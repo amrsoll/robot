@@ -154,6 +154,12 @@ int makeClockwise(char *mapPath)
     /*TODO maybe work around having a local list of nodes instead of using semaphores all the time*/
 }
 
+int clean() {
+    /*Cleans the memory for a new round of mapping*/
+    remove("map/nodes");
+    remove("map/vertices");
+}
+
 int map(int posX,int posY)
 {
     /*TODO*/

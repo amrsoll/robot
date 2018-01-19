@@ -1,31 +1,68 @@
-CC=gcc
-EV3LIB=-I./ev3dev-c/source/ev3 -O2 -std=gnu99 #use whenever you need the EV3 libraries
-CFLAGS=-W -Wall -ansi -pedantic
-LDFLAGS=
+ARCH=$(shell uname -m)
+
+ifeq ($(ARCH),x86_64) #this means we are on the docker platform
+	CC=arm-linux-gnueabi-gcc
+	CFLAGS=-W -Wall -ansi -pedantic
+	LDFLAGS=-I/src/ev3dev-c/source/ev3/ -lm /src/ev3dev-c/lib/libev3dev-c.a
+	BT=
+endif
+ifeq ($(ARCH),armv5tejl) #this means we are compiling on the brick
+	CC=gcc
+	CFLAGS=-W -Wall -ansi -pedantic
+	LDFLAGS=
+	BT=-lbluetooth
+endif
+#delete LDFLAGS when on the robot
 EXEC=robotclient
 
 all: $(EXEC)
 
-$(EXEC): $(EXEC).o gsyst.o map.o path.o spot.o servercom.o
-	$(CC) -o $(EXEC) $^ $(LDFLAGS)
+$(EXEC): $(EXEC).o gsyst.o #path.o spot.o servercom.o #map.o
+	$(CC) $^ $(LDFLAGS) -o $(EXEC)
 
-$(EXEC).o: robotclient.c gsyst.h map.h path.h spot.h servercom.h
-	$(CC) -o $@ -c $< $(CFLAGS)
+$(EXEC).o: robotclient.c gsyst.h constants.m #path.h spot.h servercom.h #map.h
+	$(CC) -o $@ -c $< $(LDFLAGS)
 
-map.o: map.c gsyst.h
-	$(CC) -o $@ -c $< $(CFLAGS)
+###### compile the test files for each module
 
-path.o: path.c
-	$(CC) -o $@ -c $< $(CFLAGS)
+ball: ball_test.o ball.o
+	$(CC) $^ $(LDFLAGS) -o ball
+ball_test.o: ball_test.c ball.h constants.m
+	$(CC) -o $@ -c $< $(LDFLAGS)
 
-spot.o: spot.c
-	$(CC) -o $@ -c $< $(CFLAGS)
+map: map_test.o map.o
+	$(CC) $^ $(LDFLAGS) -o map
+map_test.o: map_test.c map.h constants.m
+	$(CC) -o $@ -c $< $(LDFLAGS)
 
-servercom.o: servercom.c
-	$(CC) -o $@ -c $< $(CFLAGS)
+path: path_test.o path.o
+	$(CC) $^ $(LDFLAGS) -o path
+path_test.o: path_test.c path.h constants.m
+	$(CC) -o $@ -c $< $(LDFLAGS)
 
-gsyst.o: gsyst.c
-	$(CC) $(EV3LIB) -o $@ -c $< $(CFLAGS)
+spot: spot_test.o spot.o
+	$(CC) $^ $(LDFLAGS) -o spot
+spot_test.o: spot_test.c spot.h constants.m
+	$(CC) -o $@ -c $< $(LDFLAGS)
+
+servercom: servercom_test.o servercom.o
+	$(CC) $^ $(LDFLAGS) -o servercom $(BT)
+servercom_test.o: servercom_test.c servercom.h constants.m
+	$(CC) -o $@ -c $< $(LDFLAGS) $(BT)
+
+gsyst: gsyst_test.o gsyst.o
+	$(CC) $^ $(LDFLAGS) -o gsyst
+gsyst_test.o: gsyst_test.c gsyst.h constants.m
+	$(CC) -o $@ -c $< $(LDFLAGS)
+
+####### compile the .o files for each module
+#If they need a special flag, then add it here
+servercom.o: servercom.c constants.m
+	$(CC) -o $@ -c $< $(LDFLAGS) $(BT)
+#If not, then this is where it is compiles
+%.o: %.c constants.m
+	$(CC) -o $@ -c $< $(LDFLAGS)
+
 
 .PHONY: clean mrproper #tells that clean and mrproper are not filenames
 
@@ -34,3 +71,5 @@ clean:
 
 mrproper: clean
 	rm -rf $(EXEC)
+
+	# make the test files for the modules

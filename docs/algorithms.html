@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OS Robot Project</title>
+
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/demo.css" rel="stylesheet">
+    <link href="css/gsdk.css" rel="stylesheet">
+    <link href="css/prism.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="front-landing">
+        <div class="hima" id="mtitle">
+            <h1 ><span>OS Project of Fall 2017: "Cartography"</span></h1>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class=""><a href="index.html" class="bouton">Home</a></li>
+                    <li class=""><a href="architecture.html" class="bouton">Architecture</a></li>
+                    <li class=""><a href="algorithms.html" class="bouton">Algorithms</a></li>
+                    <li class=""><a href="sourcecode.html" class="bouton">Source code</a></li>
+                    <li class=""><a href="media.html" class="bouton">Media</a></li>
+                    <li class=""><a href="team.html" class="bouton">Team</a></li>
+
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+    <div class="partie1">
+        <div class="container">
+
+            <h2 class="titre">Algorithms</h2>
+            <div class="row case">
+                <!-- <a class="col-xs-6 col-sm-4 col-lg-2 btn"href="#strategy">Strategy</a> -->
+                <a class="col-xs-6 col-sm-4 col-lg-2 btn"href="#structure">Structure</a>
+                <a class="col-xs-6 col-sm-4 col-lg-2 btn"href="#protocol">Protocol</a>
+                <a class="col-xs-6 col-sm-4 col-lg-2 btn"href="#gsyst">Guidance System</a>
+                <a class="col-xs-6 col-sm-4 col-lg-2 btn"href="#scanning">Scanning</a>
+                <a class="col-xs-6 col-sm-4 col-lg-2 btn"href="#path">Pathfinding</a>
+                <a class="col-xs-6 col-sm-4 col-lg-2 btn"href="#obstacles">Movable Obstacles</a>
+            </div>
+
+            <div class="row case" id="strategy">
+                <h3>Carthography strategy</h3>
+                <div class="col-lg-10 col-lg-offset-1 col-sm-12" style="text-align:justify">
+                    <p>
+                        What would you do if you suddently woke up in an unknown place?
+                        I guess you would look around and then figure out where you are
+                        by exploring the place you are in. If there are different rooms,
+                        you would go into each one of them an see what they contain, right?
+                        Taking this same approach, Suka wakes up in the arena, and starts
+                        scanning around itself. Then it determines where it has the most
+                        chance to scan a big proportion of the arena and goes on until all
+                        of it has been discovered.
+                    </p>
+                </div>
+            </div>
+
+
+            <div class="row case" id="structure">
+                <h3>File Structure</h3>
+                <div class="col-lg-10 col-lg-offset-1 col-sm-12" style="text-align:justify">
+                    <table class="modules">
+                        <tr>
+                            <th>Path</td>                   <th>Description</td>
+                        </tr>
+                        <tr>
+                            <td><span class="darken">client/</span>robotclient.c</td>
+                            <td class="darken">This is the file containing the main functions</td>
+                        </tr>
+                        <tr>
+                            <td><span class="darken">client/</span>constants.m</td>
+                            <td class="darken">File defining a number of useful global variables
+                                used by many functions</td>
+                        </tr>
+                        <tr>
+                            <td><span class="darken">client/</span>classes.c</td>
+                            <td class="darken">Here we define a few fundamental structures helpful to
+                                handle the positioning of the robot and the mapping in general</td>
+                        </tr>
+                        <tr>
+                            <td><span class="darken">client/</span>makefile</td>
+                            <td class="darken">Builds both the robot client and the test
+                                files we made during the project</td>
+                        </tr>
+                        <tr>
+                            <td><span class="darken">client/</span>gsyst.c</td>
+                            <td class="darken">Defines functions for the interactions with
+                                the motors and sensors</td>
+                        </tr>
+                        <tr>
+                            <td><span class="darken">client/</span>servercom.c</td>
+                            <td class="darken">Functions for the communication with the server</td>
+                        </tr>
+                        <tr>
+                            <td><span class="darken">client/</span>map.c</td>
+                            <td class="darken">Map related functions for scanning the arena</td>
+                        </tr>
+                        <tr>
+                            <td><span class="darken">client/</span>spot.c</td>
+                             <td class="darken">Determines in which spot to be in order
+                                 to scan optimaly</td>
+                        </tr>
+                        <tr>
+                            <td><span class="darken">client/</span>path.c</td>
+                            <td class="darken">The pathfinding functions helping the robot
+                                to move around the arena</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div id="acordeon" class="row language-makefile">
+                <div class="panel-group" id="accordion">
+                    <div class="panel panel-default">
+                        <h4 class="panel-title panel-heading">
+                            <a data-target="#makefile" href="#makefile" data-toggle="gsdk-collapse">
+                                The makefile : compile from multiple sources [expand]
+                            </a>
+                        </h4>
+                        <div id="makefile" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <!-- TODO : Update this section when done -->
+                                <p>Our makefile detects the system architecture and compiles accordingly.
+                                    This helps if you use docker to compile your program, which you should
+                                    because the robot is very slow at compiling. The makefile will know
+                                    wether it's executing in docker/your computer or the robot using
+                                    the <code>uname -m</code> bash command.
+                                <br>
+                                The order in which we present the structure of the makefile is meant to help
+                                understanding, but is different from the actual file.</p>
+<pre><code>
+ARCH=$(shell uname -m)
+
+ifeq ($(ARCH),x86_64) #this means we are on the docker platform
+	CC=arm-linux-gnueabi-gcc
+	CFLAGS=-W -Wall -ansi -pedantic
+	LDFLAGS=-I/src/ev3dev-c/source/ev3/ -lm /src/ev3dev-c/lib/libev3dev-c.a
+	BT=  #we didn't manage to make the bluetooth work when compiling from docker.
+endif
+ifeq ($(ARCH),armv5tejl) #this means we are compiling on the brick
+	CC=gcc
+	CFLAGS=-W -Wall -ansi -pedantic
+	LDFLAGS=
+	BT=-lbluetooth  #we didn't manage to make the bluetooth work when compiling from docker.
+endif
+</code></pre>
+                                <p><code>%.o: %.c</code> is triggered whenever a .o file is requested,
+                                    and depends on the homonymous .c file. This is meant to pre-compile our modules.</p>
+<pre><code>%.o: %.c constants.m
+	$(CC) -o $@ -c $< $(LDFLAGS)
+</code></pre>
+                                <p>The compililation of the main executable is then pretty straight forward :</p>
+<pre><code>EXEC=robotclient
+
+all: $(EXEC)
+
+$(EXEC): $(EXEC).o gsyst.o path.o spot.o servercom.o map.o
+	$(CC) $^ $(LDFLAGS) -o $(EXEC)
+
+$(EXEC).o: robotclient.c gsyst.h constants.m path.h spot.h servercom.h map.h
+	$(CC) -o $@ -c $< $(LDFLAGS)
+</code></pre>
+                                <p>During the project, we kept a number of test files for each module in order to test out their functions.</p>
+<pre><code>
+
+module_name: module_name_test.o module1.o module2.o module3.o module4.o
+	$(CC) $^ $(LDFLAGS) -o spot
+module_name_test.o: module_name_test.c module1.h module2.h module3.h module4.h constants.m
+	$(CC) -o $@ -c $< $(LDFLAGS)
+</code></pre>
+                    <p>Finally, a cleaning command is made to delete the binary files (useful to do before a <code> git add . </code>
+                        to avoid including them in your repo)</p>
+<pre><code>.PHONY: clean mrproper #tells that clean and mrproper are not filenames
+
+clean:
+	rm -rf *.o
+
+mrproper: clean
+	rm -rf $(EXEC)
+	rm -rf module_name
+</code></pre>
+
+
+                                <br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end of acordeon -->
+
+            <div class="row case language-C" id="protocol">
+                <h3>Our protocol</h3>
+                <div class="col-lg-10 col-lg-offset-1 col-sm-12" style="text-align:justify">
+                    <p>
+                        The map is the string <code>char* map</code>.
+                        Each character represents a tile -- or pixel -- for wether it is a
+                        free tile, a wall or a yet unknown space in the arena. <br> <br>
+                        Describe what the main function does in robotclient.c.
+                    </p>
+<pre><code>/* give robotclient.c here */
+</code></pre>
+                </div>
+            </div>
+
+            <div id="acordeon" class="row">
+                <div class="panel-group" id="accordion">
+                    <div class="panel panel-default">
+                        <h4 class="panel-title panel-heading">
+                            <a data-target="#strategy-further" href="#strategy-further" data-toggle="gsdk-collapse">
+                                Learn more - Protocol [expand]
+                            </a>
+                        </h4>
+                        <div id="strategy-further" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <p>yup yup</p><br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end o acordeon -->
+            <div class="row case language-C" id="gsyst">
+                <h3>Guidance System</h3>
+                <div class="col-lg-10 col-lg-offset-1 col-sm-12" style="text-align:justify">
+                    <p>
+                        Here we show the core functions that makes the robot do it's magic.
+                    </p>
+                    <p><code>int refresh_distance()</code> refreshes the global variable
+                        <code>distance</code> with the output of the sonar.</p>
+                    <p><code>int refresh_angle()</code> refreshes the global variable
+                        <code>angle</code> with the output of the gyroscope. In order to
+                        increase presision, <code>angle</code> takes the average value of
+                        several consecutive measures.</p>
+                    <p><code>int init_mov_motors()</code> loads the pointers to use the motors
+                        into some global variables.</p>
+                    <p><code>void start_straight(int speed_increment)</code> makes the robot go forward or
+                        backward, depending on the sign of the increment.</p>
+                    <p><code>void start_turn(int speed_increment)</code> makes the robot turn on itself one way or
+                        another, depending on the sign of the increment.</p>
+                    <p><code>void stop_mov_motors()</code> stops the robot.</p>
+                    <p><code>int turn_to_angle(float ang)</code> makes the robot turn until <code>angle == ang</code> (obviously we don't really test if those floats are equal).</p>
+                    <p><code>void continue_until(float goal)</code> robot advances until <code>distance < goal</code></p>
+                    <p><code>int grab(int instruct)</code> uses the front mechanism in one way or the other depending on the instruction.</p>
+                </div>
+            </div>
+
+
+            <div class="row case language-C" id="scanning">
+                <h3>Scanning</h3>
+                <div class="col-lg-10 col-lg-offset-1 col-sm-12" style="text-align:justify">
+                    <p>
+                        During the scan, the robot turns on itself and continuously asks for the output
+                         of the gyroscope and sonar. Then it modifies the map according to some rules :
+                    </p>
+                    <ul>
+                        <li>Do not scan further than the distance <code>SCANNING_MAX_DISTANCE</code></li>
+                        <li>If the distance measured from sonar is under that specific value, then assign
+                            a wall to the measured position on the map</li>
+                        <li>For the first position you measure, mark all of the pixels between
+                            that position and the robot as free</li>
+                        <li>For the following measures, consider the triangle defined by the previous point,
+                            the current measured point and the position of the robot. Mark all the tiles
+                            inside it as free</li>
+                        <li>Do not overwrite known pixels if they are outside your precision radius</li>
+                    </ul>
+                    <p>For the sake of comprehension, the next snippet of code is a simplified (yet functional)
+                        version of the scan function. It does not necessarily respond to all of the previous criterias</p>
+
+<pre><code><xmp>int scan(tCoord robot_coord_on_map, char* map, int width_n, int height)
+{
+    Point O = Point_new(0,0);
+    int mm_to_pixel_size = 10*PIXEL_SIZE; //can convert a size in mm to the length of a pixel
+    float distance_before_setting_a_new_wall = SCANNING_MAX_DISTANCE - .4; //-.4 because of rounding errors
+    Point measured_point; //coordinates of the tile/pixel the sonar hits into.
+    // last_point will take the value of previously measured point.
+    Point last_point =  Point_new(0,0); //initialised like O so as to know if nothing has been measured before
+
+    refresh_angle(); //refreshes the global variable angle
+    float starting_scan_angle = angle;
+    start_turn(SCANNING_SPEED); //The robot starts turning
+    while(abs(starting_scan_angle-angle)<FULL_TURN_ANGLE)
+    {
+        refresh_angle();
+        refresh_distance();
+        distance = min(SCANNING_MAX_DISTANCE, distance);
+        fPoint fmeasured_point = fPoint_new(distance*cos(2*pi*angle/FULL_TURN_ANGLE)/mm_to_pixel_size,
+                                            distance*sin(2*pi*angle/FULL_TURN_ANGLE)/mm_to_pixel_size);
+        measured_point = fPoint_to_Point(fmeasured_point); //Converts a point's coordinates from floats to integers.                                     '
+        tCoord coord = Point_to_tCoord(measured_point, robot_coord_on_map);
+        if( Point_eq(last_point,O) )
+        {
+            free_pixels_between(O, measured_point, map);
+        } else
+        {
+            free_pixels_in_trigon(O,last_point, measured_point, map);
+        }
+        // And set the furthest pixel to become a wall if appropriate.
+        if(distance < distance_before_setting_a_new_wall)
+        {
+            set_char(coord,width_n,height,WALL_PIXEL,map);
+        }
+        last_point = measured_point;
+    }
+    stop_mov_motors(); //stops the robot from turning.
+    return 0;
+}
+</xmp></code></pre>
+                </div>
+            </div>
+
+
+
+            <div id="acordeon" class="row language-C">
+                <div class="panel-group" id="accordion">
+                    <div class="panel panel-default">
+                        <h4 class="panel-title panel-heading">
+                            <a data-target="#collapseOne" href="#collapseOne" data-toggle="gsdk-collapse">
+                                Technical difficulties [expand]
+                            </a>
+                        </h4>
+                        <div id="collapseOne" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <p>With this simple scanning function, we had the following problems :
+                                </p>
+                                <ul>
+                                    <li>Problem 1 : If the measured distance is farther than about 35cm,
+                                        the scanning would skip some pixels over and therefore
+                                        create a "hole in the wall"</li>
+                                    <li>Problem 2 : Stright walls would look curved due to the way we measure
+                                        the angle and the delay before measuring distance</li>
+                                    <li>Problem 3 : The sonar would make inexplicable and arbitrary jumps
+                                        on a continuous surface</li>
+                                </ul>
+                                <p>These issues are very well illustrated in this example of a
+                                    test with the <a onclick="show_scan_fail()">scan</a></p>
+                                <img id="scan_fail" class="hidden" src="" alt="">
+
+                                <h4>Solutions :</h4>
+                                Problem 1 :
+                                <ul>
+                                    <li>code optimisation to work better</li>
+                                    <li>interpolation</li>
+                                </ul>
+                                Problem 2 :
+                                <p>The second problem was due to <code>refresh_angle()</code> recording
+                                a certain number of consecutives values from the gyroscope before refreshing
+                                <code>angle</code> with a precise value. Therefore, we chose to
+                                create a twin function devoid of that feature and use it here.</p>
+
+                                Problem 3 :
+                                <p> These jumps seem to happen on areas further away from the robot, so the
+                                    rule of "Do not overwrite known pixels if they are outside your precision radius"</p>
+
+                                <h4>Optimisation</h4>
+                                <p>In order to help with both the first and the second issue, we proceeded
+                                    to optimise a lot of the code involved during scanning. None of the
+                                    following changes make an enormous speed increase, but are significant.</p>
+                                <ul>
+                                    <li>Instanciate a variable once instead of multiple times over.</li>
+                                    <p class="sub">Example : the variable <code>coord</code>
+                                        can be instanciated before starting to turn and rewritten during the scan</p>
+                                    <li>Prefer arithmetic solution over analityc ones</li>
+                                    <p class="sub"><code>free_pixels_between(...)</code> and
+                                        <code>free_pixels_in_trigon(...)</code> were very poorly designed in that regard</p>
+                                    <li>If variables that serve the same purpose are created multiple times
+                                        over will be put in common / make a variable serve multiple purposes.</li>
+                                    <p class="sub">Kill two birds with one stone ait'?</p>
+                                    <li>Avoid to do a task that would be unnecessary</li>
+                                    <p class="sub">It can happen that two measures can land in the same tile. In that case, the
+                                    simplified code would start rewritting over the same pixels.</p>
+                                </ul>
+
+                                <br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- acordeon end -->
+
+            <div class="row case language-C"  id="path">
+                <h3>Pathfinding</h3>
+                <div class="col-lg-10 col-lg-offset-1 col-sm-12" style="text-align:justify">
+                    <p>
+                        Between two rounds of scanning, the robot needs to get to it's next viewpoint,
+                        preferably without hitting anything. This is why we need to find the right path
+                        using a "greedy" version of the Dijkstra algorithm (some people might say that we cut corners...)
+                    </p>
+<pre><code>/* code */
+</code></pre>
+                </div>
+            </div>
+
+            <div class="row case language-C"  id="servercom">
+                <h3>Server Communications</h3>
+                <div class="col-lg-10 col-lg-offset-1 col-sm-12" style="text-align:justify">
+                    <p>
+                        To communicate with the game server, we have implemented the protocol described in the <a href="https://gitlab.eurecom.fr/ludovic.apvrille/OS_Robot_Project_Fall2017" target="_blank">project repository</a>. We used threads to let the robot listen for server messages and periodically send its position.
+                    </p>
+<pre><code>ssize_t read_from_server(int sock, char *msg, size_t maxSize) {
+    printf("meh\n");
+    ssize_t bytes_read = read(sock, msg, maxSize);
+    printf("meh?\n");
+    if (bytes_read <= 0) {
+        fprintf(stderr, "Server unexpectedly closed connection...\n");
+        close(sock);
+        exit(EXIT_FAILURE);
+    }
+    printf("[DEBUG] received %d bytes\n", bytes_read);
+    return bytes_read;
+}
+
+int send_to_server(int sock, char *data, size_t size) {
+    return write(sock, data, size);
+}
+
+int send_POSITION(int sock, int16_t x, int16_t y){
+    char string[9];
+    *((uint16_t *) string) = msgId++;
+    string[2] = TEAM_ID;
+    string[3] = 0xFF;
+    string[4] = MSG_POSITION;
+    string[5] = x;
+    string[6] = 0x00;
+    string[7] = y;
+    string[8] = 0x00;
+    return send_to_server(sock, string, 9);
+}
+
+int send_MAPDATA(int sock, int16_t x, int16_t y, uint8_t R, uint8_t G, uint8_t B){
+    char string[12];
+    *((uint16_t *) string) = msgId++;
+    string[2] = TEAM_ID;
+    string[3] = 0xFF;
+    string[4] = MSG_MAPDATA;
+    string[5] = x;
+    string[6] = 0x00;
+    string[7] = y;
+    string[8] = 0x00;
+    string[9] = R; // red value of pixel
+    string[10] = G; // green value of pixel
+    string[11] = B; // blue value of pixel
+    return send_to_server(sock, string, 12);
+}
+
+int send_MAPDONE(int sock) {
+    char string[5];
+    *((uint16_t *) string) = msgId++;
+    string[2] = TEAM_ID;
+    string[3] = 0xFF;
+    string[4] = MSG_MAPDONE;
+    return send_to_server(sock, string, 5);
+}
+
+void *thSendPosition() {
+    while(!DONE_EXPLORING) {
+        Sleep(2000);
+        setPosition();
+        send_POSITION(s, posX, posY);
+    }
+    pthread_exit(NULL);
+}
+</code></pre>
+                </div>
+            </div>
+
+            <div class="row case language-C"  id="obstacles">
+                <h3>Movable obstacles</h3>
+                <div class="col-lg-10 col-lg-offset-1 col-sm-12" style="text-align:justify">
+                    <p>
+                        TODO
+                    </p>
+<pre><code>/* code */
+</code></pre>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <div class="copyright" id="case">
+            <div class="col-lg-2"></div>
+            <div class="col-lg-5">
+                <p> <b> OS Team 9 - Suka</b> <br/>EURECOM Fall 2017 <br/> Vemund Dahle, Mariia Garetc, Natalia Balalaeva, Axel Soll</p>
+            </div>
+        </div>
+    </footer>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/monjs.js"></script>
+    <script src="js/gsdk-bootstrapswitch.js"></script>
+    <script src="js/get-shit-done.js"></script>
+    <script src="js/custom.js"></script>
+    <script src="js/prism.js"></script>
+
+</body>
+</html>

@@ -1,4 +1,5 @@
 CC=gcc
+EV3LIB=-I./ev3dev-c/source/ev3 -O2 -std=gnu99 #use whenever you need the EV3 libraries
 CFLAGS=-W -Wall -ansi -pedantic
 LDFLAGS=
 EXEC=robotclient
@@ -24,7 +25,7 @@ servercom.o: servercom.c
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 gsyst.o: gsyst.c
-	$(CC) -o $@ -c $< $(CFLAGS)
+	$(CC) $(EV3LIB) -o $@ -c $< $(CFLAGS)
 
 .PHONY: clean mrproper #tells that clean and mrproper are not filenames
 

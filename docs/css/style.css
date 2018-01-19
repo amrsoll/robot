@@ -6,12 +6,6 @@
  * @Last modified time: 13/01/2018
  */
 
-.indeximg {
-	display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 70%;
-}
 
 #archimg {
 	padding-left: 60px;
@@ -21,13 +15,6 @@
 	vertical-align: middle;
 }
 
-.images {
-	float:right;
-	padding: 10px;
-	width: 50%;
-	height : 50%;
-    
-}
 
 body {
 	background-color: #151515;

@@ -2,8 +2,8 @@
  * @Author: Axel_Soll <amrsoll>
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
- * @Last modified by:   amrsoll
- * @Last modified time: 15/01/2018
+ * @Last modified by:   madafaka
+ * @Last modified time: 19/01/2018
  */
 
 
@@ -39,33 +39,34 @@ void free_isolated_cells(tCoord cell, char* map, int width, int height)
 //if a pixel is directly surrounded by four pixels of a different type,
 //then turn it into that type
 {
-    last_row = height*width;
+    int last_row = height*width;
     tCoord output[4];
     char c;
-    if (!(cell.i=0 || cell.j=width || cell.i=last_row || cell.j=0)) {
-        get_neighbours_of_same_char(cell, c, output, width, height, map)
+    if (cell.i!=0 && cell.j!=width && cell.i!=last_row && cell.j!=0) {
+        get_neighbours_of_same_char(cell, c, output, width, height, map);
         if (get_char(output[0], width, height, map) == get_char(output[1], width, height, map)
         == get_char(output[2], width, height, map) == get_char(output[3], width, height, map)
-        !== get_char(cell, width, height, str)) {
-            value = get_char(output[0], width, height, map)
-            set_char(cell, width, height, value, map)
-
+        != get_char(cell, width, height, map)) {
+            char value = get_char(output[0], width, height, map);
+            set_char(cell, width, height, value, map);
+        }
+    }
 }
 
-void free_pixels_between(Point p1, Point p2, char* map)
+void free_pixels_between(fPoint p1, fPoint p2, int width, int height, char* map)
 {
-    Point p = Point_new(min(min(measured_point.x, last_point.x),0),
-                        min(min(measured_point.y, last_point.y),0));
+    Point p = Point_new(min((int)p1.x, (int)p2.x),
+                        min((int)p1.y, (int)p2.y));
     int py_init=p.y;
-    while (p.x< max(max(measured_point.x, last_point.x),0))
+    while (p.x< max((int)p1.x, (int)p2.x))
     {
-        while (p.y< max(max(measured_point.y, last_point.y),0))
+        while (p.y< max((int)p1.x, (int)p2.x))
         {
             //TODO : set a maximum limit to where the scan can overwrite\
              pixels that were already known (precision)
-            //if it is the first measure, last_point == O
+            //if it is the first measure, p2 == O
             //fill the pixels between the wall and you with free space
-            if(intsquare_fray_intersect(p,Point_to_fPoint(O),fmeasured_point))
+            if(intsquare_fray_intersect(p,p1,p2))
                 set_char(Point_to_tCoord(p,start_position)
                         ,width,height
                         ,FREE_PIXEL
@@ -77,7 +78,7 @@ void free_pixels_between(Point p1, Point p2, char* map)
     }
 }
 
-void free_pixels_in_trigon(Point p1, Point p2, Point p3, char* map)
+void free_pixels_in_trigon(Point p1, Point p2, Point p3, int width, int height, char* map)
 {
     Point p = Point_new(min(min(p3.x, p2.x),p1.x),
                         min(min(p3.y, p2.y),p1.y));
@@ -101,7 +102,7 @@ void free_pixels_in_trigon(Point p1, Point p2, Point p3, char* map)
     }
 }
 
-char* scan(fPoint robotPosition, tCoord start_position, int width, int height, char* scanResult) //returns the string result of the scan
+char* scan(fPoint robotPosition, tCoord start_position, int width, int height, char* map) //returns the string result of the scan
 //remember to free the returned value
 {
     Point O = fPoint_to_Point(robotPosition);
@@ -124,7 +125,10 @@ char* scan(fPoint robotPosition, tCoord start_position, int width, int height, c
     while(abs(starting_scan_angle-angle)<FULL_TURN_ANGLE)
     {
         // TODO : manual or clock interpolation to counter the wall curvatures.
-        refresh_angle();
+        get_sensor_value0(sn_gyr,&angle);
+        angle = angle - init_angle;
+        printf("breack 1 : angle : %f\n", angle);
+        // buffering the angle creates curvature lines in the scan
         refresh_distance();
         distance = min(SCANNING_MAX_DISTANCE, distance);
         // TODO : adapt speed to the measured distance (precision)
@@ -141,38 +145,38 @@ char* scan(fPoint robotPosition, tCoord start_position, int width, int height, c
 
             if( Point_eq(last_point,O) )
             {
-                free_pixels_between(O, measured_point, map);
+                free_pixels_between(Point_to_fPoint(O), fmeasured_point, width, height, map);
             } else
             {
-                free_pixels_in_trigon(O,last_point, measured_point, map);
+                free_pixels_in_trigon(O,last_point, measured_point, width, height, map);
             }
             // And set the furthest pixel to become a wall if appropriate.
             if(distance < distance_before_setting_a_new_wall) //-.4 because of rounding errors
             {
-                set_char(coord,width,height,WALL_PIXEL,scanResult);
+                set_char(coord,width,height,WALL_PIXEL,map);
                 printf("wall pixel set\n" );
             }
             last_point = measured_point;
         }
     }
     // smooth the map out / remove scattered pixels
-    free_isolated_cells(scanResult);
+    //free_isolated_cells(map);
     // mark the position of the robot during the scan
-    // set_char(start_position,width,height,'a',scanResult);
+    // set_char(start_position,width,height,'a',map);
     stop_mov_motors();
     // free(buffer); //prevent memory leaks
-    return scanResult;
+    return map;
 }
 
-int moveTo(tCoord tc, tCoord start_position, char* map)
+int moveTo(tCoord tc, tCoord start_position, int width, int height, char* map)
 {
     Point goal =  tCoord_to_Point(tc, start_position);
     fPoint fgoal =  fPoint_new(goal.x/MM_TO_PIX_SIZE,
                                goal.y/MM_TO_PIX_SIZE);
-    fPoint vector = fsub(goal, robotPosition);
+    fPoint vector = fsub(fgoal, robotPosition);
     float vector_angle = (float)atan2(vector.y,vector.x);
     turn_to_angle(vector_angle);
-    collision = moveThisDistance(fnorm(vector));
+    int collision = moveThisDistance(fnorm(vector));
     while(collision)
     {
         if(collision==-1)
@@ -196,18 +200,19 @@ int mapComplete(int width, int height, char* map)
     //TODO : if all of the free cells do not have an unknown
     //cell as a neighbour, then the map is complete
     int i;
-    last_cell = height*width;
-    for (i=0, i<last_cell, i++) {
-    if (get_char(map[i], width, height, map) == FREE_PIXEL) {
-        char c;
-        tCoord output[4];
-        get_neighbours_of_same_char(map[i], c, output, width, height, map);
-        if (   get_char(output[0], width, height, map) != UNDEFINED_PIXEL
-            || get_char(output[1], width, height, map) != UNDEFINED_PIXEL
-            || get_char(output[2], width, height, map) != UNDEFINED_PIXEL
-            || get_char(output[3], width, height, map) != UNDEFINED_PIXEL) {
-        return false; }//map is not
-      }
-    }
+    int last_cell = height*width;
+    tCoord coord;
+    // for (i=0, i<last_cell, i++) {
+    // if (get_char(map[i], width, height, map) == FREE_PIXEL) {
+    //     char c;
+    //     tCoord output[4];
+    //     get_neighbours_of_same_char(map[i], c, output, width, height, map);
+    //     if (   get_char(output[0], width, height, map) != UNDEFINED_PIXEL
+    //         || get_char(output[1], width, height, map) != UNDEFINED_PIXEL
+    //         || get_char(output[2], width, height, map) != UNDEFINED_PIXEL
+    //         || get_char(output[3], width, height, map) != UNDEFINED_PIXEL) {
+    //     return false; }//map is not
+    //   }
+    // }
     return true;
 }

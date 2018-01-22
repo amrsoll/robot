@@ -3,7 +3,7 @@
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   madafaka
- * @Last modified time: 15/01/2018
+ * @Last modified time: 19/01/2018
  */
 
 
@@ -205,12 +205,12 @@ bool intpoint_in_trigon (Point p, Point a, Point b, Point c)
 
 int set_char(tCoord coord, int width, int height, char value, char* str) //Changes the char value str on line i and j
 {
-    if(coord.i>=height){
-        printf("set_char : index out of range : i = %d and height = %d\n", coord.i, height);
+    if(coord.i>=height || coord.i<0){
+        //printf("set_char : index out of range : i = %d and height = %d\n", coord.i, height);
         return -1;
     }
-    if(coord.j>=width){
-        printf("set_char : index out of range : j = %d and width = %d\n", coord.j, width);
+    if(coord.j>=width || coord.j<0){
+        //printf("set_char : index out of range : j = %d and width = %d\n", coord.j, width);
         return -1;
     }
     str[coord.i*(width+1)+coord.j] = value;
@@ -220,11 +220,11 @@ int set_char(tCoord coord, int width, int height, char value, char* str) //Chang
 char get_char(tCoord coord, int width, int height, char* str)
 //i0 and j0 is the position of the origin of the x and y axis
 {
-    if(coord.i>=height){
+    if(coord.i>=height || coord.i<0){
         printf("get_char : index out of range : i = %d and height = %d\n", coord.i, height);
         return -1;
     }
-    if(coord.j>=width){
+    if(coord.j>=width || coord.j<0){
         printf("get_char : index out of range : j = %d and width = %d\n", coord.j, width);
         return -1;
     }

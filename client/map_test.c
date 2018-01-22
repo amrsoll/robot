@@ -2,8 +2,8 @@
  * @Author: Axel_Soll <amrsoll>
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
- * @Last modified by:   amrsoll
- * @Last modified time: 14/01/2018
+ * @Last modified by:   madafaka
+ * @Last modified time: 19/01/2018
  */
 
 
@@ -42,8 +42,7 @@ int main(int argc, char **argv) {
     init();
     init_angle = get_angle();
     refresh_angle();
-    x = 0.0;
-    y = 0.0;
+    robotPosition = fPoint_new(0.0,0.0);
     int refreshdist = 0;
     while(refreshdist++<20) refresh_distance();
     #ifndef __ARM_ARCH_4T__
@@ -64,9 +63,13 @@ int main(int argc, char **argv) {
     printf( "Found tacho motors:\n" );
     signal(SIGINT, sigint_handler);
     init_mov_motors();
-    char* scanResult = scan();
-    printf("%s\n",scanResult );
-    free(scanResult); //prevent memory leaks
+    int width = SCANNING_MAX_DISTANCE*MM_TO_PIX_SIZE*2+5;
+    int height = SCANNING_MAX_DISTANCE*MM_TO_PIX_SIZE*3+5;
+    tCoord start_position = tCoord_new(2*height/3, width/2 );
+    char* map = get_new_local_map(width, height);
+    char* scanResult = scan(robotPosition, start_position, width, height, map);
+    printf("%s\n",map );
+    free(map); //prevent memory leaks
 #endif
 #ifdef STR_TEST
     char str[29] = "123456789\n123456789\n123456789";

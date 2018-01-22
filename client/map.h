@@ -2,8 +2,8 @@
  * @Author: Axel_Soll <amrsoll>
  * @Date:   08/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
- * @Last modified by:   amrsoll
- * @Last modified time: 14/01/2018
+ * @Last modified by:   madafaka
+ * @Last modified time: 19/01/2018
  */
 
 
@@ -18,15 +18,16 @@
 #include <math.h>
 #include "gsyst.h" /* Also contains the ev3 libraries*/
 #include "classes.h"
+#include "spot.h"
 #include "constants.m"
 
 char* get_new_local_map(int, int);
-void free_isolated_cells(char*);
-void free_pixels_between(Point, Point, char* );
-void free_pixels_in_trigon(Point, Point, Point, char* );
+void free_isolated_cells(tCoord, char*, int, int);
+void free_pixels_between(fPoint, fPoint,int,int, char* );
+void free_pixels_in_trigon(Point, Point, Point,int,int, char* );
 char* scan(fPoint, tCoord, int, int, char*);
-int moveTo(tCoord, tCoord, char*);
-int mapComplete(char*);
+int moveTo(tCoord, tCoord, int, int, char*);
+int mapComplete(int,int,char*);
 
 /* add the signature of any new functions from the .c file here */
 

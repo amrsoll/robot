@@ -14,12 +14,13 @@
 #include <time.h> //for use of the random function
 
 #include "constants.m"
+#include "classes.h"
 
 #include "gsyst.h"
-#include "map.h"
-#include "path.h"
-#include "spot.h"
-#include "servercom.h"
+// #include "map.h"
+// #include "path.h"
+// #include "spot.h"
+// #include "servercom.h"
 
 volatile int DONE_EXPLORING = 0;
 int16_t posX, posY; //positions sent to the server
@@ -54,26 +55,26 @@ int motors_init() {
     return 0;
 }
 
-int setPosition() {
-    posX = (int16_t)(robotPosition.x*MM_TO_PIX_SIZE_TO_SERVER);
-    posY = (int16_t)(robotPosition.y*MM_TO_PIX_SIZE_TO_SERVER);
-}
-
-void *thSendPosition() {
-    while(!DONE_EXPLORING) {
-        Sleep(2000);
-        setPosition();
-        send_POSITION(s, posX, posY);
-    }
-    pthread_exit(NULL);
-}
-
-void *thReceiveFromServer() {
-    while(!DONE_EXPLORING) {
-        parse_message(s);
-    }
-    pthread_exit(NULL);
-}
+// int setPosition() {
+//     posX = (int16_t)(robotPosition.x*MM_TO_PIX_SIZE_TO_SERVER);
+//     posY = (int16_t)(robotPosition.y*MM_TO_PIX_SIZE_TO_SERVER);
+// }
+//
+// void *thSendPosition() {
+//     while(!DONE_EXPLORING) {
+//         Sleep(2000);
+//         setPosition();
+//         send_POSITION(s, posX, posY);
+//     }
+//     pthread_exit(NULL);
+// }
+//
+// void *thReceiveFromServer() {
+//     while(!DONE_EXPLORING) {
+//         parse_message(s);
+//     }
+//     pthread_exit(NULL);
+// }
 
 #define SMALL_ARENA
 ////////////////////////////////////////////////////////////////////////////////
@@ -173,7 +174,7 @@ int main(int argc, char **argv) {
 #ifdef SMALL_ARENA
 
 int main(int argc, char **argv) {
-    init();
+    //init();
     #ifndef __ARM_ARCH_4T__
         // Disable auto-detection of the brick
         //(you have to set the correct address below)
@@ -213,12 +214,12 @@ int main(int argc, char **argv) {
     fPoint robotPosition = fPoint_new(.0,.0);
     fPoint start_position = fPoint_new(.0,.0);
     int number_turns = 0;
-    get_sensor_value0(sn_sonar, &dist );
+    get_sensor_value0(sn_sonar, &distance );
     while(continue_while)
     {
-        float max_dist = scan_for_obstacle();
+        //float max_dist = scan_for_obstacle();
         continue_until(DISTANCE_BEFORE_STOP);
-        int error = moveThisDistance();
+        //int error = moveThisDistance(max_dist);
         printf("we found a wall, now turning\n" );
         turn_absolute(mov_motors[rand()%2],1,FULL_TURN_ANGLE/4);
         // do

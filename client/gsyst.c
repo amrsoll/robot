@@ -2,7 +2,7 @@
  * @Author: Natalia Balalaeva <nataliabalalaeva>
  * @Date:   08/01/2018
  * @Last modified by:   madafaka
- * @Last modified time: 15/01/2018
+ * @Last modified time: 19/01/2018
  */
 
 
@@ -71,7 +71,7 @@ int refresh_angle()
             Sleep(ANGLE_BUFFER_LATENCY);
             fflush( stdout );
         }
-        angle = angle - init_angle;
+        angle = angle/ANGLE_BUFFER_SIZE - init_angle;
         return 0;
     } else{
         return -1;
@@ -98,13 +98,13 @@ float fmean_value(float* fBuffer, size_t length)
 
 int init_mov_motors() {
     //
-    if ( ev3_search_tacho_plugged_in(LEFT_MOTOR_PORT,0, &mov_motors[0], 0 ) )
+    if ( !ev3_search_tacho_plugged_in(LEFT_MOTOR_PORT,0, &mov_motors[0], 0 ) )
         printf("is the left motor plugged in? \n" ); //TODO : Is this message printed when the motor is plugged in already?
 
-    if ( ev3_search_tacho_plugged_in(RIGHT_MOTOR_PORT,0, &mov_motors[1],0 ) )
+    if ( !ev3_search_tacho_plugged_in(RIGHT_MOTOR_PORT,0, &mov_motors[1],0 ) )
         printf("is the right motor plugged in? \n"); //TODO : Is this message printed when the motor is plugged in already?
 
-    if ( ev3_search_tacho_plugged_in(GRABBING_MOTOR_PORT,0, &grab_motor,0 ) )
+    if ( !ev3_search_tacho_plugged_in(GRABBING_MOTOR_PORT,0, &grab_motor,0 ) )
         printf("is the grabbing motor plugged in? \n"); //TODO : Is this message printed when the motor is plugged in already?
 }
 
@@ -167,7 +167,7 @@ int turn_to_angle(float ang)
 float scan_for_obstacle()
 //will hopefully be obsolete
 {
-    refresh_distance()
+    refresh_distance();
     refresh_angle();
     float init_check_angle = angle;
     float check_angle = init_check_angle;
@@ -180,55 +180,56 @@ float scan_for_obstacle()
     stop_mov_motors();
     //turn back the other way and scan.
     start_turn(-1);
-    sleep(100); //wait for the difference to be under the explore angle again
+    sleep(200); //wait for the difference to be under the explore angle again
     refresh_angle();
     init_check_angle = angle;
     while(abs(angle-init_check_angle) < EXPLORE_ANGLE)
     {
         get_sensor_value0(sn_sonar, &distance );
-        if(distance*sin(2*pi*(angle-init_check_angle)/FULL_TURN_ANGLE)) < ROBOT_RADIUS
-        && distance*cos(2*pi*(angle-init_check_angle)/FULL_TURN_ANGLE)) < closest_obstacle ) {
+        if(distance*sin(2*pi*(angle-init_check_angle)/FULL_TURN_ANGLE) < ROBOT_RADIUS
+        && distance*cos(2*pi*(angle-init_check_angle)/FULL_TURN_ANGLE) < closest_obstacle ) {
           closest_obstacle = distance*cos(angle - init_check_angle);
         }
         refresh_angle();
     }
     stop_mov_motors();
     start_turn(1);
+    sleep(200); //wait for the difference to be under the explore angle again
     while(abs(check_angle-init_check_angle) < EXPLORE_ANGLE) {
       refresh_angle();
     }
     stop_mov_motors();
 }
 
-// void continue_until(float goal)
-// {
-//
-//     distance = get_distance();
-//     if(distance <= goal) return;
-//     float init_distance = distance;
-//     float init_coord[2] = {x,y};
-//     angle = get_angle();
-//     start_straight(ROBOT_SPEED_INCREMENT);
-//     //	Sleep( 300 );
-//     // sleep(200);
-//     int init_time = time(NULL);
-//     while(distance > goal /*&& abs(distance-init_distance) < closest_obstacle - DISTANCE_BEFORE_STOP*/)
-//     {
-//         distance = get_distance();
-//         angle = get_angle();
-//         get_new_coordinates(init_coord[0],
-//                             init_coord[1],
-//                             distance-init_distance,
-//                             angle-init_angle);
-//         int current_time = time(NULL)-init_time;
-//         if(current_time > POSITION_MESSAGE_DELAY)
-//         {
-//             printf("x : %f   ;   y : %f\n", x, y);
-//             init_time = time(NULL);
-//         }
-//     }
-//     stop_mov_motors();
-// }
+void continue_until(float goal)
+{
+
+    distance = get_distance();
+    if(distance <= goal) return;
+    float init_distance = distance;
+    //float init_coord[2] = {x,y};
+    angle = get_angle();
+    start_straight(ROBOT_SPEED_INCREMENT);
+    //	Sleep( 300 );
+    // sleep(200);
+    int init_time = time(NULL);
+    while(distance > goal /*&& abs(distance-init_distance) < closest_obstacle - DISTANCE_BEFORE_STOP*/)
+    {
+        distance = get_distance();
+        angle = get_angle();
+        // get_new_coordinates(init_coord[0],
+        //                     init_coord[1],
+        //                     distance-init_distance,
+        //                     angle-init_angle);
+        // int current_time = time(NULL)-init_time;
+        // if(current_time > POSITION_MESSAGE_DELAY)
+        // {
+        //     printf("x : %f   ;   y : %f\n", x, y);
+        //     init_time = time(NULL);
+        // }
+    }
+    stop_mov_motors();
+}
 
 int moveThisDistance(float goal_dist)
 // returns 0 if it makes it to that distance
@@ -323,7 +324,7 @@ int  grab(int instruct)
         int time;
         if (instruct == 1)
         {
-            time = 1100;   
+            time = 1100;
         } else {
             time = 1800;
         }
@@ -344,8 +345,8 @@ int  grab(int instruct)
             Sleep(2000);
             set_tacho_stop_action_inx( grab_motor, TACHO_COAST );
             set_tacho_speed_sp( grab_motor, instruct*MOV_MOTORS_MAX_SPEED * 1 / 10 );
-            set_tacho_time_sp( grab_motor, 600 );     
-            set_tacho_command_inx( grab_motor, TACHO_RUN_TIMED );      
+            set_tacho_time_sp( grab_motor, 600 );
+            set_tacho_command_inx( grab_motor, TACHO_RUN_TIMED );
         }
                 ///////////   RUN TO REAL POSITION
 

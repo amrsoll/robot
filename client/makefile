@@ -2,7 +2,7 @@
 # @Date:   08/01/2018
 # @Email:  axel.soll@telecom-paristech.fr
 # @Last modified by:   madafaka
-# @Last modified time: 15/01/2018
+# @Last modified time: 19/01/2018
 
 
 
@@ -16,7 +16,7 @@ ifeq ($(ARCH),x86_64) #this means we are on the docker platform
 	CC=arm-linux-gnueabi-gcc
 	CFLAGS=-W -Wall -ansi -pedantic
 	LDFLAGS=-I/src/ev3dev-c/source/ev3/ -lm /src/ev3dev-c/lib/libev3dev-c.a
-	BT= -lbluetooth
+	BT= #-lbluetooth
 endif
 ifeq ($(ARCH),armv5tejl) #this means we are compiling on the brick
 	CC=gcc
@@ -29,10 +29,10 @@ EXEC=robotclient
 
 all: $(EXEC)
 
-$(EXEC): $(EXEC).o gsyst.o #path.o spot.o servercom.o #map.o
+$(EXEC): $(EXEC).o gsyst.o classes.o #path.o spot.o servercom.o map.o
 	$(CC) $^ $(LDFLAGS) -o $(EXEC) $(BT)
 
-$(EXEC).o: robotclient.c gsyst.h constants.m #path.h spot.h servercom.h #map.h
+$(EXEC).o: robotclient.c gsyst.h classes.h constants.m path.h spot.h servercom.h map.h
 	$(CC) -o $@ -c $< $(LDFLAGS) $(BT)
 
 ###### compile the test files for each module
@@ -42,7 +42,7 @@ ball: ball_test.o ball.o
 ball_test.o: ball_test.c ball.h constants.m
 	$(CC) -o $@ -c $< $(LDFLAGS)
 
-map: map_test.o gsyst.o map.o classes.o
+map: map_test.o gsyst.o map.o classes.o spot.o
 	$(CC) $^ $(LDFLAGS) -o map
 map_test.o: map_test.c map.h gsyst.h constants.m classes.h
 	$(CC) -o $@ -c $< $(LDFLAGS)

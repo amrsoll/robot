@@ -3,10 +3,17 @@
  * @Date:   15/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   madafaka
- * @Last modified time: 15/01/2018
+ * @Last modified time: 22/01/2018
  */
 
 #include "gsyst.h"
+#include <signal.h>
+
+void sigint_handler()
+{
+    stop_mov_motors();
+    exit(1);
+}
 
 int sensor_init() {
     ev3_sensor_init();
@@ -39,6 +46,7 @@ int motors_init() {
 
 void main()
 {
+    signal(SIGINT, sigint_handler);
 	motors_init();
     sensor_init();
     init_mov_motors();

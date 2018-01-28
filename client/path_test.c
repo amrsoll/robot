@@ -3,7 +3,7 @@
  * @Date:   15/01/2018
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   madafaka
- * @Last modified time: 15/01/2018
+ * @Last modified time: 22/01/2018
  */
 
 #include "path.h"
@@ -12,7 +12,7 @@
 
 int main(int argc, char **argv) {
     char* map =
-    "#    ###      #\n#    ###      #\n#    ###      #\n#    ###      #\n#    ###      #\n#    ###      #\n#             #\n#    ###      #\n#    ###      #\n";
+    "#    ##########\n###############\n###############\n";//#    ###      #\n#    ###      #\n#    ###      #\n#             #\n#    ###      #\n#    ###      #\n";
     /*
     "#    ###      #\n
     #    ###      #\n
@@ -26,9 +26,9 @@ int main(int argc, char **argv) {
     */
 
     int width = 15;
-    int height = 9;
-    tCoord start_coord = tCoord_new(2,2);
-    tCoord goal_coord = tCoord_new(6,12);
+    int height = 3;
+    tCoord start_coord = tCoord_new(0,2);
+    tCoord goal_coord = tCoord_new(0,3);
     getPathTo(start_coord, goal_coord, width, height, map);
 
 

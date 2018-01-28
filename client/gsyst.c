@@ -2,7 +2,7 @@
  * @Author: Natalia Balalaeva <nataliabalalaeva>
  * @Date:   08/01/2018
  * @Last modified by:   madafaka
- * @Last modified time: 19/01/2018
+ * @Last modified time: 22/01/2018
  */
 
 
@@ -170,35 +170,46 @@ float scan_for_obstacle()
     refresh_distance();
     refresh_angle();
     float init_check_angle = angle;
-    float check_angle = init_check_angle;
     float closest_obstacle = distance;
     //turn around to see how far you can go
     start_turn(1);
-    while(abs(check_angle-init_check_angle) < EXPLORE_ANGLE) {
+    while(abs(angle-init_check_angle) < EXPLORE_ANGLE) {
       refresh_angle();
     }
+    refresh_angle();
     stop_mov_motors();
     //turn back the other way and scan.
     start_turn(-1);
-    sleep(200); //wait for the difference to be under the explore angle again
-    refresh_angle();
-    init_check_angle = angle;
-    while(abs(angle-init_check_angle) < EXPLORE_ANGLE)
+    printf("angle 1 %f\n", angle);
+    while(abs(angle-init_check_angle) > EXPLORE_ANGLE){
+        refresh_angle();
+        printf("angle 2 %f\n", angle);
+    }
+    while(abs(angle-init_check_angle) <= EXPLORE_ANGLE)
     {
+        printf("angle 3 %f\n", angle);
         get_sensor_value0(sn_sonar, &distance );
-        if(distance*sin(2*pi*(angle-init_check_angle)/FULL_TURN_ANGLE) < ROBOT_RADIUS
+        if(distance*sin(2*pi*(angle-init_check_angle)/FULL_TURN_ANGLE) < ROBOT_RADIUS*10
         && distance*cos(2*pi*(angle-init_check_angle)/FULL_TURN_ANGLE) < closest_obstacle ) {
-          closest_obstacle = distance*cos(angle - init_check_angle);
+          closest_obstacle = distance*cos(2*pi*(angle - init_check_angle)/FULL_TURN_ANGLE);
         }
+        printf("distance         : %f\n", distance);
+        printf("closest obstacle : %f\n", closest_obstacle);
         refresh_angle();
     }
     stop_mov_motors();
     start_turn(1);
-    sleep(200); //wait for the difference to be under the explore angle again
-    while(abs(check_angle-init_check_angle) < EXPLORE_ANGLE) {
-      refresh_angle();
+    while(abs(angle-init_check_angle) >= EXPLORE_ANGLE){
+        refresh_angle();
     }
+    printf("angle %f\n", angle);
+    while(angle +1 < init_check_angle) {
+      refresh_angle();
+      printf("angle 4 %f\n", angle);
+    }
+    printf("outside loop\n" );
     stop_mov_motors();
+    return closest_obstacle;
 }
 
 void continue_until(float goal)

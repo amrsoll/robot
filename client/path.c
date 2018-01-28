@@ -3,7 +3,7 @@
 * @Date:   13/01/2018
 * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   madafaka
- * @Last modified time: 15/01/2018
+ * @Last modified time: 22/01/2018
 */
 
 
@@ -72,16 +72,16 @@ struct node * addEdge(struct node * head, int vertex, int weight)
 // Retuns the vertex which is not visited and has least distance
 int getMinVertex(int distances[], int visited[], int vertices)
 {
-  int min = INT_MAX, index = -1, i;
+    int min = INT_MAX, index = -1, i;
 
-  for (i = 1; i <= vertices; ++i) {
-    if (visited[i] == 0 && min > distances[i]) {
-      min = distances[i];
-      index = i;
+    for (i = 0; i < vertices; ++i) {
+        if (visited[i] == 0 && min > distances[i]) {
+            min = distances[i];
+            index = i;
+        }
     }
-  }
 
-  return index;
+    return index;
 }
 
 // Dijkstra's Algorithm function
@@ -90,7 +90,8 @@ void dijkstra(struct node * adjacencyList[], int vertices, int start_Vertex, int
     int i, visited[vertices + 1];
 
     // Initially no routes to vertices are know, so all are infinity
-    for (i = 1; i <= vertices; ++i) {
+    for (i = 0; i < vertices; ++i) {
+        printf("Dijkstra init: %d\n", i);
         distances[i] = INT_MAX;
         parent[i] = 0;
         visited[i] = 0;
@@ -99,23 +100,28 @@ void dijkstra(struct node * adjacencyList[], int vertices, int start_Vertex, int
     // Setting distance to source to zero
     distances[start_Vertex] = 0;
 
-    for (i = 1; i <= vertices; ++i) {     // Untill there are vertices to be processed
+    for (i = 0; i < vertices; ++i) {     // Untill there are vertices to be processed
+        printf("\nsearch the parents of :%d    ",i);
         int minVertex = getMinVertex(distances, visited, vertices); // Greedily process the nearest vertex
-    struct node * trav = adjacencyList[minVertex];    // Checking all the vertices adjacent to 'min'
-    visited[minVertex] = 1;
-
+        struct node * trav = NULL;
+        if(minVertex > 0)
+            trav = adjacencyList[minVertex];    // Checking all the vertices adjacent to 'min'
+        visited[minVertex] = 1;
+        int j=1;
         while (trav != NULL) {
-          int u = minVertex;
-          int v = trav->vertex;
-          int w = trav->weight;
-
+            printf("nb parents : %d  ",j++ );
+            int u = minVertex;
+            int v = trav->vertex;
+            int w = trav->weight;
             if (distances[u] != INT_MAX && distances[v] > distances[u] + w) {
                 // a new shortest route, make the neccesary adjustments in data
                 distances[v] = distances[u] + w;
                 parent[v] = u;
             }
             trav = trav->next;
+            printf("check valeurs de trav ok\n");
         }
+        printf("fin for\n");
     }
 }
 
@@ -155,7 +161,7 @@ int getPathTo(tCoord start_coord, tCoord goal_coord, int width, int height, char
     int parent[vertices + 1];
     tCoord coord_correspond[vertices + 1];
 
-    for (i = 0; i <= vertices; ++i) { // Must initialize array
+    for (i = 0; i < vertices; ++i) { // Must initialize array
           adjacencyList[i] = NULL;
     }
     // get all of the free pixels in the same list
@@ -172,6 +178,7 @@ int getPathTo(tCoord start_coord, tCoord goal_coord, int width, int height, char
         }
     }
     int number_vertices = k; //int vertices
+    printf("number of vertices : %d\n  vertives buffer : %d\n\n", number_vertices, vertices);
     //add edges between all of the
     for(v1=0;v1<number_vertices;v1++)
     {
@@ -182,15 +189,16 @@ int getPathTo(tCoord start_coord, tCoord goal_coord, int width, int height, char
         // because we read the list of free cells from the top left.
         int l;
         for(l=0;l<4;l++)
-            if(  neighbours[l].i>coord_correspond[v1].i
-               ||neighbours[l].j>coord_correspond[v1].j)
-            {
-                printf("parent : %d,%d    tested son : %d,%d\n",coord_correspond[v1].i,coord_correspond[v1].j, neighbours[l].i,neighbours[l].j);
-                v2 = get_pos_in_list(coord_correspond, number_vertices, neighbours[l]);
-                adjacencyList[v1] = addEdge(adjacencyList[v1], v2, 1); // the weight will always be 1
-            }
+        if(  neighbours[l].i>coord_correspond[v1].i
+           ||neighbours[l].j>coord_correspond[v1].j)
+        {
+            printf("parent : %d,%d and ID : %d   tested son : %d,%d\n",coord_correspond[v1].i,coord_correspond[v1].j,v1, neighbours[l].i,neighbours[l].j);
+            v2 = get_pos_in_list(coord_correspond, number_vertices, neighbours[l]);
+            printf("tested son ID: %d\n",v2);
+            adjacencyList[v1] = addEdge(adjacencyList[v1], v2, 1); // the weight will always be 1
+        }
     }
-    printf("start coord : %d,%d ; goal cpoord : %d,%d\n", start_coord.i, start_coord.j, goal_coord.i,goal_coord.j);
+    printf("start coord : %d,%d ; goal coord : %d,%d\n", start_coord.i, start_coord.j, goal_coord.i,goal_coord.j);
 
     int start_Vertex = get_pos_in_list(coord_correspond, number_vertices, start_coord);
     int goal_Vertex =  get_pos_in_list(coord_correspond, number_vertices, goal_coord);
@@ -198,7 +206,9 @@ int getPathTo(tCoord start_coord, tCoord goal_coord, int width, int height, char
     dijkstra(adjacencyList, number_vertices, start_Vertex, distances, parent);
 
     //The file onto which we will write the nodes for when the robot moves around
-    remove(PATH_PATH);
+
+    printf("create pathfile");
+    // remove(PATH_PATH);
     FILE *path = fopen(PATH_PATH, "w");
     if (goal_Vertex == start_Vertex) {  // reached the source goal_Vertex
         fprintf_tCoord_to_str(path, coord_correspond[goal_Vertex] );

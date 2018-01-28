@@ -3,7 +3,7 @@
  * @Date:   19/12/2017
  * @Email:  axel.soll@telecom-paristech.fr
  * @Last modified by:   madafaka
- * @Last modified time: 15/01/2018
+ * @Last modified time: 22/01/2018
  */
 
 #include "spot.h"
@@ -23,7 +23,7 @@ void get_neighbours_of_same_char(tCoord tc, char c,tCoord* output, int width, in
     int i=0;
     tCoord neighbour;
     int j=0;
-    printf("                  break 4  %d , %d\n",tc.i,tc.j);
+    //printf("                  break 4  %d , %d\n",tc.i,tc.j);
     while(i<4)
     {
         j<<=1;

@@ -49,13 +49,13 @@
 
             <h2 class="titre">Algorithms</h2>
             <div class="row case">
-                <!-- <a class="col-xs-6 col-sm-4 col-lg-2 btn"href="#strategy">Strategy</a> -->
+                <a class="col-xs-6 col-sm-4 col-lg-2 btn"href="#strategy">Strategy</a>
                 <a class="col-xs-6 col-sm-4 col-lg-2 btn"href="#structure">Structure</a>
                 <a class="col-xs-6 col-sm-4 col-lg-2 btn"href="#protocol">Protocol</a>
                 <a class="col-xs-6 col-sm-4 col-lg-2 btn"href="#gsyst">Guidance System</a>
                 <a class="col-xs-6 col-sm-4 col-lg-2 btn"href="#scanning">Scanning</a>
                 <a class="col-xs-6 col-sm-4 col-lg-2 btn"href="#path">Pathfinding</a>
-                <a class="col-xs-6 col-sm-4 col-lg-2 btn"href="#obstacles">Movable Obstacles</a>
+                <!-- <a class="col-xs-6 col-sm-4 col-lg-2 btn"href="#obstacles">Movable Obstacles</a> -->
             </div>
 
             <div class="row case" id="strategy">
@@ -212,12 +212,50 @@ mrproper: clean
                 <h3>Our protocol</h3>
                 <div class="col-lg-10 col-lg-offset-1 col-sm-12" style="text-align:justify">
                     <p>
-                        The map is the string <code>char* map</code>.
+                        Upon receiving the start signal, the robot starts by creating a thread that will send the position to the
+                        server every 2 second through the use of <code>pthread_create(&positioning, NULL, thSendPosition, NULL)</code>
+                        and a second thread to receive any secial instructions sent from the server : <code>pthread_create(&receiving, NULL, thReceiveFromServer, NULL)</code> <br>
+                        Then, the initial map is generated! <code>char* map = get_new_local_map(width, height);</code> The map's width and height is given as arguments when launching the program.<br>
                         Each character represents a tile -- or pixel -- for wether it is a
-                        free tile, a wall or a yet unknown space in the arena. <br> <br>
-                        Describe what the main function does in robotclient.c.
+                        free tile, a wall or a yet unknown space in the arena.
                     </p>
-<pre><code>/* give robotclient.c here */
+<pre><code>/* Code for the rest of the program on the large arena */
+// position the robot at one extremity of the map
+start_position = tCoord_new(width/2, height - 300*MM_TO_PIX_SIZE); //This automaticaly creates a virtual wall behind the robot
+
+// scan a first time to get the surroundings :
+scan(robotPosition, start_position, width, height, map);
+tCoord previousSpots[4*width*height/(DIST_MIN_FROM_WALLS*DIST_MIN_FROM_WALLS)]; //A list of all the spots ou robot is going to go
+size_t size_previousSpots = 0;
+while(!mapComplete(map))
+{   // determine a new spot in order to maximise the new area to explore
+    tCoord spot = getNewSpot(Point_to_tCoord(fPoint_to_Point(robotPosition), start_position),
+                             width,
+                             height,
+                             map);
+    previousSpots[size_previousSpots++] = spot;
+    if(getPathTo(spot))  // writes into a file the checkpoints we have to go by in order to avoid obstacles
+    {
+        printf("failed to find the path to the new coordinates");
+        exit(EXIT_FAILURE);
+    }
+    FILE *path = fopen(PATH_PATH, "r"); //PATH_PATH is the path to the fie containing the checkpoints
+    int pathLen = countlines(path);
+    fclose(path);
+    int i;
+    for(i=0; i&ltpathLen; i++)
+    {
+        tCoord checkPoint = getCheckpoint(i, pathLen); //pops the next node from the file.
+        if(moveTo(checkPoint, start_position, map))
+        {
+            printf("failed to move to the next coordinates");
+            exit(EXIT_FAILURE);
+        }
+    }
+    scan(robotPosition, start_position, width, height, map); //finally, when we get to the right spot, scan and start over
+}
+DONE_EXPLORING = 1; //signals the threads to stop
+sendMap();
 </code></pre>
                 </div>
             </div>
@@ -227,12 +265,18 @@ mrproper: clean
                     <div class="panel panel-default">
                         <h4 class="panel-title panel-heading">
                             <a data-target="#strategy-further" href="#strategy-further" data-toggle="gsdk-collapse">
-                                Learn more - Protocol
+                                Learn more - our home made structures
                             </a>
                         </h4>
                         <div id="strategy-further" class="panel-collapse collapse">
                             <div class="panel-body">
-                                <p>yup yup</p><br>
+                                <p>We have made several useful structures to represent coordinates for either :</p>
+                                <ul>
+                                    <li>Cells in a table <code>tCoord</code></li>
+                                    <li>Integer points <code>Point</code></li>
+                                    <li>Floating points <code>fPoint</code></li>
+                                </ul>
+                                <p>They are used extensively in the project and we encourage looking at how we define and use them in classes.h and classes.c.</p><br>
                             </div>
                         </div>
                     </div>
@@ -406,24 +450,11 @@ mrproper: clean
                         preferably without hitting anything. This is why we need to find the right path
                         using a "greedy" version of the Dijkstra algorithm (some people might say that we cut corners...)
                     </p>
-<pre><code>/* code */
-</code></pre>
                 </div>
             </div>
 
             <div class="row case language-C"  id="servercom">
                 <h3>Server Communications</h3>
-                <div class="col-lg-10 col-lg-offset-1 col-sm-12" style="text-align:justify">
-                    <p>
-                        TODO
-                    </p>
-<pre><code>/* code */
-</code></pre>
-                </div>
-            </div>
-
-            <div class="row case language-C"  id="obstacles">
-                <h3>Movable obstacles</h3>
                 <div class="col-lg-10 col-lg-offset-1 col-sm-12" style="text-align:justify">
                     <p>
                         TODO

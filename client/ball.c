@@ -1,6 +1,16 @@
+/**
+ * @Author: Axel_Soll <amrsoll>
+ * @Date:   04/01/2018
+ * @Email:  axel.soll@telecom-paristech.fr
+ * @Last modified by:   amrsoll
+ * @Last modified time: 08/01/2018
+ */
+
+
+
 // #include "ball.h"
 //
-// const char const *colourName[] = { "?", "BLACK", "BLUE", "GREEN", "YELLOW", "RED", "WHITE", "BROWN" };
+//  char  *colourName[] = { "?", "BLACK", "BLUE", "GREEN", "YELLOW", "RED", "WHITE", "BROWN" };
 // #define NB_COLOUR  (( int )( sizeof( colourName ) / sizeof( colourName[ 0 ])))
 //
 // int init_colour()

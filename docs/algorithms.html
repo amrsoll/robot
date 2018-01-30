@@ -388,15 +388,15 @@ sendMap();
                                 </p>
                                 <ul>
                                     <li>Problem 1 : If the measured distance is farther than about 35cm,
-                                        the scanning would skip some pixels over and therefore
-                                        create a "hole in the wall"</li>
+                                        the scanning would skip some pixels over -- each measure on a wall
+                                        would be non-adjacent pixels -- and therefore create a "hole in the wall"</li>
                                     <li>Problem 2 : Stright walls would look curved due to the way we measure
                                         the angle and the delay before measuring distance</li>
                                     <li>Problem 3 : The sonar would make inexplicable and arbitrary jumps
                                         on a continuous surface</li>
                                 </ul>
-                                <p>These issues are very well illustrated in this example of a
-                                    test with the <a onclick="show_scan_fail()">scan</a></p>
+                                <!-- <p>These issues are very well illustrated in this example of a
+                                    test with the <a onclick="show_scan_fail()">scan</a></p> -->
                                 <img id="scan_fail" class="hidden" src="" alt="">
 
                                 <h4>Solutions :</h4>
@@ -420,9 +420,6 @@ sendMap();
                                     to optimise a lot of the code involved during scanning. None of the
                                     following changes make an enormous speed increase, but are significant.</p>
                                 <ul>
-                                    <li>Instanciate a variable once instead of multiple times over.</li>
-                                    <p class="sub">Example : the variable <code>coord</code>
-                                        can be instanciated before starting to turn and rewritten during the scan</p>
                                     <li>Prefer arithmetic solution over analityc ones</li>
                                     <p class="sub"><code>free_pixels_between(...)</code> and
                                         <code>free_pixels_in_trigon(...)</code> were very poorly designed in that regard</p>
@@ -433,7 +430,10 @@ sendMap();
                                     <p class="sub">It can happen that two measures can land in the same tile. In that case, the
                                     simplified code would start rewritting over the same pixels.</p>
                                 </ul>
-
+                                <h4>Interpolation</h4>
+                                <p>This is an option we didn't try extensively but the ideas is to record the duration between
+                                    the measure of the angle and the distance. Then, a function would correct the current angle
+                                    with the knowledge of the rotation speed</p>
                                 <br>
                             </div>
                         </div>

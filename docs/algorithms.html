@@ -133,7 +133,7 @@
                     <div class="panel panel-default">
                         <h4 class="panel-title panel-heading">
                             <a data-target="#makefile" href="#makefile" data-toggle="gsdk-collapse">
-                                The makefile : compile from multiple sources
+                                The makefile : compile from multiple sources [expand]
                             </a>
                         </h4>
                         <div id="makefile" class="panel-collapse collapse">
@@ -265,7 +265,11 @@ sendMap();
                     <div class="panel panel-default">
                         <h4 class="panel-title panel-heading">
                             <a data-target="#strategy-further" href="#strategy-further" data-toggle="gsdk-collapse">
+<<<<<<< HEAD
                                 Learn more - our home made structures
+=======
+                                Learn more - Protocol [expand]
+>>>>>>> c6c5f1d00c03dbd7ba0ebcc08fb29d7951a21646
                             </a>
                         </h4>
                         <div id="strategy-further" class="panel-collapse collapse">
@@ -379,7 +383,7 @@ sendMap();
                     <div class="panel panel-default">
                         <h4 class="panel-title panel-heading">
                             <a data-target="#collapseOne" href="#collapseOne" data-toggle="gsdk-collapse">
-                                Technical difficulties
+                                Technical difficulties [expand]
                             </a>
                         </h4>
                         <div id="collapseOne" class="panel-collapse collapse">
@@ -457,9 +461,71 @@ sendMap();
                 <h3>Server Communications</h3>
                 <div class="col-lg-10 col-lg-offset-1 col-sm-12" style="text-align:justify">
                     <p>
-                        TODO
+                        To communicate with the game server, we have implemented the protocol described in the <a href="https://gitlab.eurecom.fr/ludovic.apvrille/OS_Robot_Project_Fall2017" target="_blank">project repository</a>. We used threads to let the robot listen for server messages and periodically send its position.
                     </p>
-<pre><code>/* code */
+<pre><code>ssize_t read_from_server(int sock, char *msg, size_t maxSize) {
+    printf("meh\n");
+    ssize_t bytes_read = read(sock, msg, maxSize);
+    printf("meh?\n");
+    if (bytes_read <= 0) {
+        fprintf(stderr, "Server unexpectedly closed connection...\n");
+        close(sock);
+        exit(EXIT_FAILURE);
+    }
+    printf("[DEBUG] received %d bytes\n", bytes_read);
+    return bytes_read;
+}
+
+int send_to_server(int sock, char *data, size_t size) {
+    return write(sock, data, size);
+}
+
+int send_POSITION(int sock, int16_t x, int16_t y){
+    char string[9];
+    *((uint16_t *) string) = msgId++;
+    string[2] = TEAM_ID;
+    string[3] = 0xFF;
+    string[4] = MSG_POSITION;
+    string[5] = x;
+    string[6] = 0x00;
+    string[7] = y;
+    string[8] = 0x00;
+    return send_to_server(sock, string, 9);
+}
+
+int send_MAPDATA(int sock, int16_t x, int16_t y, uint8_t R, uint8_t G, uint8_t B){
+    char string[12];
+    *((uint16_t *) string) = msgId++;
+    string[2] = TEAM_ID;
+    string[3] = 0xFF;
+    string[4] = MSG_MAPDATA;
+    string[5] = x;
+    string[6] = 0x00;
+    string[7] = y;
+    string[8] = 0x00;
+    string[9] = R; // red value of pixel
+    string[10] = G; // green value of pixel
+    string[11] = B; // blue value of pixel
+    return send_to_server(sock, string, 12);
+}
+
+int send_MAPDONE(int sock) {
+    char string[5];
+    *((uint16_t *) string) = msgId++;
+    string[2] = TEAM_ID;
+    string[3] = 0xFF;
+    string[4] = MSG_MAPDONE;
+    return send_to_server(sock, string, 5);
+}
+
+void *thSendPosition() {
+    while(!DONE_EXPLORING) {
+        Sleep(2000);
+        setPosition();
+        send_POSITION(s, posX, posY);
+    }
+    pthread_exit(NULL);
+}
 </code></pre>
                 </div>
             </div>
